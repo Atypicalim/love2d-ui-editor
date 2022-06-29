@@ -2,7 +2,7 @@
     test
 ]]
 
-require('pure-lua-tools/initialize')
+require('tools/initialize')
 local Editor = require('editor/editor')
 
 local debug = true
