@@ -1,6 +1,0 @@
-[submodule "gooi"]
-	path = gooi
-	url = git@github.com:tavuntu/gooi.git
-[submodule "tools"]
-	path = tools
-	url = git@github.com:kompasim/pure-lua-tools.git

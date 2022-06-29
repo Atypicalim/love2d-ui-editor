@@ -2,7 +2,8 @@
     test
 ]]
 
-require('tools/initialize')
+require('thirds/pure-lua-tools/initialize')
+require('thirds/gooi/gooi')
 local Editor = require('editor/editor')
 
 local debug = true
