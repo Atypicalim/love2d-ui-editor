@@ -2,10 +2,10 @@
 	rectangle
 ]]
 
-Rectangle = Node:ext()
+Rectangle = class("Rectangle", Node)
 
-function Rectangle:init(conf, parent)
-	Node.init(self, conf, parent)
+function Rectangle:__init__(conf, parent)
+	Node.__init__(self, conf, parent)
 end
 
 function Rectangle:draw()

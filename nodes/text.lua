@@ -2,11 +2,11 @@
 	Text
 ]]
 
-Text = Node:ext()
+Text = class("Text", Node)
 
-function Text:init(conf, parent)
+function Text:__init__(conf, parent)
 	self._text = conf.text
-	Node.init(self, conf, parent)
+	Node.__init__(self, conf, parent)
 end
 
 function Text:_adjust()

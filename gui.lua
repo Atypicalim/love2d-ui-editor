@@ -2,6 +2,9 @@
 	gui
 ]]
 
+require('thirds/pure-lua-tools/initialize')
+require('thirds/gooi/gooi')
+
 require 'others/constants'
 require 'others/tools'
 require 'nodes/node'
@@ -9,37 +12,37 @@ require 'nodes/button'
 require 'nodes/text'
 require 'nodes/rectangle'
 
-local Gui = Object:ext()
+local Gui = class('Gui')
 
-function Gui:init(uiPath)
+function Gui:__init__(uiPath, x, y, w, h, bgColor)
+	assert(string.valid(uiPath) and files.is_file(uiPath), 'invalid ui path!')
+	assert(is_number(x), 'invalid ui x!')
+	assert(is_number(y), 'invalid ui y!')
+	assert(is_number(w), 'invalid ui w!')
+	assert(is_number(h), 'invalid ui h!')
+	assert(bgColor == nil or is_table(bgColor), 'invalid ui color!')
 	self._config = table.read_from_file(uiPath)
-	self._options = self._config.options
-	self._window = self._config.window
-	self._root = Node:new({
-		x = self._window.w / 2,
-		y = self._window.w / 2,
-		w = self._window.w,
-		h = self._window.h,
+	self._canvas = Rectangle({
+		type = "Rectangle",
+		id = "bgCanvas",
+		x = x,
+		y = y,
+		w = w,
+		h = h,
+		color = bgColor or {10, 10, 10, 150},
 	})
-	self._children = tools_create_nodes(self._config.children, self._root)
-end
-
-function Gui:load()
-	love.window.setMode(self._window.w, self._window.h)
-	love.window.setPosition(self._window.x, self._window.y)
-	love.window.setTitle(self._options.title)
-	love.window.setFullscreen(self._options.fullscreen)
+	self._children = tools_create_nodes(self._config, self._canvas)
 end
 
 function Gui:update(dt)
+	self._canvas:update(dt)
 	for i,v in ipairs(self._children) do
-		v:update()
+		v:update(dt)
 	end
 end
 
 function Gui:draw()
-	tools_set_color(self._options.background)
-    love.graphics.rectangle("fill", 0, 0, self._window.w, self._window.h)
+	self._canvas:draw()
 	for i,v in ipairs(self._children) do
 		v:draw()
 	end

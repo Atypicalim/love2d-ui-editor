@@ -2,14 +2,10 @@
     test
 ]]
 
-require('thirds/pure-lua-tools/initialize')
-require('thirds/gooi/gooi')
 local Editor = require('editor/editor')
 
-local debug = true
-
 function love.load()
-    editor = Editor:new()
+    editor = Editor()
     editor:load()
 end
 

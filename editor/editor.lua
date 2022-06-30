@@ -2,17 +2,28 @@
 	editor
 ]]
 
-local Editor = Object:ext()
+require('thirds/pure-lua-tools/initialize')
+require('thirds/gooi/gooi')
+
+local Editor = class("Editor")
 local Gui = require('gui')
 
-function Editor:init()
-    self.eui = Gui:new("./editor/editor.ui.lua")
+local EDITOR_X = 100
+local EDITOR_Y = 100
+local EDITOR_W = 1000
+local EDITOR_H = 800
+
+function Editor:__init__()
+    self.eui = Gui("./editor/editor.ui.lua", EDITOR_W / 2, EDITOR_H / 2, EDITOR_W, EDITOR_H)
 end
 
 function Editor:load()
     width = love.graphics.getWidth()
     height = love.graphics.getHeight()
-    self.eui:load()
+	love.window.setMode(EDITOR_W, EDITOR_H)
+	love.window.setPosition(EDITOR_X, EDITOR_Y)
+	love.window.setTitle("Editor!")
+	love.window.setFullscreen(false)
 end
 
 function Editor:update(dt)
@@ -27,15 +38,10 @@ function Editor:keypressed(key, scancode, isrepeat)
     if key == 'escape' then
         love.event.quit()
     elseif key == 'f5' then
-        if debug then
-            love.event.quit('restart')
-        end
+        love.event.quit('restart')
     elseif key == 'space' or key == 'return' then
-        if debug then
-            updateWindow()
-        end
+        --
     end
-    print(key, scancode, isrepeat)
 end
 
 return Editor

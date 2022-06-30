@@ -2,9 +2,9 @@
 	node
 ]]
 
-Node = Object:ext()
+Node = class("Node")
 
-function Node:init(conf, parent)
+function Node:__init__(conf, parent)
 	self._conf = conf
 	self._parent = parent
 	self._x = is_number(self._conf.x) and self._conf.x or tools_calculate_number(self._parent:getW(), self._conf.x)

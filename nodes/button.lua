@@ -2,10 +2,10 @@
 	button
 ]]
 
-Button = Node:ext()
+Button = class("Button", Node)
 
-function Button:init(conf, parent)
-	Node.init(self, conf, parent)
+function Button:__init__(conf, parent)
+	Node.__init__(self, conf, parent)
 end
 
 function Button:draw()
