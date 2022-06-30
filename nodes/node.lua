@@ -4,7 +4,7 @@
 
 Node = class("Node")
 
-function Node:__init__(conf, parent)
+function Node:__init__(gui, conf, parent)
 	self._conf = conf
 	self._parent = parent
 	self._x = is_number(self._conf.x) and self._conf.x or tools_calculate_number(self._parent:getW(), self._conf.x)
@@ -21,7 +21,7 @@ function Node:__init__(conf, parent)
 	self:_adjust()
 	--
 	self._isHide = self._conf.hide == true
-	self._children = tools_create_nodes(self._conf.children or {}, self)
+	self._children = gui:create(self._conf.children or {}, self)
 end
 
 function Node:_adjust()
@@ -61,10 +61,12 @@ end
 
 function Node:setXY(x, y)
 	self._x, self._y = x, y
+	self:_adjust()
 end
 
 function Node:setWH(w, h)
-	self._w, self._h = 0, 0
+	self._w, self._h = w, h
+	self:_adjust()
 end
 
 function Node:getXY()
@@ -77,18 +79,22 @@ end
 
 function Node:setX(x)
 	self._x = x
+	self:_adjust()
 end
 
 function Node:setY(y)
 	self._y = y
+	self:_adjust()
 end
 
 function Node:setW(w)
 	self._w = w
+	self:_adjust()
 end
 
 function Node:setH(h)
 	self._h = h
+	self:_adjust()
 end
 
 function Node:getX(x)
@@ -105,4 +111,8 @@ end
 
 function Node:getH(h)
 	return self._h
+end
+
+function Node:getConf()
+	return self._conf
 end

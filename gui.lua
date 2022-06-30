@@ -22,7 +22,7 @@ function Gui:__init__(uiPath, x, y, w, h, bgColor)
 	assert(is_number(h), 'invalid ui h!')
 	assert(bgColor == nil or is_table(bgColor), 'invalid ui color!')
 	self._config = table.read_from_file(uiPath)
-	self._canvas = Rectangle({
+	self._canvas = Rectangle(self, {
 		type = "Rectangle",
 		id = "bgCanvas",
 		x = x,
@@ -31,7 +31,8 @@ function Gui:__init__(uiPath, x, y, w, h, bgColor)
 		h = h,
 		color = bgColor or {10, 10, 10, 150},
 	})
-	self._children = tools_create_nodes(self._config, self._canvas)
+	self._id2node = {}
+	self._children = self:create(self._config, self._canvas)
 end
 
 function Gui:update(dt)
@@ -48,11 +49,33 @@ function Gui:draw()
 	end
 end
 
+function Gui:create(configs, parent)
+	local children = {}
+	for i,v in ipairs(configs) do
+		assert(_G[v.type], string.format('node [%s] not found!', v.type))
+		local child = _G[v.type](self, v, parent)
+		table.insert(children, child)
+		if string.valid(v.id) then
+			assert(self._id2node[v.id] == nil, 'multiple node id:' .. v.id)
+			self._id2node[v.id] = child
+		end
+	end
+	return children
+end
+
 function Gui:getById(nodeId)
-	return {}
+	assert(string.valid(nodeId), 'invalid node id!')
+	return self._id2node[nodeId]
 end
 
 function Gui:getByType(nodeType)
+	local nodes = {}
+	for k,v in pairs(self._id2node) do
+		if v:getConf().type == nodeType then
+			table.insert(nodes, v)
+		end
+	end
+	return nodes
 end
 
 return Gui

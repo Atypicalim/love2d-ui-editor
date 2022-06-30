@@ -45,7 +45,7 @@
     },
     {
         type = "Rectangle",
-        id = "bgStage",
+        id = "nodeStage",
         x = '0.5',
         y = '0.5',
         w = "0.6",

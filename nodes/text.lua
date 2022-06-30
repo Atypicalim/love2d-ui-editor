@@ -4,9 +4,9 @@
 
 Text = class("Text", Node)
 
-function Text:__init__(conf, parent)
+function Text:__init__(gui, conf, parent)
 	self._text = conf.text
-	Node.__init__(self, conf, parent)
+	Node.__init__(self, gui, conf, parent)
 end
 
 function Text:_adjust()

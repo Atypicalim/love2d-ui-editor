@@ -4,8 +4,8 @@
 
 Rectangle = class("Rectangle", Node)
 
-function Rectangle:__init__(conf, parent)
-	Node.__init__(self, conf, parent)
+function Rectangle:__init__(gui, conf, parent)
+	Node.__init__(self, gui, conf, parent)
 end
 
 function Rectangle:draw()

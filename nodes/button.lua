@@ -4,8 +4,8 @@
 
 Button = class("Button", Node)
 
-function Button:__init__(conf, parent)
-	Node.__init__(self, conf, parent)
+function Button:__init__(gui, conf, parent)
+	Node.__init__(self, gui, conf, parent)
 end
 
 function Button:draw()
