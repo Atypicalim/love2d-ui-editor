@@ -9,14 +9,19 @@ require 'nodes/button'
 require 'nodes/text'
 require 'nodes/rectangle'
 
-local Gui = Node:ext()
+local Gui = Object:ext()
 
 function Gui:init(uiPath)
 	self._config = table.read_from_file(uiPath)
 	self._options = self._config.options
 	self._window = self._config.window
-	Node.init(self, self._window, nil)
-	self._children = tools_create_nodes(self._config.children, self)
+	self._root = Node:new({
+		x = self._window.w / 2,
+		y = self._window.w / 2,
+		w = self._window.w,
+		h = self._window.h,
+	})
+	self._children = tools_create_nodes(self._config.children, self._root)
 end
 
 function Gui:load()

@@ -5,15 +5,26 @@
 Text = Node:ext()
 
 function Text:init(conf, parent)
+	self._text = conf.text
 	Node.init(self, conf, parent)
-	self._x, self._y = 100, 100
-	self._w, self._h = 100, 50
+end
+
+function Text:_adjust()
+	local font = love.graphics.getFont()
+	self._w = font:getWidth(self._text)
+	self._h = font:getHeight()
+	self._targetX = self._x - self._ax * self._w
+	self._targetY = self._y - self._ay * self._h
+	if self._parent then
+		self._targetX = self._targetX + self._parent._targetX
+		self._targetY = self._targetY + self._parent._targetY
+	end
 end
 
 function Text:draw()
 	if not self._isHide then
 	    love.graphics.setColor(0.7, 0.7, 0.7, 1)
-    love.graphics.print(os.date("%Y-%m-%d_%H:%M:%S", os.time()), 10, 10, 0, 1, 1)
+		love.graphics.print(self._conf.text, self._targetX, self._targetY)
 	end
 	Node.draw(self)
 end
