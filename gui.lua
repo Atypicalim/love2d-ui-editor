@@ -21,6 +21,7 @@ function Gui:__init__(uiPath, x, y, w, h, bgColor)
 	assert(is_number(w), 'invalid ui w!')
 	assert(is_number(h), 'invalid ui h!')
 	assert(bgColor == nil or is_table(bgColor), 'invalid ui color!')
+	self._id2node = {}
 	self._config = table.read_from_file(uiPath)
 	self._canvas = Rectangle(self, {
 		type = "Rectangle",
@@ -30,23 +31,16 @@ function Gui:__init__(uiPath, x, y, w, h, bgColor)
 		w = w,
 		h = h,
 		color = bgColor or {10, 10, 10, 150},
+		children = self._config,
 	})
-	self._id2node = {}
-	self._children = self:create(self._config, self._canvas)
 end
 
 function Gui:update(dt)
 	self._canvas:update(dt)
-	for i,v in ipairs(self._children) do
-		v:update(dt)
-	end
 end
 
 function Gui:draw()
 	self._canvas:draw()
-	for i,v in ipairs(self._children) do
-		v:draw()
-	end
 end
 
 function Gui:create(configs, parent)

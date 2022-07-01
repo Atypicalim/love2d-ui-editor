@@ -7,6 +7,7 @@
         w = "1",
         h = "0.1",
         color = {10, 10, 10},
+        open = true,
         children = {
             {
                 type = "Button",

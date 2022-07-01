@@ -1,0 +1,7 @@
+--[[
+	constants
+]]
+
+TREE_ITEM_COUNT = 10
+TREE_LEAF_MARGIN = 5
+TREE_LEAF_INDENT = 10

@@ -4,9 +4,8 @@
 
 local Printer = class("Printer")
 
-function Printer:__init__(editor)
-    self._editor = editor
-    self._text = Text(self._editor.eui, {
+function Printer:__init__()
+    self._text = Text(g_egui, {
         type = "Text",
         x = 0,
         y = 0,

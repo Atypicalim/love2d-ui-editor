@@ -116,3 +116,15 @@ end
 function Node:getConf()
 	return self._conf
 end
+
+function Node:getChildren()
+	return self._children
+end
+
+function Node:getId()
+	return self._conf.id
+end
+
+function Node:getType()
+	return self._conf.type
+end
