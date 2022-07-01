@@ -72,7 +72,16 @@ function Editor:draw()
     end
 end
 
+function Editor:mousepressed(x, y, button)
+	g_egui:mousepressed(x, y, button)
+end
+
+function Editor:mousereleased(x, y, button)
+	g_egui:mousereleased(x, y, button)
+end
+
 function Editor:keypressed(key, scancode, isrepeat)
+	g_egui:keypressed(key, scancode, isrepeat)
     if key == 'escape' then
         love.event.quit()
     elseif key == 'f5' then
@@ -80,6 +89,14 @@ function Editor:keypressed(key, scancode, isrepeat)
     elseif key == 'space' or key == 'return' then
         self:setTemplate("./editor/editor.ui.lua")
     end
+end
+
+function Editor:eyreleased(key, scancode)
+	g_egui:eyreleased(key, scancode, isrepeat)
+end
+
+function Editor:textinput(text)
+	g_egui:textinput(text)
 end
 
 function Editor:setTemplate(path)

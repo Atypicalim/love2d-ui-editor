@@ -37,11 +37,33 @@ end
 
 function Gui:update(dt)
 	self._canvas:update(dt)
+	gooi.update(dt)
 end
 
 function Gui:draw()
 	self._canvas:draw()
+	gooi.draw()
 end
+
+function Gui:mousepressed(x, y, button)
+	gooi.pressed()
+end
+
+function Gui:mousereleased(x, y, button)
+	gooi.released()
+end
+
+function Gui:keypressed(key, scancode, isrepeat)
+	gooi.keypressed(key, scancode, isrepeat)
+end
+
+function Gui:eyreleased(key, scancode)
+	gooi.keyreleased(key, scancode)
+end
+
+function Gui:textinput(text)
+	gooi.textinput(text)
+  end
 
 function Gui:create(configs, parent)
 	local children = {}
