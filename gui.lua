@@ -78,4 +78,8 @@ function Gui:getByType(nodeType)
 	return nodes
 end
 
+function Gui:getRootNode()
+	return self._canvas
+end
+
 return Gui
