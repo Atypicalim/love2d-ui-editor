@@ -15,7 +15,6 @@ function Button:__init__(gui, conf, parent)
 		icon= "/media/down.png",
 	}):onRelease(function()
 		if self.onClick then self.onClick() end
-		print('click...')
     end)
 	self.btn.style.bgColor = {0.5, 0.5, 0.5}
 end

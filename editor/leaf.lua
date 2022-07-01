@@ -23,12 +23,16 @@ function Leaf:__init__(node, parent, x, y, w, h)
 		color = {10, 10, 10, 255},
 	}, self._background)
     self._btnFold = Button(g_egui, {
-        x = '0.9',
+        x = '0.5',
         y = '0.5',
         w = 15,
         h = 15,
         icon = "/media/down.png",
     }, self._background)
+    self._btnFold.onClick = function()
+        node:getConf().open = not node:getConf().open
+        g_tree:_updateTree()
+    end
     --
     self._leafs = {}
     local bgW = self._background:getW()
@@ -52,7 +56,7 @@ end
 function Leaf:setXY(x, y)
     self._background:setXY(x, y)
     self._border:setXY('0.5', '0.5')
-    self._btnFold:setXY('0.5', '0.5')
+    self._btnFold:setXY('0+15', '0.5')
     self:_updateLeafs()
 end
 
