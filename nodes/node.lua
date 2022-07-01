@@ -9,6 +9,7 @@ function Node:__init__(gui, conf, parent)
 	self._parent = parent
 	self._x = is_number(self._conf.x) and self._conf.x or tools_calculate_number(self._parent:getW(), self._conf.x)
 	self._y = is_number(self._conf.y) and self._conf.y or tools_calculate_number(self._parent:getH(), self._conf.y)
+	self._y = is_number(self._conf.y) and self._conf.y or tools_calculate_number(self._parent:getH(), self._conf.y)
 	self._w = is_number(self._conf.w) and self._conf.w or tools_calculate_number(self._parent:getW(), self._conf.w)
 	self._h = is_number(self._conf.h) and self._conf.h or tools_calculate_number(self._parent:getH(), self._conf.h)
 	self._w = math.max(0, self._w)
@@ -60,8 +61,8 @@ function Node:isVisible()
 end
 
 function Node:setXY(x, y)
-	self._x, self._y = x, y
-	self:_adjust()
+	self:setX(x)
+	self:setY(y)
 end
 
 function Node:setWH(w, h)
@@ -78,12 +79,12 @@ function Node:getWH()
 end
 
 function Node:setX(x)
-	self._x = x
+	self._x = is_number(x) and x or tools_calculate_number(self._parent:getW(), x)
 	self:_adjust()
 end
 
 function Node:setY(y)
-	self._y = y
+	self._y = is_number(y) and y or tools_calculate_number(self._parent:getH(), y)
 	self:_adjust()
 end
 

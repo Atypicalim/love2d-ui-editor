@@ -16,12 +16,12 @@ function Leaf:__init__(node, parent, x, y, w, h)
 		color = {10 * g_tree._leafDepth, 10 * g_tree._leafDepth, 10 * g_tree._leafDepth, 150},
 	}, self._parent)
     self._border = Rectangle(g_egui, {
-		x = x,
-		y = y,
-		w = w,
-		h = h,
+		x = '0.5',
+		y = '0.5',
+		w = '1',
+		h = '1',
 		color = {10, 10, 10, 255},
-	}, self._parent)
+	}, self._background)
     --
     self._leafs = {}
     local bgW = self._background:getW()
@@ -44,7 +44,7 @@ end
 
 function Leaf:setXY(x, y)
     self._background:setXY(x, y)
-    self._border:setXY(x, y)
+    self._border:setXY('0.5', '0.5')
     self:_updateLeafs()
 end
 
