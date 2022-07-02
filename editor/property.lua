@@ -10,7 +10,7 @@ function Property:__init__(key, value, x, y, w, h)
     self._parent = g_attribute._background
     --
     local info = PROPERTY_NAME_INFO[key] or {}
-    local length = 20 + (info.ignoreEdit and 3 or 0)
+    local length = 18 + (info.ignoreEdit and 3 or 0)
     local name = "[" .. tostring(self._key) .. "][" .. string.sub(tostring(self._value), 1, length)
     if #name > length then
         name = string.sub(name, 1, length - 4) .. "..."

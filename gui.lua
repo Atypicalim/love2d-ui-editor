@@ -15,30 +15,19 @@ require 'nodes/rectangle'
 
 local Gui = class('Gui')
 
-function Gui:__init__(pathOrTable, x, y, w, h, bgColor)
-	if is_table(pathOrTable) then
-		assert(not table.is_empty(pathOrTable), 'invalid ui config')
-		self._config = pathOrTable
-	else
-		assert(string.valid(pathOrTable) and files.is_file(pathOrTable), 'invalid ui path!')
-		self._config = table.read_from_file(pathOrTable)
-	end
+function Gui:__init__(uiPath, x, y, w, h, bgColor)
+	assert(string.valid(uiPath) and files.is_file(uiPath), 'invalid ui path!')
 	assert(is_number(x), 'invalid ui x!')
 	assert(is_number(y), 'invalid ui y!')
 	assert(is_number(w), 'invalid ui w!')
 	assert(is_number(h), 'invalid ui h!')
 	assert(bgColor == nil or is_table(bgColor), 'invalid ui color!')
-	self._id2node = {}
-	self._canvas = Rectangle(self, {
-		type = "Rectangle",
-		id = "bgCanvas",
-		x = x,
-		y = y,
-		w = w,
-		h = h,
-		color = bgColor or rgba2hex(10, 10, 10, 150),
-		children = self._config,
-	})
+	self._canvasX = x
+	self._canvasY = y
+	self._canvasW = w
+	self._canvasH = h
+	self._config = table.read_from_file(uiPath)
+	self:doRefreshUi()
 	gooi.desktopMode()
 end
 
@@ -101,8 +90,23 @@ function Gui:getByType(nodeType)
 	return nodes
 end
 
-function Gui:getRootNode()
-	return self._canvas
+function Gui:getUiConfig()
+	return self._config
+end
+
+function Gui:doRefreshUi()
+	self._id2node = {}
+	if self._canvas then
+		self._canvas:destroy()
+	end
+	self._canvas = Rectangle(self, {
+		x = self._canvasX,
+		y = self._canvasY,
+		w = self._canvasW,
+		h = self._canvasH,
+		color = bgColor or rgba2hex(10, 10, 10, 150),
+		children = self._config,
+	})
 end
 
 return Gui

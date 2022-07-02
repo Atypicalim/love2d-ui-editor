@@ -84,9 +84,8 @@ function Editor:draw()
     if self._field then
         self._field:draw()
     else
-        self._printer:print(g_egui:getById('bgBottom'), "no input ...")
+        self._printer:print(g_egui:getById('bgBottom'), "no field ...")
     end
-
     self._printer:print(g_egui:getById('nodeStage'), self._describe, '0.5', '0+15')
 end
 
@@ -99,14 +98,15 @@ function Editor:mousereleased(x, y, button)
 end
 
 function Editor:keypressed(key, scancode, isrepeat)
-	g_egui:keypressed(key, scancode, isrepeat)
-    if key == 'escape' then
-        love.event.quit()
-    elseif key == 'f5' then
+    if key == 'f5' then
         love.event.quit('restart')
-    elseif key == 'space' or key == 'return' then
-        self:setPath("./editor/editor.ui.lua")
+        return
     end
+    if self._field then
+        self._field:onKey(key)
+        return
+    end
+	g_egui:keypressed(key, scancode, isrepeat)
 end
 
 function Editor:keyreleased(key, scancode)
@@ -154,7 +154,12 @@ function Editor:setKey(key)
     if not self._key then
         self._field = nil
     else
-        self._field = Field(g_egui:getById('bgBottom'))
+        self._field = Field(g_egui:getById('bgBottom'), function(text)
+            self:setValue(text)
+            self:setKey(nil)
+        end, function(text)
+            self:setKey(nil)
+        end)
     end
     self:_updateDescribe()
 end
@@ -166,17 +171,25 @@ function Editor:setValue(textValue)
         g_editor._conf[g_editor._key] = newValue
     end
     g_attribute:_updateAttribute()
+    self._template:doRefreshUi()
 end
 
 function Editor:_updateDescribe()
+    local LENGTH = 15
     self._describe = ""
     if not self._path then return end
-    self._describe = 'editing: [' .. self._path .. ']'
+    self._describe = 'editing: [' .. tostring(self._path) .. ']'
     if not self._conf then return end
-    self._describe = self._describe .. "  [" .. tostring(self._conf.type) .."]"
-    self._describe = self._describe .. "  [" .. tostring(self._conf.id) .. "]"
+    local tp = tostring(self._conf.type)
+    local id = tostring(self._conf.id)
+    tp = #tp <= LENGTH and tp or string.sub(tp, 1, LENGTH) .. "..."
+    id = #id <= LENGTH and id or string.sub(id, 1, LENGTH) .. "..."
+    self._describe = self._describe .. "  [" .. tp .."]"
+    self._describe = self._describe .. "  [" .. id .. "]"
     if not self._key then return end
-    self._describe = self._describe .. "  [" .. tostring(self._key) .."]"
+    local key = tostring(self._key)
+    key = #key <= LENGTH and key or string.sub(key, 1, LENGTH) .. "..."
+    self._describe = self._describe .. "  [" .. key .."]"
 end
 
 return Editor

@@ -7,7 +7,7 @@ local Tree = class("Tree")
 function Tree:__init__(parent)
     g_tree = self
     self._parent = parent
-    self._root = g_editor._template:getRootNode()
+    self._config = g_editor._template:getUiConfig()
     self._background = Rectangle(g_egui, {
 		x = '0.5',
 		y = '0.5',
@@ -62,9 +62,8 @@ function Tree:_updateTree()
     self._skippedCount = 0
     self._leafCount = 0
     self._leafDepth = 0
-    self:createLeaf(self._root:getChildren())
+    self:createLeaf(self._config)
     --
-    g_editor:setConf(self._leafs[1]._node:getConf())
 end
 
 function Tree:createLeaf(children)

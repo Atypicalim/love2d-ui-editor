@@ -4,13 +4,13 @@
 
 local Leaf = class("Leaf")
 
-function Leaf:__init__(node, x, y, w, h)
-    self._node = node
+function Leaf:__init__(config, x, y, w, h)
+    self._config = config
     self._parent = g_tree._background
     --
     if g_tree._skippedCount < g_tree._treeIndent then
         g_tree._skippedCount = g_tree._skippedCount + 1
-        g_tree:createLeaf(node:getConf().open and self._node:getChildren() or {})
+        g_tree:createLeaf(self._config.open and self._config.children or {})
         return
     end
     --
@@ -34,7 +34,7 @@ function Leaf:__init__(node, x, y, w, h)
         y = '0.5',
         w = 0,
         h = 0,
-        text = "[" .. self._node:getConf().type .. "]",
+        text = "[" .. self._config.type .. "]",
     }, self._background)
     self._btnFold = Button(g_egui, {
         x = '0+15',
@@ -42,9 +42,9 @@ function Leaf:__init__(node, x, y, w, h)
         w = 15,
         h = 15,
     }, self._background)
-    self._btnFold:setIcon(node:getConf().open and "/media/up.png" or "/media/down.png")
+    self._btnFold:setIcon(self._config.open and "/media/up.png" or "/media/down.png")
     self._btnFold.onClick = function()
-        node:getConf().open = not node:getConf().open
+        self._config.open = not self._config.open
         g_tree:_updateTree()
     end
     self._btnEdit = Button(g_egui, {
@@ -55,12 +55,12 @@ function Leaf:__init__(node, x, y, w, h)
     }, self._background)
     self._btnEdit:setIcon("/media/edit.png")
     self._btnEdit.onClick = function()
-        g_editor:setConf(self._node:getConf())
+        g_editor:setConf(self._config)
     end
     --
     table.insert(g_tree._leafs, self)
     g_tree._leafCount = g_tree._leafCount + 1
-    g_tree:createLeaf(node:getConf().open and self._node:getChildren() or {})
+    g_tree:createLeaf(self._config.open and self._config.children or {})
 end
 
 function Leaf:update(dt)

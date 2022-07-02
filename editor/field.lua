@@ -4,7 +4,7 @@
 
 local Field = class("Field")
 
-function Field:__init__(parent)
+function Field:__init__(parent, yesFunc, noFunc)
     g_input = self
     self._parent = parent
     --
@@ -14,7 +14,7 @@ function Field:__init__(parent)
         w = '0.7',
         h = '0.5',
     }, self._parent)
-    self._input:setText(g_editor._conf[g_editor._key])
+    self._input:setText(tostring(g_editor._conf[g_editor._key]))
     --
     self._btnOk = Button(g_egui, {
         x = '0.9',
@@ -25,8 +25,7 @@ function Field:__init__(parent)
     }, self._parent)
     self._btnOk:setIcon("/media/confirm.png")
     self._btnOk.onClick = function()
-        g_editor:setValue(self._input:getText())
-        g_editor:setKey(nil)
+        yesFunc(self._input:getText())
     end
     --
     self._btnNo = Button(g_egui, {
@@ -38,7 +37,7 @@ function Field:__init__(parent)
     }, self._parent)
     self._btnNo:setIcon("/media/cancel.png")
     self._btnNo.onClick = function()
-        g_editor:setKey(nil)
+        noFunc(self._input:getText())
     end
 end
 
@@ -58,6 +57,31 @@ function Field:destroy()
     self._input:destroy()
     self._btnOk:destroy()
     self._btnNo:destroy()
+end
+
+function Field:onKey(key)
+    if key == 'escape' then
+        self._btnNo.onClick()
+    elseif key == 'return' then
+        self._btnOk.onClick()
+    else
+        if love.keyboard.isDown('lctrl') or love.keyboard.isDown('rctrl') then
+            if key == 'x' then
+                love.system.setClipboardText(self._input:getText())
+                self._input:setText("")
+            elseif key == 'c' then
+                love.system.setClipboardText(self._input:getText())
+            elseif key == 'v' then
+                local txt = self._input:getText()
+                self._input:setText(txt .. love.system.getClipboardText())
+            end
+        else
+            if key == 'backspace' then
+                local txt = self._input:getText()
+                self._input:setText(string.sub(txt, 1, #txt - 1))
+            end
+        end
+    end
 end
 
 return Field
