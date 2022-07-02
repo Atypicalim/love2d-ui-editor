@@ -13,6 +13,7 @@ Leaf = require('editor/leaf')
 Tree = require('editor/tree')
 Property = require('editor/property')
 Attribute = require('editor/attribute')
+Field = require('editor/field')
 
 local EDITOR_X = 100
 local EDITOR_Y = 100
@@ -26,13 +27,16 @@ function Editor:__init__()
     self._printer = Printer()
     --
     self._path = nil
-    self._template = nil
+    self._conf = nil
+    self._key = nil
     --
+    self._template = nil
     self._tree = nil
-    self._node = nil
     self._attribute = nil
+    self._field = nil
     --
     self._describe = ""
+    self:setPath("./editor/editor.ui.lua")
 end
 
 function Editor:load()
@@ -55,6 +59,9 @@ function Editor:update(dt)
     if self._attribute then
         self._attribute:update(dt)
     end
+    if self._field then
+        self._field:update(dt)
+    end
 end
 
 function Editor:draw()
@@ -74,6 +81,12 @@ function Editor:draw()
     else
         self._printer:print(g_egui:getById('bgRight'), "no attribute ...")
     end
+    if self._field then
+        self._field:draw()
+    else
+        self._printer:print(g_egui:getById('bgBottom'), "no input ...")
+    end
+
     self._printer:print(g_egui:getById('nodeStage'), self._describe, '0.5', '0+15')
 end
 
@@ -92,53 +105,78 @@ function Editor:keypressed(key, scancode, isrepeat)
     elseif key == 'f5' then
         love.event.quit('restart')
     elseif key == 'space' or key == 'return' then
-        self:setTemplate("./editor/editor.ui.lua")
+        self:setPath("./editor/editor.ui.lua")
     end
 end
 
-function Editor:eyreleased(key, scancode)
-	g_egui:eyreleased(key, scancode, isrepeat)
+function Editor:keyreleased(key, scancode)
+	g_egui:keyreleased(key, scancode)
 end
 
 function Editor:textinput(text)
 	g_egui:textinput(text)
 end
 
-function Editor:setTemplate(path)
+function Editor:setPath(path)
     if self._tree then
         self._tree:destroy()
     end
     self._path = path
-    self:setNode(nil)
+    self:setConf(nil)
     if not self._path then
         self._template = nil
         self._tree = nil
-        self._describe = ""
     else
-        local parent
-        parent = g_egui:getById('nodeStage')
+        local parent = g_egui:getById('nodeStage')
         self._template = Gui(self._path, parent:getX(), parent:getY(), parent:getW() - 100, parent:getH() - 100)
-        parent = g_egui:getById('boxTree')
-        self._tree = Tree(parent)
-        self._describe = 'editing: [' .. self._path .. ']'
+        self._tree = Tree(g_egui:getById('boxTree'))
     end
 end
 
-function Editor:setNode(node)
+function Editor:setConf(conf)
     if self._attribute then
         self._attribute:destroy()
     end
-    self._node = node
-    if not self._node then
+    self._conf = conf
+    self:setKey(nil)
+    if not self._conf then
         self._attribute = nil
-        self._describe = 'editing: [' .. self._path .. ']'
     else
-        local parent = g_egui:getById('boxProp')
-        self._attribute = Attribute(parent)
-        self._describe = 'editing: [' .. self._path .. ']'
-        self._describe = self._describe .. "  [" .. tostring(self._node:getConf().type) .."]"
-        self._describe = self._describe .. "  [" .. tostring(self._node:getConf().id) .. "]"
+        self._attribute = Attribute(g_egui:getById('boxProp'))
     end
+end
+
+function Editor:setKey(key)
+    if self._field then
+        self._field:destroy()
+    end
+    self._key = key
+    if not self._key then
+        self._field = nil
+    else
+        self._field = Field(g_egui:getById('bgBottom'))
+    end
+    self:_updateDescribe()
+end
+
+function Editor:setValue(textValue)
+    local oldValue = g_editor._conf[g_editor._key]
+    local newValue = to_type(textValue, type(oldValue))
+    if newValue ~= nil then
+        g_editor._conf[g_editor._key] = newValue
+    end
+    g_attribute:_updateAttribute()
+end
+
+function Editor:_updateDescribe()
+    self._describe = ""
+    if not self._path then return end
+    self._describe = 'editing: [' .. self._path .. ']'
+    if not self._conf then return end
+    self._describe = self._describe .. "  [" .. tostring(self._conf.type) .."]"
+    self._describe = self._describe .. "  [" .. tostring(self._conf.id) .. "]"
+    if not self._key then return end
+    self._describe = self._describe .. "  [" .. tostring(self._key) .."]"
 end
 
 return Editor

@@ -64,6 +64,7 @@ function Tree:_updateTree()
     self._leafDepth = 0
     self:createLeaf(self._root:getChildren())
     --
+    g_editor:setConf(self._leafs[1]._node:getConf())
 end
 
 function Tree:createLeaf(children)

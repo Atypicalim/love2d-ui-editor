@@ -16,8 +16,6 @@ function Property:__init__(key, value, x, y, w, h)
         name = string.sub(name, 1, length - 4) .. "..."
     end
     name = name .. "]"
-
-    
     --
     if g_attribute._skippedCount < g_attribute._propertyIndent then
         g_attribute._skippedCount = g_attribute._skippedCount + 1
@@ -55,7 +53,7 @@ function Property:__init__(key, value, x, y, w, h)
         }, self._background)
         self._btnEdit:setIcon("/media/edit.png")
         self._btnEdit.onClick = function()
-            g_attribute:setProperty(key, value)
+            g_editor:setKey(key)
         end
     end
     --

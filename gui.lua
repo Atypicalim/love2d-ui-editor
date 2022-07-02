@@ -10,19 +10,25 @@ require 'others/tools'
 require 'nodes/node'
 require 'nodes/button'
 require 'nodes/text'
+require 'nodes/input'
 require 'nodes/rectangle'
 
 local Gui = class('Gui')
 
-function Gui:__init__(uiPath, x, y, w, h, bgColor)
-	assert(string.valid(uiPath) and files.is_file(uiPath), 'invalid ui path!')
+function Gui:__init__(pathOrTable, x, y, w, h, bgColor)
+	if is_table(pathOrTable) then
+		assert(not table.is_empty(pathOrTable), 'invalid ui config')
+		self._config = pathOrTable
+	else
+		assert(string.valid(pathOrTable) and files.is_file(pathOrTable), 'invalid ui path!')
+		self._config = table.read_from_file(pathOrTable)
+	end
 	assert(is_number(x), 'invalid ui x!')
 	assert(is_number(y), 'invalid ui y!')
 	assert(is_number(w), 'invalid ui w!')
 	assert(is_number(h), 'invalid ui h!')
 	assert(bgColor == nil or is_table(bgColor), 'invalid ui color!')
 	self._id2node = {}
-	self._config = table.read_from_file(uiPath)
 	self._canvas = Rectangle(self, {
 		type = "Rectangle",
 		id = "bgCanvas",
@@ -33,6 +39,7 @@ function Gui:__init__(uiPath, x, y, w, h, bgColor)
 		color = bgColor or rgba2hex(10, 10, 10, 150),
 		children = self._config,
 	})
+	gooi.desktopMode()
 end
 
 function Gui:update(dt)
@@ -57,7 +64,7 @@ function Gui:keypressed(key, scancode, isrepeat)
 	gooi.keypressed(key, scancode, isrepeat)
 end
 
-function Gui:eyreleased(key, scancode)
+function Gui:keyreleased(key, scancode)
 	gooi.keyreleased(key, scancode)
 end
 

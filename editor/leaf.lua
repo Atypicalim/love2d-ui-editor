@@ -55,7 +55,7 @@ function Leaf:__init__(node, x, y, w, h)
     }, self._background)
     self._btnEdit:setIcon("/media/edit.png")
     self._btnEdit.onClick = function()
-        g_editor:setNode(self._node)
+        g_editor:setConf(self._node:getConf())
     end
     --
     table.insert(g_tree._leafs, self)

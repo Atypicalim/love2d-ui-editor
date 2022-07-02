@@ -17,22 +17,22 @@ function love.draw()
     editor:draw()
 end
 
-function love:mousepressed(x, y, button)
+function love.mousepressed(x, y, button)
 	editor:mousepressed(x, y, button)
 end
 
-function love:mousereleased(x, y, button)
+function love.mousereleased(x, y, button)
 	editor:mousereleased(x, y, button)
 end
 
-function love:keypressed(key, scancode, isrepeat)
+function love.keypressed(key, scancode, isrepeat)
 	editor:keypressed(key, scancode, isrepeat)
 end
 
-function love:eyreleased(key, scancode)
-	editor:eyreleased(key, scancode, isrepeat)
+function love.keyreleased(key, scancode)
+	editor:keyreleased(key, scancode)
 end
 
-function love:textinput(text)
+function love.textinput(text)
 	editor:textinput(text)
 end

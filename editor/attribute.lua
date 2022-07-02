@@ -8,7 +8,6 @@ function Attribute:__init__(parent, setPropertyFunc)
     g_attribute = self
     self._parent = parent
     self._setPropertyFunc = setPropertyFunc
-    self._node = g_editor._node
     self._background = Rectangle(g_egui, {
 		x = '0.5',
 		y = '0.5',
@@ -62,7 +61,7 @@ function Attribute:_updateAttribute()
     self._propertyPadding = (bgH - self._propertyH * ATTRIBUTE_PROPERTY_COUNT) / 2
     self._skippedCount = 0
     self._propertyCount = 0
-    self:createProperty(self._node:getConf())
+    self:createProperty(g_editor._conf)
     --
 end
 
@@ -76,11 +75,6 @@ function Attribute:createProperty(config)
             Property(key, value, '0.5', y, self._propertyW, self._propertyH)
         end
     end
-end
-
-function Attribute:setProperty(key, value)
-    self._node:getConf()[key] = value
-    g_attribute:_updateAttribute()
 end
 
 function Attribute:update(dt)
