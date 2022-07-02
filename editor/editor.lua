@@ -11,6 +11,8 @@ require('editor/constants')
 Printer = require('editor/printer')
 Leaf = require('editor/leaf')
 Tree = require('editor/tree')
+Property = require('editor/property')
+Attribute = require('editor/attribute')
 
 local EDITOR_X = 100
 local EDITOR_Y = 100
@@ -26,9 +28,11 @@ function Editor:__init__()
     self._path = nil
     self._template = nil
     --
-    self._node = nil
     self._tree = nil
-    self._prop = nil
+    self._node = nil
+    self._attribute = nil
+    --
+    self._describe = ""
 end
 
 function Editor:load()
@@ -48,8 +52,8 @@ function Editor:update(dt)
     if self._tree then
         self._tree:update(dt)
     end
-    if self._prop then
-        self._prop:update(dt)
+    if self._attribute then
+        self._attribute:update(dt)
     end
 end
 
@@ -65,11 +69,12 @@ function Editor:draw()
     else
         self._printer:print(g_egui:getById('bgLeft'), "no tree ...")
     end
-    if self._prop then
-        self._prop:draw()
+    if self._attribute then
+        self._attribute:draw()
     else
-        self._printer:print(g_egui:getById('bgRight'), "no prop ...")
+        self._printer:print(g_egui:getById('bgRight'), "no attribute ...")
     end
+    self._printer:print(g_egui:getById('nodeStage'), self._describe, '0.5', '0+15')
 end
 
 function Editor:mousepressed(x, y, button)
@@ -100,28 +105,39 @@ function Editor:textinput(text)
 end
 
 function Editor:setTemplate(path)
+    if self._tree then
+        self._tree:destroy()
+    end
     self._path = path
     self:setNode(nil)
     if not self._path then
         self._template = nil
+        self._tree = nil
+        self._describe = ""
     else
         local parent
         parent = g_egui:getById('nodeStage')
         self._template = Gui(self._path, parent:getX(), parent:getY(), parent:getW() - 100, parent:getH() - 100)
         parent = g_egui:getById('boxTree')
-        self._tree = Tree(parent, function(node)
-            self:setNode(node)
-        end)
+        self._tree = Tree(parent)
+        self._describe = 'editing: [' .. self._path .. ']'
     end
 end
 
 function Editor:setNode(node)
+    if self._attribute then
+        self._attribute:destroy()
+    end
     self._node = node
     if not self._node then
-        self._prop = nil
+        self._attribute = nil
+        self._describe = 'editing: [' .. self._path .. ']'
     else
         local parent = g_egui:getById('boxProp')
-        self._prop = Prop(parent)
+        self._attribute = Attribute(parent)
+        self._describe = 'editing: [' .. self._path .. ']'
+        self._describe = self._describe .. "  [" .. tostring(self._node:getConf().type) .."]"
+        self._describe = self._describe .. "  [" .. tostring(self._node:getConf().id) .. "]"
     end
 end
 

@@ -30,7 +30,7 @@ function Gui:__init__(uiPath, x, y, w, h, bgColor)
 		y = y,
 		w = w,
 		h = h,
-		color = bgColor or {10, 10, 10, 150},
+		color = bgColor or rgba2hex(10, 10, 10, 150),
 		children = self._config,
 	})
 end

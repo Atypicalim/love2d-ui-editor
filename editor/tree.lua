@@ -4,17 +4,16 @@
 
 local Tree = class("Tree")
 
-function Tree:__init__(parent, setNodeFunc)
+function Tree:__init__(parent)
     g_tree = self
     self._parent = parent
-    self._setNodeFunc = setNodeFunc
     self._root = g_editor._template:getRootNode()
     self._background = Rectangle(g_egui, {
 		x = '0.5',
 		y = '0.5',
 		w = '0.9',
 		h = '0.9',
-		color = {100, 100, 100, 150},
+		color = rgba2hex(100, 100, 100, 150),
 	}, self._parent)
     --
     self._btnUp = Button(g_egui, {
@@ -22,7 +21,7 @@ function Tree:__init__(parent, setNodeFunc)
         y = '0+15',
         w = 15,
         h = 15,
-        color = {255, 0, 0},
+        color = rgba2hex(255, 0, 0),
     }, self._parent)
     self._btnUp:setIcon("/media/angle_up.png")
     self._btnUp.onClick = function()
@@ -37,7 +36,7 @@ function Tree:__init__(parent, setNodeFunc)
         y = '1-15',
         w = 15,
         h = 15,
-        color = {255, 0, 0},
+        color = rgba2hex(255, 0, 0),
     }, self._parent)
     self._btnDown:setIcon("/media/angle_down.png")
     self._btnDown.onClick = function()
@@ -49,16 +48,10 @@ function Tree:__init__(parent, setNodeFunc)
     --
     self._treeIndent = 0
     self:_updateTree()
-    --
-    self:setNode(nil)
 end
 
 function Tree:_updateTree()
-    --
-    for i,v in ipairs(self._leafs or {}) do
-        v:destroy()
-    end
-    --
+    self:destroy()
     self._leafs = {}
     local bgW = self._background:getW()
     local bgH = self._background:getH()
@@ -79,7 +72,7 @@ function Tree:createLeaf(children)
         if self._leafCount >= TREE_ITEM_COUNT then break end
         local x = '0.5+' .. ((self._leafDepth - 1) * TREE_LEAF_INDENT)
         local y = self._leafH / 2 + TREE_LEAF_MARGIN + (self._leafH + TREE_LEAF_MARGIN * 2) * (#self._leafs)
-        local leaf = Leaf(v, x, y, self._leafW, self._leafH)
+        Leaf(v, x, y, self._leafW, self._leafH)
     end
     self._leafDepth = self._leafDepth - 1
 end
@@ -102,8 +95,10 @@ function Tree:draw()
     end
 end
 
-function Tree:setNode(node)
-    self._setNodeFunc(node)
+function Tree:destroy()
+    for i,v in ipairs(self._leafs or {}) do
+        v:destroy()
+    end
 end
 
 return Tree

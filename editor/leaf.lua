@@ -7,11 +7,10 @@ local Leaf = class("Leaf")
 function Leaf:__init__(node, x, y, w, h)
     self._node = node
     self._parent = g_tree._background
-    self._isOpen = node:getConf().open == true
     --
     if g_tree._skippedCount < g_tree._treeIndent then
         g_tree._skippedCount = g_tree._skippedCount + 1
-        g_tree:createLeaf(self._isOpen and self._node:getChildren() or {})
+        g_tree:createLeaf(node:getConf().open and self._node:getChildren() or {})
         return
     end
     --
@@ -20,14 +19,14 @@ function Leaf:__init__(node, x, y, w, h)
 		y = y,
 		w = w,
 		h = h,
-		color = {10 * g_tree._leafDepth, 10 * g_tree._leafDepth, 10 * g_tree._leafDepth, 150},
+		color = rgba2hex(10 * g_tree._leafDepth, 10 * g_tree._leafDepth, 10 * g_tree._leafDepth, 150),
 	}, self._parent)
     self._border = Rectangle(g_egui, {
 		x = '0.5',
 		y = '0.5',
 		w = '1',
 		h = '1',
-		color = {10, 10, 10, 255},
+		color = rgba2hex(10, 10, 10, 255),
 	}, self._background)
     self._labelName = Text(g_egui, {
         type = "Text",
@@ -43,7 +42,7 @@ function Leaf:__init__(node, x, y, w, h)
         w = 15,
         h = 15,
     }, self._background)
-    self._btnFold:setIcon(self._isOpen and "/media/up.png" or "/media/down.png")
+    self._btnFold:setIcon(node:getConf().open and "/media/up.png" or "/media/down.png")
     self._btnFold.onClick = function()
         node:getConf().open = not node:getConf().open
         g_tree:_updateTree()
@@ -61,7 +60,7 @@ function Leaf:__init__(node, x, y, w, h)
     --
     table.insert(g_tree._leafs, self)
     g_tree._leafCount = g_tree._leafCount + 1
-    g_tree:createLeaf(self._isOpen and self._node:getChildren() or {})
+    g_tree:createLeaf(node:getConf().open and self._node:getChildren() or {})
 end
 
 function Leaf:update(dt)
@@ -78,14 +77,6 @@ function Leaf:draw()
     self._labelName:draw('line')
     self._btnFold:draw()
     self._btnEdit:draw()
-end
-
-function Leaf:getCount()
-    local count = 1
-    if not self._isOpen then
-        return count
-    end
-    return count
 end
 
 function Leaf:destroy()

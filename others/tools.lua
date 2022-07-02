@@ -2,9 +2,30 @@
 	tools
 ]]
 
-function tools_set_color(color)
-	local alpha = color[4] ~= nil and color[4] / 255 or 1
-    love.graphics.setColor(color[1] / 255, color[2] / 255, color[3] / 255, alpha)
+function hex2rgba(hex)
+    assert(type(hex) == "string")
+    hex = hex:gsub("#","")
+    if #hex == 3 then
+        hex = hex:sub(1,1) .. hex:sub(1,1) .. hex:sub(2,2) .. hex:sub(2,2) .. hex:sub(3,3) .. hex:sub(3,3) .. "ff"
+    elseif #hex == 6 then
+        hex = hex .. "ff"
+    end
+    assert(#hex == 8)
+    local r = tonumber("0x"..hex:sub(1, 2))
+    local g = tonumber("0x"..hex:sub(3, 4))
+    local b = tonumber("0x"..hex:sub(5, 6))
+    local a = tonumber("0x"..hex:sub(7, 8))
+    return r, g, b, a
+end
+
+function rgba2hex(r, g, b, a)
+    assert(type(r) == "number")
+    assert(type(g) == "number")
+    assert(type(b) == "number")
+    a = a or 255
+    local rgba = (r * 0x1000000) + (g * 0x10000) + (b * 0x100) + a
+    local hex = string.format("#%08x", rgba)
+    return hex
 end
 
 function tools_calculate_number(base, describe)

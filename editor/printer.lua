@@ -15,10 +15,11 @@ function Printer:__init__()
     }, nil)
 end
 
-function Printer:print(parent, text)
+function Printer:print(parent, text, x, y)
+    self._text._parent = parent
     self._text._text = text
-    self._text:setX(parent:getX())
-    self._text:setY(parent:getY())
+    self._text:setX(x or '0.5')
+    self._text:setY(y or '0.5')
     self._text:draw()
 end
 
