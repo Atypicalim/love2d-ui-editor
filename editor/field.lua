@@ -39,6 +39,11 @@ function Field:__init__(parent, yesFunc, noFunc)
     self._btnNo.onClick = function()
         noFunc(self._input:getText())
     end
+    -- focus text input
+    self._input.text.hasFocus = true
+    gooi.focused = self._input.text
+    love.keyboard.setTextInput(true)
+
 end
 
 function Field:update(dt)
@@ -62,8 +67,10 @@ end
 function Field:onKey(key)
     if key == 'escape' then
         self._btnNo.onClick()
+        love.keyboard.setTextInput(false)
     elseif key == 'return' then
         self._btnOk.onClick()
+        love.keyboard.setTextInput(false)
     else
         if love.keyboard.isDown('lctrl') or love.keyboard.isDown('rctrl') then
             if key == 'x' then
@@ -77,8 +84,13 @@ function Field:onKey(key)
             end
         else
             if key == 'backspace' then
-                local txt = self._input:getText()
-                self._input:setText(string.sub(txt, 1, #txt - 1))
+                self._input.text:deleteBack()
+            elseif key == 'delete' then
+                self._input.text:deleteDel()
+            elseif key == 'right' then
+                self._input.text:moveRight()
+            elseif key == 'left' then
+                self._input.text:moveLeft()
             end
         end
     end

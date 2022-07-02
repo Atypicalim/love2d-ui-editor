@@ -38,7 +38,6 @@ function tools_execute_powershell(func, ...)
     local cmd = func
     local agrs = {...}
     for i,v in ipairs(agrs) do
-        print(i, v)
         cmd = cmd .. [[ "]] .. tostring(v) .. [["]]
     end
     local isOk, r = tools.execute([[ powershell.exe -file ./others/powershell.ps1 ]] .. cmd)
