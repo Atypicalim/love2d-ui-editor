@@ -26,7 +26,7 @@ function Attribute:__init__(parent, setPropertyFunc)
     }, self._parent)
     self._btnUp:setIcon("/media/angle_up.png")
     self._btnUp.onClick = function()
-        if #self._properties > 0 then
+        if self._propertyIndent > 0 then
             self._propertyIndent = self._propertyIndent - 1
             self:_updateAttribute()
         end

@@ -25,7 +25,7 @@ function Tree:__init__(parent)
     }, self._parent)
     self._btnUp:setIcon("/media/angle_up.png")
     self._btnUp.onClick = function()
-        if #self._leafs > 0 then
+        if self._treeIndent > 0 then
             self._treeIndent = self._treeIndent - 1
             self:_updateTree()
         end
