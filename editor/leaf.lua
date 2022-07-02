@@ -4,10 +4,17 @@
 
 local Leaf = class("Leaf")
 
-function Leaf:__init__(node, parent, x, y, w, h)
+function Leaf:__init__(node, x, y, w, h)
     self._node = node
-    self._parent = parent
+    self._parent = g_tree._background
     self._isOpen = node:getConf().open == true
+    --
+    if g_tree._skippedCount < g_tree._treeIndent then
+        g_tree._skippedCount = g_tree._skippedCount + 1
+        g_tree:createLeaf(self._isOpen and self._node:getChildren() or {})
+        return
+    end
+    --
     self._background = Rectangle(g_egui, {
 		x = x,
 		y = y,
@@ -22,72 +29,55 @@ function Leaf:__init__(node, parent, x, y, w, h)
 		h = '1',
 		color = {10, 10, 10, 255},
 	}, self._background)
-    self._btnFold = Button(g_egui, {
+    self._labelName = Text(g_egui, {
+        type = "Text",
         x = '0.5',
+        y = '0.5',
+        w = 0,
+        h = 0,
+        text = "[" .. self._node:getConf().type .. "]",
+    }, self._background)
+    self._btnFold = Button(g_egui, {
+        x = '0+15',
         y = '0.5',
         w = 15,
         h = 15,
-        icon = "/media/down.png",
     }, self._background)
+    self._btnFold:setIcon(self._isOpen and "/media/up.png" or "/media/down.png")
     self._btnFold.onClick = function()
         node:getConf().open = not node:getConf().open
         g_tree:_updateTree()
     end
+    self._btnEdit = Button(g_egui, {
+        x = '1-15',
+        y = '0.5',
+        w = 15,
+        h = 15,
+    }, self._background)
+    self._btnEdit:setIcon("/media/edit.png")
+    self._btnEdit.onClick = function()
+        g_editor:setNode(self._node)
+    end
     --
-    self._leafs = {}
-    local bgW = self._background:getW()
-    local bgH = self._background:getH()
-    self._leafW = bgW
-    self._leafH = bgH
-    self._leafX = bgW / 2 + TREE_LEAF_INDENT
+    table.insert(g_tree._leafs, self)
     g_tree._leafCount = g_tree._leafCount + 1
-    g_tree._leafDepth = g_tree._leafDepth + 1
-    for i,v in ipairs(self._isOpen and self._node:getChildren() or {}) do
-        local leaf = Leaf(v, self._background, self._leafX, '1', self._leafW, self._leafH)
-        table.insert(self._leafs, leaf)
-        if g_tree._leafCount >= TREE_ITEM_COUNT then break end
-    end
-    g_tree._leafDepth = g_tree._leafDepth - 1
-    --
-    self:_updateLeafs()
-    --
-end
-
-function Leaf:setXY(x, y)
-    self._background:setXY(x, y)
-    self._border:setXY('0.5', '0.5')
-    self._btnFold:setXY('0+15', '0.5')
-    self:_updateLeafs()
-end
-
-function Leaf:_updateLeafs()
-    for i,v in ipairs(self._leafs) do
-        local count = 0
-        for ii,vv in ipairs(self._leafs) do
-            if vv == v then break end
-            count = count + vv:getCount()
-        end
-        local y = self._leafH / 2 + (self._leafH + TREE_LEAF_MARGIN * 2) * (count + 1)
-        v:setXY(self._leafX, y)
-    end
+    g_tree:createLeaf(self._isOpen and self._node:getChildren() or {})
 end
 
 function Leaf:update(dt)
     self._background:update(dt)
     self._border:update(dt)
+    self._labelName:update(dt)
     self._btnFold:update(dt)
-    for i,v in ipairs(self._leafs) do
-        v:update(dt)
-    end
+    self._btnEdit:update(dt)
 end
 
 function Leaf:draw()
     self._background:draw('fill')
     self._border:draw('line')
+    self._labelName:draw('line')
     self._btnFold:draw()
-    for i,v in ipairs(self._leafs) do
-        v:draw(dt)
-    end
+    self._btnEdit:draw()
 end
 
 function Leaf:getCount()
@@ -95,10 +85,12 @@ function Leaf:getCount()
     if not self._isOpen then
         return count
     end
-    for i,v in ipairs(self._leafs) do
-        count = count + v:getCount()
-    end
     return count
+end
+
+function Leaf:destroy()
+    self._btnFold:destroy()
+    self._btnEdit:destroy()
 end
 
 return Leaf

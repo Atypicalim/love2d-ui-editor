@@ -129,3 +129,9 @@ end
 function Node:getType()
 	return self._conf.type
 end
+
+function Node:destroy()
+	for i,v in ipairs(self._children) do
+		v:destroy()
+	end
+end
