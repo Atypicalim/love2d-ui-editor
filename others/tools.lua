@@ -34,21 +34,64 @@ function tools_calculate_number(base, describe)
     return func()
 end
 
-function tools_execute_powershell(cmd)
-    local isOk, r = tools.execute([[ powershell.exe -file ]] .. cmd)
+function tools_execute_powershell(func, ...)
+    local cmd = func
+    local agrs = {...}
+    for i,v in ipairs(agrs) do
+        print(i, v)
+        cmd = cmd .. [[ "]] .. tostring(v) .. [["]]
+    end
+    local isOk, r = tools.execute([[ powershell.exe -file ./others/powershell.ps1 ]] .. cmd)
     assert(isOk, 'powershell execute failed:' .. cmd)
     return string.trim(r)
 end
 
-function tools_pws_select_file(folder)
-	folder = folder or files.cwd():sub(1, -2):gsub('/', '\\')
-	local path = tools_execute_powershell("./others/select_file.ps1 " .. folder)
-	if string.valid(path) and files.is_file(path) then
+function tools_platform_select_file(title, filter, folder)
+    title = title or "please select a file ..."
+    filter = filter or "All files (*.*)|*.*"
+	folder = folder or ""
+	local path = tools_execute_powershell("select_file", title, filter, folder)
+	if string.valid(path) then
 		return path
 	end
 end
 
-function tools_pws_show_message(msg)
-	msg = msg or "msg..."
-	return tools_execute_powershell("./others/show_error.ps1 " .. msg)
+function tools_platform_save_file(title, filter, folder)
+    title = title or "please save a file ..."
+    filter = filter or "All files (*.*)|*.*"
+	folder = folder or ""
+	local path = tools_execute_powershell("save_file", title, filter, folder)
+	if string.valid(path) then
+		return path
+	end
+end
+
+function tools_platform_select_folder(title, folder)
+    title = title or "please select a folder ..."
+	folder = folder or ""
+	local path = tools_execute_powershell("select_folder", title, folder)
+	if string.valid(path) then
+		return path
+	end
+end
+
+function tools_platform_show_confirm(title, message, buttons, iconDesc)
+	title = title or "title"
+	message = message or "confirm..."
+    buttons = buttons or "YesNoCancel" -- YesNoCancel, YesNo, OkCancel, Ok
+    iconDesc = iconDesc or "Question" -- Warning, Error, Information, Question
+	local r = tools_execute_powershell("show_eror", title, message, buttons, iconDesc)
+    if r == "Yes" or r == "Ok" then return true end
+    if r == "No" then return false end
+    return nil
+end
+
+function tools_platform_show_input(title, message, default)
+	title = title or "title"
+	message = message or "input..."
+	default = default or ""
+	local path = tools_execute_powershell("show_input", title, message, default)
+	if string.valid(path) then
+		return path
+	end
 end
