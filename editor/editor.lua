@@ -113,6 +113,27 @@ function Editor:keypressed(key, scancode, isrepeat)
         love.event.quit('restart')
         return
     end
+    print('\n\n\n--->', key, scancode, isrepeat)
+    if love.keyboard.isDown('lctrl') or love.keyboard.isDown('rctrl') then
+        if key == 'o' then
+            self:setKey(nil)
+            if love.keyboard.isDown('lshift') or love.keyboard.isDown('rshift') then
+                self:_tryOpenWorkspace()
+            else
+                self:_tryOpenFile()
+            end
+        elseif key == 'n' then
+            self:setKey(nil)
+            self:_tryCreateFile()
+        elseif key == 's' then
+            self:setKey(nil)
+            if love.keyboard.isDown('lshift') or love.keyboard.isDown('rshift') then
+                self:_trySaveFile(true)
+            else
+                self:_trySaveFile(false)
+            end
+        end
+    end
     if self._field then
         self._field:onKey(key)
         return
@@ -228,22 +249,7 @@ function Editor:_onClick(id, event)
     end
     --
     if id == 'btnWorkspace' then
-        local from = files.cwd():sub(1, -2):gsub('/', '\\')
-        local folder = tools_platform_select_folder('please select a love2d project or empty folder as workspace:', from)
-        if not string.valid(folder) or not files.is_folder(folder) then
-            self:pushMessage('invalid folder!')
-            return
-        end
-        local templateFiles = files.list(files.cwd() .. 'template')
-        local workspaceFiles = files.list(folder)
-        for i,v in ipairs(templateFiles) do
-            if not files.is_file(folder .. "/" .. v) then
-                files.copy(files.cwd() .. 'template/' .. v, folder .. "/" .. v)
-                self:pushMessage('workspace created:' .. v)
-            end
-        end
-        self:setWorkspace(folder)
-        self:pushMessage('workspace selected!')
+        self:_tryOpenWorkspace()
         return
     elseif not self._workspace then
         self:pushMessage('please select workspace!')
@@ -267,7 +273,6 @@ function Editor:_onClick(id, event)
     --
     if id == 'btnExplorer' then
         local isOk, out = tools_platform_open_path(self._workspace)
-        print("===>", isOk, out)
         if isOk then
             self:pushMessage('workspace opened in explorer!')
         else
@@ -277,23 +282,10 @@ function Editor:_onClick(id, event)
     end
     --
     if id == 'btnFileOpen' then
-        local path = tools_platform_select_file('please select a ui file:', '*.ui.lua|*.ui.lua', self._workspace)
-        if not string.valid(path) or not files.is_file(path) then
-            self:pushMessage('invalid path in open!')
-            return
-        end
-        self:setPath(path)
-        self:pushMessage('file opened!')
+        self:_tryOpenFile()
         return
     elseif id == 'btnFileCreate' then
-        local path = tools_platform_save_file('please target a ui file:', '*.ui.lua|*.ui.lua', self._workspace)
-        if not string.valid(path) then
-            self:pushMessage('invalid path in create!')
-            return
-        end
-        files.copy(files.cwd() .. 'template/app.ui.lua', path)
-        self:setPath(path)
-        self:pushMessage('file created!')
+        self:_tryCreateFile()
         return
     elseif not self._path then
         self:pushMessage('please select file!')
@@ -301,13 +293,71 @@ function Editor:_onClick(id, event)
     end
     --
     if id == 'btnFileSave' then
-        table.write_to_file(self._template:getUiConfig(), self._path)
-        self:pushMessage('file saved:' .. self._path)
+        self:_trySaveFile(false)
         return
     elseif id == 'btnPreview' then
         local isOk, out = tools.execute([[start love . "]] .. self._path .. [["]])
         self:pushMessage('preview opened!')
         return
+    end
+end
+
+function Editor:_tryOpenWorkspace()
+    local folder = tools_platform_select_folder('please select a love2d project or empty folder as workspace:', files.cwd())
+    if not string.valid(folder) or not files.is_folder(folder) then
+        self:pushMessage('invalid folder!')
+        return
+    end
+    local templateFiles = files.list(files.cwd() .. 'template')
+    local workspaceFiles = files.list(folder)
+    for i,v in ipairs(templateFiles) do
+        if not files.is_file(folder .. "/" .. v) then
+            files.copy(files.cwd() .. 'template/' .. v, folder .. "/" .. v)
+            self:pushMessage('workspace created:' .. v)
+        end
+    end
+    self:setWorkspace(folder)
+    self:pushMessage('workspace selected!')
+end
+
+function Editor:_tryOpenFile()
+    local path = tools_platform_select_file('please select a ui file to open:', '*.ui.lua|*.ui.lua', self._workspace)
+    if not string.valid(path) or not files.is_file(path) then
+        self:pushMessage('invalid path to open!')
+        return
+    end
+    self:setPath(path)
+    self:pushMessage('file opened!')
+end
+
+function Editor:_tryCreateFile()
+    local path = tools_platform_save_file('please enter a file to create ui:', '*.ui.lua|*.ui.lua', self._workspace)
+    if not string.valid(path) then
+        self:pushMessage('invalid path to create!')
+        return
+    end
+    files.copy(files.cwd() .. 'template/app.ui.lua', path)
+    self:setPath(path)
+    self:pushMessage('file created!')
+end
+
+function Editor:_trySaveFile(toNewFile)
+    local config = self._template:getUiConfig()
+    local content = table.string(config, nil, PROPERTY_NAME_ORDER)
+
+    if toNewFile then
+        local path = tools_platform_save_file('please enter a file to save ui:', '*.ui.lua|*.ui.lua', self._workspace)
+        if not string.valid(path) then
+            self:pushMessage('invalid path to save!')
+        else
+            files.write(path, content)
+            self:pushMessage('file saved:' .. path)
+            self:setPath(path)
+            self:pushMessage('file opened!')
+        end
+    else
+        files.write(self._path, content)
+        self:pushMessage('file saved:' .. self._path)
     end
 end
 

@@ -45,11 +45,20 @@ function tools_execute_powershell(func, ...)
     return string.trim(r)
 end
 
+function tools_windows_validate_folder(folder)
+    folder = folder:gsub('/', '\\')
+    if folder:sub(-1, -1) == '\\' then
+        folder = folder:sub(1, -2)
+    end
+    folder = folder:gsub('\\\\', '\\')
+    return folder
+end
+
 function tools_platform_select_file(title, filter, folder)
     title = title or "please select a file ..."
     filter = filter or "All files (*.*)|*.*"
 	folder = folder or ""
-	local path = tools_execute_powershell("select_file", title, filter, folder)
+	local path = tools_execute_powershell("select_file", title, filter, tools_windows_validate_folder(folder))
 	if string.valid(path) then
 		return path
 	end
@@ -59,7 +68,7 @@ function tools_platform_save_file(title, filter, folder)
     title = title or "please save a file ..."
     filter = filter or "All files (*.*)|*.*"
 	folder = folder or ""
-	local path = tools_execute_powershell("save_file", title, filter, folder)
+	local path = tools_execute_powershell("save_file", title, filter, tools_windows_validate_folder(folder))
 	if string.valid(path) then
 		return path
 	end
@@ -68,7 +77,7 @@ end
 function tools_platform_select_folder(title, folder)
     title = title or "please select a folder ..."
 	folder = folder or ""
-	local path = tools_execute_powershell("select_folder", title, folder)
+	local path = tools_execute_powershell("select_folder", title, tools_windows_validate_folder(folder))
 	if string.valid(path) then
 		return path
 	end
