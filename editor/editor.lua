@@ -6,7 +6,7 @@ require('thirds/pure-lua-tools/initialize')
 require('thirds/gooi/gooi')
 
 local Editor = class("Editor")
-local Gui = require('gui')
+local gui = require('gui')
 require('editor/constants')
 Printer = require('editor/printer')
 Leaf = require('editor/leaf')
@@ -16,6 +16,7 @@ Attribute = require('editor/attribute')
 Field = require('editor/field')
 
 function Editor:__init__()
+    gui.useProxy(self)
     --
     g_editor = self
     self._workspace = nil
@@ -43,7 +44,7 @@ function Editor:load()
     local width = love.graphics.getWidth()
     local height = love.graphics.getHeight()
     --
-    g_egui = Gui("./editor/editor.ui.lua"):customize(width / 2, height / 2, width, height)
+    g_egui = gui.newGUI("./editor/editor.ui.lua"):customize(width / 2, height / 2, width, height)
     g_egui.onClick = function(id, node)
         self:_onClick(id, node)
     end
@@ -58,7 +59,7 @@ function Editor:load()
 end
 
 function Editor:update(dt)
-    g_egui:update(dt)
+	gooi.update(dt)
     if self._template then
         self._template:update(dt)
     end
@@ -74,7 +75,7 @@ function Editor:update(dt)
 end
 
 function Editor:draw()
-    g_egui:draw()
+	gooi.draw()
     if self._template then
         self._template:draw()
     else
@@ -101,15 +102,8 @@ function Editor:draw()
     self._printer:print(g_egui:getById('nodeStage'), self._describe, '0.5', '0+15')
 end
 
-function Editor:mousepressed(x, y, button)
-	g_egui:mousepressed(x, y, button)
-end
-
-function Editor:mousereleased(x, y, button)
-	g_egui:mousereleased(x, y, button)
-end
-
 function Editor:keypressed(key, scancode, isrepeat)
+	gooi.keypressed(key, scancode, isrepeat)
     if key == 'f5' then
         love.event.quit('restart')
         return
@@ -143,15 +137,22 @@ function Editor:keypressed(key, scancode, isrepeat)
             self:setConf(nil)
         end
     end
-	g_egui:keypressed(key, scancode, isrepeat)
 end
 
 function Editor:keyreleased(key, scancode)
-	g_egui:keyreleased(key, scancode)
+	gooi.keyreleased(key, scancode)
+end
+
+function Editor:mousepressed(x, y, button)
+	gooi.pressed()
+end
+
+function Editor:mousereleased(x, y, button)
+	gooi.released()
 end
 
 function Editor:textinput(text)
-	g_egui:textinput(text)
+	gooi.textinput(text)
 end
 
 function Editor:resize(width, height)
@@ -167,7 +168,6 @@ function Editor:resize(width, height)
 end
 
 function Editor:wheelmoved(x, y)
-    g_egui:wheelmoved(x, y)
     if self._tree then
         self._tree:wheelmoved(x, y)
     end
@@ -197,7 +197,7 @@ function Editor:setPath(path)
         self._tree = nil
     else
         local parent = g_egui:getById('nodeStage')
-        self._template = Gui(self._path):customize(parent:getX(), parent:getY(), parent:getW() - 100, parent:getH() - 100)
+        self._template = gui.newGUI(self._path):customize(parent:getX(), parent:getY(), parent:getW() - 100, parent:getH() - 100)
         self._tree = Tree(g_egui:getById('boxTree'))
     end
 end

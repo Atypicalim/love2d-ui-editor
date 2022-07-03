@@ -84,13 +84,13 @@ function Field:onKey(key)
             end
         else
             if key == 'backspace' then
-                self._input.text:deleteBack()
+                -- self._input.text:deleteBack()
             elseif key == 'delete' then
-                self._input.text:deleteDel()
+                -- self._input.text:deleteDel()
             elseif key == 'right' then
-                self._input.text:moveRight()
+                -- self._input.text:moveRight()
             elseif key == 'left' then
-                self._input.text:moveLeft()
+                -- self._input.text:moveLeft()
             end
         end
     end

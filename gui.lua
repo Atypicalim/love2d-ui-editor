@@ -39,32 +39,25 @@ end
 
 function Gui:update(dt)
 	self._canvas:update(dt)
-	gooi.update(dt)
 end
 
 function Gui:draw()
 	self._canvas:draw()
-	gooi.draw()
 end
 
 function Gui:mousepressed(x, y, button)
-	gooi.pressed()
 end
 
 function Gui:mousereleased(x, y, button)
-	gooi.released()
 end
 
 function Gui:keypressed(key, scancode, isrepeat)
-	gooi.keypressed(key, scancode, isrepeat)
 end
 
 function Gui:keyreleased(key, scancode)
-	gooi.keyreleased(key, scancode)
 end
 
 function Gui:textinput(text)
-	gooi.textinput(text)
 end
 
 function Gui:wheelmoved(x, y)
@@ -118,4 +111,56 @@ function Gui:doRefreshUi()
 	})
 end
 
-return Gui
+-- interfaces
+
+local gui = {}
+
+local proxyObjects = {}
+
+function gui._initProxy()
+    for k,v in pairs(LOVE_PROXY_FUNCTIONS) do
+        local originFunction
+        if love[k] then
+            originFunction = love[k]
+        end
+        love[k] = function(...)
+            local args = {...}
+            for i,v in ipairs(proxyObjects) do
+                if v[k] then
+                    v[k](v, unpack(args))
+                end
+            end
+            if originFunction then
+                originFunction(unpack(args))
+            end
+        end
+    end
+end
+
+function gui.useProxy(obj)
+    assert(love ~= nil)
+    if not love.usingProxy then
+        gui._initProxy()
+        love.usingProxy = true
+    end
+    if not table.find_value(proxyObjects, obj) then
+        table.insert(proxyObjects, 1, obj)
+    end
+end
+
+function gui.cancelProxy(obj)
+    for i,v in ipairs(proxyObjects) do
+        if obj == v then
+            table.remove(proxyObjects, i)
+            break
+        end
+    end
+end
+
+function gui.newGUI(path)
+    local obj = Gui(path)
+	gui.useProxy(obj)
+	return obj
+end
+
+return gui
