@@ -15,21 +15,26 @@ require 'nodes/rectangle'
 
 local Gui = class('Gui')
 
-function Gui:__init__(uiPath, x, y, w, h, bgColor)
+function Gui:__init__(uiPath)
 	assert(string.valid(uiPath) and files.is_file(uiPath), 'invalid ui path!')
+	self._config = table.read_from_file(uiPath)
+	assert(self._config ~= nil, 'invalid ui config! in:' .. uiPath)
+	gooi.desktopMode()
+end
+
+function Gui:customize(x, y, w, h, bgColor)
 	assert(is_number(x), 'invalid ui x!')
 	assert(is_number(y), 'invalid ui y!')
 	assert(is_number(w), 'invalid ui w!')
 	assert(is_number(h), 'invalid ui h!')
-	assert(bgColor == nil or is_table(bgColor), 'invalid ui color!')
+	assert(bgColor == nil or string.valid(bgColor), 'invalid ui color!')
 	self._canvasX = x
 	self._canvasY = y
 	self._canvasW = w
 	self._canvasH = h
-	self._config = table.read_from_file(uiPath)
-	assert(self._config ~= nil, 'invalid ui config! in:' .. uiPath)
+	self._bgColor = bgColor
 	self:doRefreshUi()
-	gooi.desktopMode()
+	return self
 end
 
 function Gui:update(dt)
@@ -60,7 +65,7 @@ end
 
 function Gui:textinput(text)
 	gooi.textinput(text)
-  end
+end
 
 function Gui:create(configs, parent)
 	local children = {}
@@ -105,7 +110,7 @@ function Gui:doRefreshUi()
 		y = self._canvasY,
 		w = self._canvasW,
 		h = self._canvasH,
-		color = bgColor or rgba2hex(10, 10, 10, 150),
+		color = self._bgColor or rgba2hex(10, 10, 10, 150),
 		children = self._config,
 	})
 end

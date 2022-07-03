@@ -77,3 +77,12 @@ function love.textinput(text)
         editor:textinput(text)
     end
 end
+
+function love.resize(width, height)
+    if previewer then
+        previewer:resize(width, height)
+    end
+    if editor then
+        editor:resize(width, height)
+    end
+end

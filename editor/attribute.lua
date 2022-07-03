@@ -29,6 +29,7 @@ function Attribute:__init__(parent, setPropertyFunc)
             self._propertyIndent = self._propertyIndent - 1
             self:_updateAttribute()
         end
+        g_editor:setKey(nil)
     end
     --
     self._btnDown = Button(g_egui, {
@@ -44,6 +45,7 @@ function Attribute:__init__(parent, setPropertyFunc)
             self._propertyIndent = self._propertyIndent + 1
             self:_updateAttribute()
         end
+        g_editor:setKey(nil)
     end
     --
     self._propertyIndent = 0
@@ -57,7 +59,9 @@ function Attribute:updateColor()
 end
 
 function Attribute:_updateAttribute()
-    self:destroy()
+    for i,v in ipairs(self._properties or {}) do
+        v:destroy()
+    end
     self._properties = {}
     local bgW = self._background:getW()
     local bgH = self._background:getH()
@@ -105,6 +109,9 @@ function Attribute:destroy()
     for i,v in ipairs(self._properties or {}) do
         v:destroy()
     end
+    self._background:destroy()
+    self._btnUp:destroy()
+    self._btnDown:destroy()
 end
 
 return Attribute

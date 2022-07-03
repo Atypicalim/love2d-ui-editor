@@ -33,18 +33,17 @@ function Editor:__init__()
 end
 
 function Editor:load()
-	love.window.setMode(1000, 700, {
-        minwidth = 500,
-        minheight = 500,
-        resizable = false,
+	love.window.setMode(EDITOR_WIDTH, EDITOR_HEIGHT, {
+        minwidth = EDITOR_WIDTH,
+        minheight = EDITOR_HEIGHT,
+        resizable = true,
         centered = true,
     })
-	love.window.setPosition(100, 100)
 	love.window.setFullscreen(false)
     local width = love.graphics.getWidth()
     local height = love.graphics.getHeight()
     --
-    g_egui = Gui("./editor/editor.ui.lua", width / 2, height / 2, width, height)
+    g_egui = Gui("./editor/editor.ui.lua"):customize(width / 2, height / 2, width, height)
     g_egui.onClick = function(id, node)
         self:_onClick(id, node)
     end
@@ -150,6 +149,18 @@ function Editor:textinput(text)
 	g_egui:textinput(text)
 end
 
+function Editor:resize(width, height)
+    g_egui:customize(width / 2, height / 2, width, height)
+    local parent = g_egui:getById('nodeStage')
+    self._template:customize(parent:getX(), parent:getY(), parent:getW() - 100, parent:getH() - 100)
+    local path = self._path
+    local conf = self._conf
+    local key = self._key
+    self:setPath(path)
+    self:setConf(conf)
+    self:setKey(key)
+end
+
 function Editor:setWorkspace(workspace)
     self._workspace = workspace
     self:setPath(nil)
@@ -171,7 +182,7 @@ function Editor:setPath(path)
         self._tree = nil
     else
         local parent = g_egui:getById('nodeStage')
-        self._template = Gui(self._path, parent:getX(), parent:getY(), parent:getW() - 100, parent:getH() - 100)
+        self._template = Gui(self._path):customize(parent:getX(), parent:getY(), parent:getW() - 100, parent:getH() - 100)
         self._tree = Tree(g_egui:getById('boxTree'))
     end
 end

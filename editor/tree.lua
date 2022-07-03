@@ -29,6 +29,7 @@ function Tree:__init__(parent)
             self._treeIndent = self._treeIndent - 1
             self:_updateTree()
         end
+        g_editor:setConf(nil)
     end
     --
     self._btnDown = Button(g_egui, {
@@ -44,6 +45,7 @@ function Tree:__init__(parent)
             self._treeIndent = self._treeIndent + 1
             self:_updateTree()
         end
+        g_editor:setConf(nil)
     end
     --
     self._treeIndent = 0
@@ -57,7 +59,9 @@ function Tree:updateColor()
 end
 
 function Tree:_updateTree()
-    self:destroy()
+    for i,v in ipairs(self._leafs or {}) do
+        v:destroy()
+    end
     self._leafs = {}
     local bgW = self._background:getW()
     local bgH = self._background:getH()
@@ -105,6 +109,9 @@ function Tree:destroy()
     for i,v in ipairs(self._leafs or {}) do
         v:destroy()
     end
+    self._background:destroy()
+    self._btnUp:destroy()
+    self._btnDown:destroy()
 end
 
 return Tree

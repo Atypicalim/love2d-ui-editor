@@ -8,17 +8,17 @@ require('thirds/gooi/gooi')
 local Previewer = class("Previewer")
 local Gui = require('gui')
 
-local WIDTH = 800
-local HEIGHT = 700
-
 function Previewer:__init__(path)
     g_previewer = self
-    g_pgui = Gui(path or './template/app.ui.lua', WIDTH / 2, HEIGHT / 2, WIDTH, HEIGHT)
+    g_pgui = Gui(path or './template/app.ui.lua'):customize(PREVIEW_WIDTH / 2, PREVIEW_HEIGHT / 2, PREVIEW_WIDTH, PREVIEW_HEIGHT)
 end
 
 function Previewer:load()
 
-	love.window.setMode(WIDTH, HEIGHT, {
+	love.window.setMode(PREVIEW_WIDTH, PREVIEW_HEIGHT, {
+        minwidth = PREVIEW_WIDTH,
+        minheight = PREVIEW_HEIGHT,
+        resizable = true,
         centered = true,
     })
     local w = love.graphics.getWidth()
@@ -55,6 +55,10 @@ end
 
 function Previewer:textinput(text)
 	g_pgui:textinput(text)
+end
+
+function Previewer:resize(width, height)
+    g_pgui:customize(width / 2, height / 2, width, height)
 end
 
 return Previewer

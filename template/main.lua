@@ -11,7 +11,7 @@ local HEIGHT = 500
 
 function love.load()
     love.window.setMode(WIDTH, HEIGHT)
-    gui = Gui("./app.ui.lua", WIDTH / 2, HEIGHT / 2, WIDTH, HEIGHT)
+    gui = Gui("./app.ui.lua"):customize(WIDTH / 2, HEIGHT / 2, WIDTH, HEIGHT)
 end
 
 function love.update(dt)
