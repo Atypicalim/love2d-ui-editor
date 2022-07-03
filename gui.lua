@@ -67,6 +67,9 @@ function Gui:textinput(text)
 	gooi.textinput(text)
 end
 
+function Gui:wheelmoved(x, y)
+end
+
 function Gui:create(configs, parent)
 	local children = {}
 	for i,v in ipairs(configs) do

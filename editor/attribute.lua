@@ -28,8 +28,8 @@ function Attribute:__init__(parent, setPropertyFunc)
         if self._propertyIndent > 0 then
             self._propertyIndent = self._propertyIndent - 1
             self:_updateAttribute()
+            g_editor:setKey(nil)
         end
-        g_editor:setKey(nil)
     end
     --
     self._btnDown = Button(g_egui, {
@@ -44,8 +44,8 @@ function Attribute:__init__(parent, setPropertyFunc)
         if self._propertyCount >= ATTRIBUTE_PROPERTY_COUNT then
             self._propertyIndent = self._propertyIndent + 1
             self:_updateAttribute()
+            g_editor:setKey(nil)
         end
-        g_editor:setKey(nil)
     end
     --
     self._propertyIndent = 0
@@ -98,10 +98,32 @@ end
 
 function Attribute:draw()
     self._background:draw()
+    love.graphics.setScissor(
+        self._background:getLeft(),
+        self._background:getTop(),
+        self._background:getW(),
+        self._background:getH()
+    )
     self._btnUp:draw()
     self._btnDown:draw()
     for i,v in ipairs(self._properties) do
         v:draw(dt)
+    end
+    love.graphics.setScissor()
+end
+
+function Attribute:wheelmoved(x, y)
+    local mouseX, mouseY = love.mouse.getPosition()
+    if mouseX < self._background:getLeft() or mouseX > self._background:getRight() then
+        return
+    elseif mouseY < self._background:getTop() or mouseY > self._background:getBottom() then
+        return
+    end
+    if y > 0 then
+        self._btnUp.onClick()
+    end
+    if y < 0 then
+        self._btnDown.onClick()
     end
 end
 

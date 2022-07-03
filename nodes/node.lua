@@ -114,6 +114,22 @@ function Node:getH(h)
 	return self._h
 end
 
+function Node:getLeft()
+	return self._targetX
+end
+
+function Node:getRight()
+	return self._targetX + self._w
+end
+
+function Node:getTop()
+	return self._targetY
+end
+
+function Node:getBottom()
+	return self._targetY + self._h
+end
+
 function Node:getConf()
 	return self._conf
 end

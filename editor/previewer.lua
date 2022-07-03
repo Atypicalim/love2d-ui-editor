@@ -61,4 +61,8 @@ function Previewer:resize(width, height)
     g_pgui:customize(width / 2, height / 2, width, height)
 end
 
+function Previewer:wheelmoved(x, y)
+    g_pgui:wheelmoved(x, y)
+end
+
 return Previewer

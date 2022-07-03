@@ -166,6 +166,16 @@ function Editor:resize(width, height)
     self:setKey(key)
 end
 
+function Editor:wheelmoved(x, y)
+    g_egui:wheelmoved(x, y)
+    if self._tree then
+        self._tree:wheelmoved(x, y)
+    end
+    if self._attribute then
+        self._attribute:wheelmoved(x, y)
+    end
+end
+
 function Editor:setWorkspace(workspace)
     self._workspace = workspace
     self:setPath(nil)

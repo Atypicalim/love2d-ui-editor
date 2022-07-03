@@ -28,8 +28,8 @@ function Tree:__init__(parent)
         if self._treeIndent > 0 then
             self._treeIndent = self._treeIndent - 1
             self:_updateTree()
+            g_editor:setConf(nil)
         end
-        g_editor:setConf(nil)
     end
     --
     self._btnDown = Button(g_egui, {
@@ -44,8 +44,8 @@ function Tree:__init__(parent)
         if self._leafCount >= TREE_ITEM_COUNT then
             self._treeIndent = self._treeIndent + 1
             self:_updateTree()
+            g_editor:setConf(nil)
         end
-        g_editor:setConf(nil)
     end
     --
     self._treeIndent = 0
@@ -98,10 +98,32 @@ end
 
 function Tree:draw()
     self._background:draw()
+    love.graphics.setScissor(
+        self._background:getLeft(),
+        self._background:getTop(),
+        self._background:getW(),
+        self._background:getH()
+    )
     self._btnUp:draw()
     self._btnDown:draw()
     for i,v in ipairs(self._leafs) do
         v:draw(dt)
+    end
+    love.graphics.setScissor()
+end
+
+function Tree:wheelmoved(x, y)
+    local mouseX, mouseY = love.mouse.getPosition()
+    if mouseX < self._background:getLeft() or mouseX > self._background:getRight() then
+        return
+    elseif mouseY < self._background:getTop() or mouseY > self._background:getBottom() then
+        return
+    end
+    if y > 0 then
+        self._btnUp.onClick()
+    end
+    if y < 0 then
+        self._btnDown.onClick()
     end
 end
 

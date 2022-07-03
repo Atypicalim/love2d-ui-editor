@@ -7,7 +7,7 @@ local Previewer = require('editor/previewer')
 
 function love.load()
     if string.valid(arg[2]) and files.is_file(arg[2]) and string.find(arg[2], '.ui.lua') then
-        previewer = Previewer()
+        previewer = Previewer(arg[2])
         previewer:load()
     else
         editor = Editor()
@@ -84,5 +84,14 @@ function love.resize(width, height)
     end
     if editor then
         editor:resize(width, height)
+    end
+end
+
+function love.wheelmoved(x, y)
+    if previewer then
+        previewer:wheelmoved(x, y)
+    end
+    if editor then
+        editor:wheelmoved(x, y)
     end
 end
