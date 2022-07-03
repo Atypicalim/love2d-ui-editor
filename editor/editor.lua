@@ -138,6 +138,11 @@ function Editor:keypressed(key, scancode, isrepeat)
         self._field:onKey(key)
         return
     end
+    if key == 'escape' then
+        if self._conf then
+            self:setConf(nil)
+        end
+    end
 	g_egui:keypressed(key, scancode, isrepeat)
 end
 
@@ -316,6 +321,9 @@ function Editor:_onClick(id, event)
     elseif id == 'btnPreview' then
         local isOk, out = tools.execute([[start love . "]] .. self._path .. [["]])
         self:pushMessage('preview opened!')
+        return
+    elseif id == 'btnBuild' then
+        --
         return
     end
 end

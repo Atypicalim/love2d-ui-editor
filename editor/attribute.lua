@@ -72,7 +72,7 @@ function Attribute:_updateAttribute()
     self._skippedCount = 0
     self._propertyCount = 0
     self:createProperty(g_editor._conf)
-    --
+    self:updateColor()
 end
 
 function Attribute:createProperty(config)

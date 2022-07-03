@@ -105,6 +105,7 @@ function tools_platform_show_input(title, message, default)
 end
 
 function tools_platform_open_path(path)
+    path = tools_windows_validate_folder(path)
     return tools.execute([[start %windir%\explorer.exe "]] .. path .. [["]])
 end
 

@@ -73,7 +73,7 @@ function Tree:_updateTree()
     self._leafCount = 0
     self._leafDepth = 0
     self:createLeaf(self._config)
-    --
+    self:updateColor()
 end
 
 function Tree:createLeaf(children)
