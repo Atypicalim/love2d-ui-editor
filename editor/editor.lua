@@ -15,17 +15,9 @@ Property = require('editor/property')
 Attribute = require('editor/attribute')
 Field = require('editor/field')
 
-local EDITOR_X = 100
-local EDITOR_Y = 100
-local EDITOR_W = 1000
-local EDITOR_H = 800
-
 function Editor:__init__()
     --
     g_editor = self
-    g_egui = Gui("./editor/editor.ui.lua", EDITOR_W / 2, EDITOR_H / 2, EDITOR_W, EDITOR_H)
-    self._printer = Printer()
-    --
     self._workspace = nil
     self._path = nil
     self._conf = nil
@@ -38,21 +30,30 @@ function Editor:__init__()
     self._describe = ""
     self._messages = {}
     -- 
-    g_egui.onClick = function(id, node)
-        self:_onClick(id, node)
-    end
-    --
-    self:pushMessage('welcome!')
-    self:setWorkspace(nil)
-    -- self:setPath("./editor/editor.ui.lua")
 end
 
 function Editor:load()
-    width = love.graphics.getWidth()
-    height = love.graphics.getHeight()
-	love.window.setMode(EDITOR_W, EDITOR_H)
-	love.window.setPosition(EDITOR_X, EDITOR_Y)
+	love.window.setMode(1000, 700, {
+        minwidth = 500,
+        minheight = 500,
+        resizable = false,
+        centered = true,
+    })
+	love.window.setPosition(100, 100)
 	love.window.setFullscreen(false)
+    local width = love.graphics.getWidth()
+    local height = love.graphics.getHeight()
+    --
+    g_egui = Gui("./editor/editor.ui.lua", width / 2, height / 2, width, height)
+    g_egui.onClick = function(id, node)
+        self:_onClick(id, node)
+    end
+    self._printer = Printer()
+    --
+    self:pushMessage('welcome!')
+    self:setWorkspace(files.cwd() .. "/template/")
+    self:setPath("./template/app.ui.lua")
+    -- self:setPath("./editor/editor.ui.lua")
 end
 
 function Editor:update(dt)
@@ -130,7 +131,7 @@ end
 function Editor:setWorkspace(workspace)
     self._workspace = workspace
     self:setPath(nil)
-    if not self._workspace then
+    if not self._workspace or not files.is_folder(self._workspace) then
         love.window.setTitle("Editor! workspace [empty]")
     else
         love.window.setTitle(string.format("Editor! workspace [%s]", self._workspace))
@@ -143,7 +144,7 @@ function Editor:setPath(path)
     end
     self._path = path
     self:setConf(nil)
-    if not self._path then
+    if not self._path or not files.is_file(self._path) then
         self._template = nil
         self._tree = nil
     else
@@ -227,7 +228,8 @@ function Editor:_onClick(id, event)
     end
     --
     if id == 'btnWorkspace' then
-        local folder = tools_platform_select_folder('please select a love2d project or empty folder as workspace:', EDITOR_ROOT_FOLDER)
+        local from = files.cwd():sub(1, -2):gsub('/', '\\')
+        local folder = tools_platform_select_folder('please select a love2d project or empty folder as workspace:', from)
         if not string.valid(folder) or not files.is_folder(folder) then
             self:pushMessage('invalid folder!')
             return
@@ -295,6 +297,16 @@ function Editor:_onClick(id, event)
         return
     elseif not self._path then
         self:pushMessage('please select file!')
+        return
+    end
+    --
+    if id == 'btnFileSave' then
+        table.write_to_file(self._template:getUiConfig(), self._path)
+        self:pushMessage('file saved:' .. self._path)
+        return
+    elseif id == 'btnPreview' then
+        local isOk, out = tools.execute([[start love . "]] .. self._path .. [["]])
+        self:pushMessage('preview opened!')
         return
     end
 end

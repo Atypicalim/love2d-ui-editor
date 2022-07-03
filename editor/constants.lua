@@ -2,7 +2,6 @@
 	constants
 ]]
 
-EDITOR_ROOT_FOLDER = files.cwd():sub(1, -2):gsub('/', '\\')
 EDITOR_GITHUB_URL = "https://github.com/kompasim/love2d-ui-editor"
 
 MESSAGE_MAX_COUNT = 5
