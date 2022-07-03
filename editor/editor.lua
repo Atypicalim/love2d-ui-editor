@@ -26,6 +26,7 @@ function Editor:__init__()
     g_egui = Gui("./editor/editor.ui.lua", EDITOR_W / 2, EDITOR_H / 2, EDITOR_W, EDITOR_H)
     self._printer = Printer()
     --
+    self._workspace = nil
     self._path = nil
     self._conf = nil
     self._key = nil
@@ -34,9 +35,16 @@ function Editor:__init__()
     self._tree = nil
     self._attribute = nil
     self._field = nil
-    --
     self._describe = ""
-    self:setPath("./editor/editor.ui.lua")
+    self._messages = {}
+    -- 
+    g_egui.onClick = function(id, node)
+        self:_onClick(id, node)
+    end
+    --
+    self:pushMessage('welcome!')
+    self:setWorkspace(nil)
+    -- self:setPath("./editor/editor.ui.lua")
 end
 
 function Editor:load()
@@ -44,7 +52,6 @@ function Editor:load()
     height = love.graphics.getHeight()
 	love.window.setMode(EDITOR_W, EDITOR_H)
 	love.window.setPosition(EDITOR_X, EDITOR_Y)
-	love.window.setTitle("Editor!")
 	love.window.setFullscreen(false)
 end
 
@@ -84,7 +91,10 @@ function Editor:draw()
     if self._field then
         self._field:draw()
     else
-        self._printer:print(g_egui:getById('bgBottom'), "no field ...")
+        local distance = (1 - MESSAGE_MARGIN_RATE * 2) / (#self._messages * 2)
+        for i,v in ipairs(self._messages) do
+            self._printer:print(g_egui:getById('bgBottom'), v, nil, tostring(distance * (i * 2 - 1) + MESSAGE_MARGIN_RATE))
+        end
     end
     self._printer:print(g_egui:getById('nodeStage'), self._describe, '0.5', '0+15')
 end
@@ -115,6 +125,16 @@ end
 
 function Editor:textinput(text)
 	g_egui:textinput(text)
+end
+
+function Editor:setWorkspace(workspace)
+    self._workspace = workspace
+    self:setPath(nil)
+    if not self._workspace then
+        love.window.setTitle("Editor! workspace [empty]")
+    else
+        love.window.setTitle(string.format("Editor! workspace [%s]", self._workspace))
+    end
 end
 
 function Editor:setPath(path)
@@ -190,6 +210,105 @@ function Editor:_updateDescribe()
     local key = tostring(self._key)
     key = #key <= LENGTH and key or string.sub(key, 1, LENGTH) .. "..."
     self._describe = self._describe .. "  [" .. key .."]"
+end
+
+function Editor:_onClick(id, event)
+    --
+    if id == 'btnClose' then
+        love.event.quit()
+        return
+    elseif id == 'btnGithub' then
+        if tools_platform_open_url(EDITOR_GITHUB_URL) then
+            self:pushMessage('github opened in browser!')
+        else
+            self:pushMessage('github open failed!')
+        end
+        return
+    end
+    --
+    if id == 'btnWorkspace' then
+        local folder = tools_platform_select_folder('please select a love2d project or empty folder as workspace:', EDITOR_ROOT_FOLDER)
+        if not string.valid(folder) or not files.is_folder(folder) then
+            self:pushMessage('invalid folder!')
+            return
+        end
+        local templateFiles = files.list(files.cwd() .. 'template')
+        local workspaceFiles = files.list(folder)
+        for i,v in ipairs(templateFiles) do
+            if not files.is_file(folder .. "/" .. v) then
+                files.copy(files.cwd() .. 'template/' .. v, folder .. "/" .. v)
+                self:pushMessage('workspace created:' .. v)
+            end
+        end
+        self:setWorkspace(folder)
+        self:pushMessage('workspace selected!')
+        return
+    elseif not self._workspace then
+        self:pushMessage('please select workspace!')
+        return
+    end
+    -- 
+    if id == 'btnCode' then
+        local isOk, out = tools.execute([[code "]] .. self._workspace .. [["]])
+        if isOk then
+            self:pushMessage('workspace opened in vscode!')
+            return
+        end
+        isOk, out = tools.execute([[subl "]] .. self._workspace .. [["]])
+        if isOk then
+            self:pushMessage('workspace opened in sublime!')
+            return
+        end
+        self:pushMessage('no editor(vscode or sublime) found!')
+        return
+    end
+    --
+    if id == 'btnExplorer' then
+        local isOk, out = tools_platform_open_path(self._workspace)
+        print("===>", isOk, out)
+        if isOk then
+            self:pushMessage('workspace opened in explorer!')
+        else
+            self:pushMessage('workspace open failed!')
+        end
+        return
+    end
+    --
+    if id == 'btnFileOpen' then
+        local path = tools_platform_select_file('please select a ui file:', '*.ui.lua|*.ui.lua', self._workspace)
+        if not string.valid(path) or not files.is_file(path) then
+            self:pushMessage('invalid path in open!')
+            return
+        end
+        self:setPath(path)
+        self:pushMessage('file opened!')
+        return
+    elseif id == 'btnFileCreate' then
+        local path = tools_platform_save_file('please target a ui file:', '*.ui.lua|*.ui.lua', self._workspace)
+        if not string.valid(path) then
+            self:pushMessage('invalid path in create!')
+            return
+        end
+        files.copy(files.cwd() .. 'template/app.ui.lua', path)
+        self:setPath(path)
+        self:pushMessage('file created!')
+        return
+    elseif not self._path then
+        self:pushMessage('please select file!')
+        return
+    end
+end
+
+function Editor:pushMessage(message)
+    local date = os.date("%Y-%m-%d_%H:%M:%S", os.time())
+    local msg = string.format("[%s] %s", date, tostring(message))
+    local new = {msg}
+    for i=#self._messages,1,-1 do
+        if #new < MESSAGE_MAX_COUNT then
+            table.insert(new, 1, self._messages[i])
+        end
+    end
+    self._messages = new
 end
 
 return Editor

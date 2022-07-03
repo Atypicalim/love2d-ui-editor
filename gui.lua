@@ -27,6 +27,7 @@ function Gui:__init__(uiPath, x, y, w, h, bgColor)
 	self._canvasW = w
 	self._canvasH = h
 	self._config = table.read_from_file(uiPath)
+	assert(self._config ~= nil, 'invalid ui config! in:' .. uiPath)
 	self:doRefreshUi()
 	gooi.desktopMode()
 end

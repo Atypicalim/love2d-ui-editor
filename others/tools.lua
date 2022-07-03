@@ -94,3 +94,12 @@ function tools_platform_show_input(title, message, default)
 		return path
 	end
 end
+
+function tools_platform_open_path(path)
+    return tools.execute([[start %windir%\explorer.exe "]] .. path .. [["]])
+end
+
+function tools_platform_open_url(url)
+    return tools.execute([[start https://github.com/kompasim/love2d-ui-editor]])
+end
+

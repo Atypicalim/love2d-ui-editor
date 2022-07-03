@@ -13,9 +13,16 @@ function Button:__init__(gui, conf, parent)
 		w = self._w,
 		h = self._h,
 	})
+	if self._conf.icon then
+		self:setIcon(self._conf.icon)
+	end
 	self.btn.style.bgColor = {0.5, 0.5, 0.5}
 	self.btn:onRelease(function()
-		if self.onClick then self.onClick() end
+		if self.onClick then
+			self.onClick()
+		elseif gui.onClick then
+			gui.onClick(self._conf.id, self)
+		end
     end)
 end
 
