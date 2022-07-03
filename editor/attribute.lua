@@ -50,6 +50,12 @@ function Attribute:__init__(parent, setPropertyFunc)
     self:_updateAttribute()
 end
 
+function Attribute:updateColor()
+    for i,v in ipairs(self._properties or {}) do
+        v:updateColor()
+    end
+end
+
 function Attribute:_updateAttribute()
     self:destroy()
     self._properties = {}

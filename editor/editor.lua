@@ -53,6 +53,8 @@ function Editor:load()
     self:pushMessage('welcome!')
     self:setWorkspace(files.cwd() .. "/template/")
     self:setPath("./template/app.ui.lua")
+    self:setConf(self._template:getUiConfig()[1])
+    self:setKey('color')
     -- self:setPath("./editor/editor.ui.lua")
 end
 
@@ -113,7 +115,6 @@ function Editor:keypressed(key, scancode, isrepeat)
         love.event.quit('restart')
         return
     end
-    print('\n\n\n--->', key, scancode, isrepeat)
     if love.keyboard.isDown('lctrl') or love.keyboard.isDown('rctrl') then
         if key == 'o' then
             self:setKey(nil)
@@ -181,6 +182,9 @@ function Editor:setConf(conf)
     end
     self._conf = conf
     self:setKey(nil)
+    if self._tree then
+        self._tree:updateColor()
+    end
     if not self._conf then
         self._attribute = nil
     else
@@ -193,6 +197,9 @@ function Editor:setKey(key)
         self._field:destroy()
     end
     self._key = key
+    if self._attribute then
+        self._attribute:updateColor()
+    end
     if not self._key then
         self._field = nil
     else

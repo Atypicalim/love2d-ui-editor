@@ -34,7 +34,7 @@ function Property:__init__(key, value, x, y, w, h)
 		y = '0.5',
 		w = '1',
 		h = '1',
-		color = rgba2hex(10, 10, 10, 255),
+		color = BORDER_OFF_COLOR,
 	}, self._background)
     self._labelName = Text(g_egui, {
         type = "Text",
@@ -59,6 +59,10 @@ function Property:__init__(key, value, x, y, w, h)
     --
     table.insert(g_attribute._properties, self)
     g_attribute._propertyCount = g_attribute._propertyCount + 1
+end
+
+function Property:updateColor()
+    self._border:setColor(g_editor._key == self._key and BORDER_ON_COLOR or BORDER_OFF_COLOR)
 end
 
 function Property:update(dt)

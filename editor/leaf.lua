@@ -26,7 +26,7 @@ function Leaf:__init__(config, x, y, w, h)
 		y = '0.5',
 		w = '1',
 		h = '1',
-		color = rgba2hex(10, 10, 10, 255),
+		color = BORDER_OFF_COLOR,
 	}, self._background)
     self._labelName = Text(g_egui, {
         type = "Text",
@@ -61,6 +61,10 @@ function Leaf:__init__(config, x, y, w, h)
     table.insert(g_tree._leafs, self)
     g_tree._leafCount = g_tree._leafCount + 1
     g_tree:createLeaf(self._config.open and self._config.children or {})
+end
+
+function Leaf:updateColor()
+    self._border:setColor(g_editor._conf == self._config and BORDER_ON_COLOR or BORDER_OFF_COLOR)
 end
 
 function Leaf:update(dt)

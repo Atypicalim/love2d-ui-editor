@@ -36,3 +36,6 @@ PROPERTY_NAME_INFO = {
 		ignoreEdit = true,
 	}
 }
+
+BORDER_OFF_COLOR = "#000000"
+BORDER_ON_COLOR = "#ffffff"

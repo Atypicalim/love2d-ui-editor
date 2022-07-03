@@ -50,6 +50,12 @@ function Tree:__init__(parent)
     self:_updateTree()
 end
 
+function Tree:updateColor()
+    for i,v in ipairs(self._leafs or {}) do
+        v:updateColor()
+    end
+end
+
 function Tree:_updateTree()
     self:destroy()
     self._leafs = {}
