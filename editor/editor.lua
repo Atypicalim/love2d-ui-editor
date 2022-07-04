@@ -2,7 +2,7 @@
 	editor
 ]]
 
-require('thirds/pure-lua-tools/initialize')
+require('thirds/tools/test')
 require('thirds/gooi/gooi')
 
 local Editor = class("Editor")

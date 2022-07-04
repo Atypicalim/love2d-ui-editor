@@ -2,7 +2,7 @@
 	gui
 ]]
 
-require('thirds/pure-lua-tools/initialize')
+require('thirds/tools/test')
 require('thirds/gooi/gooi')
 
 require 'others/constants'
@@ -144,7 +144,7 @@ function gui.useProxy(obj)
         love.usingProxy = true
     end
     if not table.find_value(proxyObjects, obj) then
-        table.insert(proxyObjects, 1, obj)
+		proxyObjects = {obj, unpack(proxyObjects)} -- using insert will cause a bug related to ipairs when trigger love2d event
     end
 end
 
