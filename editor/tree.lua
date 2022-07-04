@@ -113,10 +113,7 @@ function Tree:draw()
 end
 
 function Tree:wheelmoved(x, y)
-    local mouseX, mouseY = love.mouse.getPosition()
-    if mouseX < self._background:getLeft() or mouseX > self._background:getRight() then
-        return
-    elseif mouseY < self._background:getTop() or mouseY > self._background:getBottom() then
+    if not self._background:isHover() then
         return
     end
     if y > 0 then

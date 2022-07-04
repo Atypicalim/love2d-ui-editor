@@ -71,8 +71,8 @@ end
 function Node:getXY() return self._x, self._y end
 function Node:setX(x) self:setXY(x, self._conf.y) end
 function Node:setY(y) self:setXY(self._conf.x, y) end
-function Node:getX(x) return self._x end
-function Node:getY(y) return self._y end
+function Node:getX() return self._x end
+function Node:getY() return self._y end
 
 function Node:setWH(w, h)
 	self._conf.w = w or self._conf.w
@@ -86,8 +86,8 @@ end
 function Node:getWH() return self._w, self._h end
 function Node:setW(w) self:setXY(w, self._conf.h) end
 function Node:setH(h) self:setXY(self._conf.w, h) end
-function Node:getW(w) return self._w end
-function Node:getH(h) return self._h end
+function Node:getW() return self._w end
+function Node:getH() return self._h end
 
 function Node:getLeft() return self._x - self._w * self._ax end
 function Node:getRight() return self._x + self._w * ((1 - self._ax)) end
@@ -108,6 +108,11 @@ end
 
 function Node:getType()
 	return self._conf.type
+end
+
+function Node:isHover()
+	local mouseX, mouseY = love.mouse.getPosition()
+    return mouseX > self:getLeft() or mouseX < self:getRight() and mouseY > self:getTop() or mouseY < self:getBottom()
 end
 
 function Node:destroy()

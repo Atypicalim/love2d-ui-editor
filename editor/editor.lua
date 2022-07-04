@@ -52,10 +52,10 @@ function Editor:load()
     --
     self:pushMessage('welcome!')
     self:setWorkspace(files.cwd() .. "/template/")
-    self:setPath("./template/app.ui.lua")
-    self:setConf(self._template:getUiConfig()[1])
-    self:setKey('color')
-    -- self:setPath("./editor/editor.ui.lua")
+    -- self:setPath("./template/app.ui.lua")
+    -- self:setConf(self._template:getUiConfig()[1])
+    -- self:setKey('color')
+    self:setPath("./editor/editor.ui.lua")
 end
 
 function Editor:update(dt)

@@ -33,4 +33,12 @@ function Previewer:keypressed(key, scancode, isrepeat)
     end
 end
 
+function Previewer:draw()
+	gooi.draw()
+end
+
+function Previewer:resize(width, height)
+    g_pgui:customize(width / 2, height / 2, width, height)
+end
+
 return Previewer
