@@ -8,8 +8,8 @@ function Button:__init__(gui, conf, parent)
 	Node.__init__(self, gui, conf, parent)
 	self.btn = gooi.newButton({
 		text = self._conf.text or "",
-		x = self._targetX,
-		y = self._targetY,
+		x = self:getLeft(),
+		y = self:getTop(),
 		w = self._w,
 		h = self._h,
 	})
@@ -32,8 +32,10 @@ end
 
 function Button:setXY(x, y)
 	Node.setXY(self, x, y)
-	self.btn.x = self._targetX
-	self.btn.y = self._targetY
+	if self.btn then
+		self.btn.x = self:getLeft()
+		self.btn.y = self:getTop()
+	end
 end
 
 function Button:setIcon(icon)

@@ -8,8 +8,8 @@ function Input:__init__(gui, conf, parent)
 	Node.__init__(self, gui, conf, parent)
 	self.text = gooi.newText({
 		text = self._conf.text or "",
-		x = self._targetX,
-		y = self._targetY,
+		x = self:getLeft(),
+		y = self:getTop(),
 		w = self:getW(),
 		h = self:getH(),
 	})
@@ -22,8 +22,10 @@ end
 
 function Input:setXY(x, y)
 	Node.setXY(self, x, y)
-	self.text.x = self._targetX
-	self.text.y = self._targetY
+	if self.text then
+		self.text.x = self:getLeft()
+		self.text.y = self:getTop()
+	end
 end
 
 function Input:getText()

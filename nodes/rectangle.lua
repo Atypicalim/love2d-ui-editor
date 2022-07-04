@@ -17,7 +17,7 @@ end
 function Rectangle:draw(mode)
 	if not self._isHide then
 		love.graphics.setColor(self._r, self._g, self._b, self._a)
-	    love.graphics.rectangle(mode or "fill", self._targetX, self._targetY, self._w, self._h)
+	    love.graphics.rectangle(mode or "fill", self:getLeft(), self:getTop(), self._w, self._h)
 	end
 	Node.draw(self)
 end
