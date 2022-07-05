@@ -9,21 +9,22 @@ local Previewer = class("Previewer")
 local gui = require('gui')
 
 function Previewer:__init__(path)
+    self._path = path or './template/app.ui.lua'
     gui.useProxy(self)
     g_previewer = self
-    g_pgui = gui.newGUI(path or './template/app.ui.lua'):customize(PREVIEW_WIDTH / 2, PREVIEW_HEIGHT / 2, PREVIEW_WIDTH, PREVIEW_HEIGHT)
 end
 
 function Previewer:load()
-
 	love.window.setMode(PREVIEW_WIDTH, PREVIEW_HEIGHT, {
         minwidth = PREVIEW_WIDTH,
         minheight = PREVIEW_HEIGHT,
         resizable = true,
         centered = true,
     })
-    local w = love.graphics.getWidth()
-    local h = love.graphics.getHeight()
+    g_pgui = gui.newGUI():setXYWH(PREVIEW_WIDTH / 2, PREVIEW_HEIGHT / 2, PREVIEW_WIDTH, PREVIEW_HEIGHT):addTemplate(self._path)
+    g_pgui.onClick = function(id, node)
+        print(id, node)
+    end
 end
 
 function Previewer:keypressed(key, scancode, isrepeat)
@@ -33,12 +34,23 @@ function Previewer:keypressed(key, scancode, isrepeat)
     end
 end
 
+function Previewer:mousepressed(x, y, button)
+	gooi.pressed()
+end
+
+function Previewer:mousereleased(x, y, button)
+	gooi.released()
+end
+
+function Previewer:mousemoved( x, y, dx, dy, istouch)
+end
+
 function Previewer:draw()
 	gooi.draw()
 end
 
 function Previewer:resize(width, height)
-    g_pgui:customize(width / 2, height / 2, width, height)
+    g_pgui:setXYWH(width / 2, height / 2, width, height)
 end
 
 return Previewer

@@ -4,8 +4,8 @@
 
 local Printer = class("Printer")
 
-function Printer:__init__()
-    self._text = Text(g_egui, {
+function Printer:__init__(parent)
+    self._text = parent:newConfig({
         type = "Text",
         x = 0,
         y = 0,

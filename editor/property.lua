@@ -22,21 +22,23 @@ function Property:__init__(key, value, x, y, w, h)
         return
     end
     --
-    self._background = Rectangle(g_egui, {
+    self._background = self._parent:newConfig({
+        type = "Rectangle",
 		x = x,
 		y = y,
 		w = w,
 		h = h,
 		color = rgba2hex(10, 10, 10, 150),
 	}, self._parent)
-    self._border = Rectangle(g_egui, {
+    self._border = self._parent:newConfig({
+        type = "Rectangle",
 		x = '0.5',
 		y = '0.5',
 		w = '1',
 		h = '1',
 		color = BORDER_OFF_COLOR,
 	}, self._background)
-    self._labelName = Text(g_egui, {
+    self._labelName = self._parent:newConfig({
         type = "Text",
         x = info.ignoreEdit and '0.5' or '0.5-12',
         y = '0.5',
@@ -45,7 +47,8 @@ function Property:__init__(key, value, x, y, w, h)
         text = name,
     }, self._background)
     if not info.ignoreEdit then
-        self._btnEdit = Button(g_egui, {
+        self._btnEdit = self._parent:newConfig({
+            type = "Button",
             x = '1-15',
             y = '0.5',
             w = 15,

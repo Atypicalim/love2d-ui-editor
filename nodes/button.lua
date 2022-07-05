@@ -4,8 +4,8 @@
 
 Button = class("Button", Node)
 
-function Button:__init__(gui, conf, parent)
-	Node.__init__(self, gui, conf, parent)
+function Button:__init__(conf, parent)
+	Node.__init__(self, conf, parent)
 	self.btn = gooi.newButton({
 		text = self._conf.text or "",
 		x = self:getLeft(),
@@ -18,10 +18,11 @@ function Button:__init__(gui, conf, parent)
 	end
 	self.btn.style.bgColor = {0.5, 0.5, 0.5}
 	self.btn:onRelease(function()
+		print('\n\n\n===>', self.canvas)
 		if self.onClick then
 			self.onClick()
-		elseif gui.onClick then
-			gui.onClick(self._conf.id, self)
+		elseif self.canvas then
+			self.canvas.onClick(self._conf.id, self)
 		end
     end)
 end

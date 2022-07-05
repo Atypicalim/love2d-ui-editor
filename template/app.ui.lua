@@ -8,7 +8,8 @@
         color = "#5577ff"
     },
     [2] = {
-        type = "Text",
+        type = "Button",
+        id = 'idTest',
         x = "0.5",
         y = "0.5",
         w = "0.5",

@@ -4,8 +4,8 @@
 
 Rectangle = class("Rectangle", Node)
 
-function Rectangle:__init__(gui, conf, parent)
-	Node.__init__(self, gui, conf, parent)
+function Rectangle:__init__(conf, parent)
+	Node.__init__(self, conf, parent)
 	self:setColor(self._conf.color)
 end
 

@@ -7,8 +7,9 @@ local Tree = class("Tree")
 function Tree:__init__(parent)
     g_tree = self
     self._parent = parent
-    self._config = g_editor._template:getUiConfig()
-    self._background = Rectangle(g_egui, {
+    self._config = g_editor._template:getConf()
+    self._background = parent:newConfig({
+        type = "Rectangle",
 		x = '0.5',
 		y = '0.5',
 		w = '0.9',
@@ -16,7 +17,8 @@ function Tree:__init__(parent)
 		color = rgba2hex(100, 100, 100, 150),
 	}, self._parent)
     --
-    self._btnUp = Button(g_egui, {
+    self._btnUp = parent:newConfig({
+        type = "Button",
         x = '0.5',
         y = '0+15',
         w = 15,
@@ -32,7 +34,8 @@ function Tree:__init__(parent)
         end
     end
     --
-    self._btnDown = Button(g_egui, {
+    self._btnDown = parent:newConfig({
+        type = "Button",
         x = '0.5',
         y = '1-15',
         w = 15,

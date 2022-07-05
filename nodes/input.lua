@@ -4,8 +4,8 @@
 
 Input = class("Input", Node)
 
-function Input:__init__(gui, conf, parent)
-	Node.__init__(self, gui, conf, parent)
+function Input:__init__(conf, parent)
+	Node.__init__(self, conf, parent)
 	self.text = gooi.newText({
 		text = self._conf.text or "",
 		x = self:getLeft(),

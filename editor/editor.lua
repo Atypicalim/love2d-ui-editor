@@ -44,16 +44,16 @@ function Editor:load()
     local width = love.graphics.getWidth()
     local height = love.graphics.getHeight()
     --
-    g_egui = gui.newGUI("./editor/editor.ui.lua"):customize(width / 2, height / 2, width, height)
+    g_egui = gui.newGUI():setXYWH(width / 2, height / 2, width, height):addTemplate("./editor/editor.ui.lua")
     g_egui.onClick = function(id, node)
         self:_onClick(id, node)
     end
-    self._printer = Printer()
+    self._printer = Printer(g_egui)
     --
     self:pushMessage('welcome!')
     self:setWorkspace(files.cwd() .. "/template/")
     -- self:setPath("./template/app.ui.lua")
-    -- self:setConf(self._template:getUiConfig()[1])
+    -- self:setConf(self._template:getConf()[1])
     -- self:setKey('color')
     self:setPath("./editor/editor.ui.lua")
 end
@@ -156,9 +156,9 @@ function Editor:textinput(text)
 end
 
 function Editor:resize(width, height)
-    g_egui:customize(width / 2, height / 2, width, height)
+    g_egui:setXYWH(width / 2, height / 2, width, height)
     local parent = g_egui:getById('nodeStage')
-    self._template:customize(parent:getX(), parent:getY(), parent:getW() - 100, parent:getH() - 100)
+    self._template:setXYWH(parent:getX(), parent:getY(), parent:getW() - 100, parent:getH() - 100)
     local path = self._path
     local conf = self._conf
     local key = self._key
@@ -197,7 +197,7 @@ function Editor:setPath(path)
         self._tree = nil
     else
         local parent = g_egui:getById('nodeStage')
-        self._template = gui.newGUI(self._path):customize(parent:getX(), parent:getY(), parent:getW() - 100, parent:getH() - 100)
+        self._template = gui.newGUI():setXYWH(parent:getX(), parent:getY(), parent:getW() - 100, parent:getH() - 100):addTemplate(self._path)
         self._tree = Tree(g_egui:getById('boxTree'))
     end
 end
@@ -246,7 +246,6 @@ function Editor:setValue(textValue)
         g_editor._conf[g_editor._key] = newValue
     end
     g_attribute:_updateAttribute()
-    self._template:doRefreshUi()
 end
 
 function Editor:_updateDescribe()
@@ -378,7 +377,7 @@ function Editor:_tryCreateFile()
 end
 
 function Editor:_trySaveFile(toNewFile)
-    local config = self._template:getUiConfig()
+    local config = self._template:getConf()
     local content = table.string(config, nil, PROPERTY_NAME_ORDER)
 
     if toNewFile then
