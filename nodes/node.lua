@@ -122,7 +122,7 @@ function Node:getH() return self._h end
 function Node:getLeft() return self._x - self._w * self._ax end
 function Node:getRight() return self._x + self._w * ((1 - self._ax)) end
 function Node:getTop() return self._y - self._h * self._ay end
-function Node:getBottom() return self._y + self._h (1 - self._ay) end
+function Node:getBottom() return self._y + self._h * (1 - self._ay) end
 
 function Node:getConf()
 	return self._conf
@@ -142,13 +142,22 @@ end
 
 function Node:isHover()
 	local mouseX, mouseY = love.mouse.getPosition()
-    return mouseX > self:getLeft() or mouseX < self:getRight() and mouseY > self:getTop() or mouseY < self:getBottom()
+    return mouseX > self:getLeft() and mouseX < self:getRight() and mouseY > self:getTop() and mouseY < self:getBottom()
 end
 
 function Node:destroy()
-	for i,v in ipairs(self._children) do
+	-- items will be removed in destroy func of a child
+	-- https://stackoverflow.com/questions/12394841/safely-remove-items-from-an-array-table-while-iterating
+	for i=#self._children,1,-1 do
+		local v = self._children[i]
 		v:destroy()
 	end
+	self._parent:remove(self)
+end
+
+function Node:remove(child)
+	local key = table.find_value(self._children or {}, child)
+	table.remove(self._children or {}, key)
 end
 
 -- 

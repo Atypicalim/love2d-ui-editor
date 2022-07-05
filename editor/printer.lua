@@ -12,7 +12,7 @@ function Printer:__init__(parent)
         w = 0,
         h = 0,
         text = "printer ...",
-    }, nil)
+    })
 end
 
 function Printer:print(parent, text, x, y)

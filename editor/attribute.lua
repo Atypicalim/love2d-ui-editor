@@ -14,8 +14,15 @@ function Attribute:__init__(parent, setPropertyFunc)
 		y = '0.5',
 		w = '0.9',
 		h = '0.9',
-		color = rgba2hex(100, 100, 100, 150),
-	}, self._parent)
+		color = "#1e1e1e",
+	})
+    self._clipper = self._background:newConfig({
+        type = "Clipper",
+		x = '0.5',
+		y = '0.5',
+		w = '1',
+		h = '1',
+	})
     --
     self._btnUp = parent:newConfig({
         type = "Button",
@@ -24,7 +31,7 @@ function Attribute:__init__(parent, setPropertyFunc)
         w = 15,
         h = 15,
         color = rgba2hex(255, 0, 0),
-    }, self._parent)
+    })
     self._btnUp:setIcon("/media/angle_up.png")
     self._btnUp.onClick = function()
         if self._propertyIndent > 0 then
@@ -41,7 +48,7 @@ function Attribute:__init__(parent, setPropertyFunc)
         w = 15,
         h = 15,
         color = rgba2hex(255, 0, 0),
-    }, self._parent)
+    })
     self._btnDown:setIcon("/media/angle_down.png")
     self._btnDown.onClick = function()
         if self._propertyCount >= ATTRIBUTE_PROPERTY_COUNT then
@@ -88,31 +95,6 @@ function Attribute:createProperty(config)
             Property(key, value, '0.5', y, self._propertyW, self._propertyH)
         end
     end
-end
-
-function Attribute:update(dt)
-    self._background:update(dt)
-    self._btnUp:update(dt)
-    self._btnDown:update(dt)
-    for i,v in ipairs(self._properties) do
-        v:update(dt)
-    end
-end
-
-function Attribute:draw()
-    self._background:draw()
-    love.graphics.setScissor(
-        self._background:getLeft(),
-        self._background:getTop(),
-        self._background:getW(),
-        self._background:getH()
-    )
-    self._btnUp:draw()
-    self._btnDown:draw()
-    for i,v in ipairs(self._properties) do
-        v:draw(dt)
-    end
-    love.graphics.setScissor()
 end
 
 function Attribute:wheelmoved(x, y)

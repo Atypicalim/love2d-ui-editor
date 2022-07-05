@@ -6,7 +6,7 @@ local Leaf = class("Leaf")
 
 function Leaf:__init__(config, x, y, w, h)
     self._config = config
-    self._parent = g_tree._background
+    self._parent = g_tree._clipper
     --
     if g_tree._skippedCount < g_tree._treeIndent then
         g_tree._skippedCount = g_tree._skippedCount + 1
@@ -21,42 +21,43 @@ function Leaf:__init__(config, x, y, w, h)
 		w = w,
 		h = h,
 		color = rgba2hex(10 * g_tree._leafDepth, 10 * g_tree._leafDepth, 10 * g_tree._leafDepth, 150),
-	}, self._parent)
-    self._border = self._parent:newConfig({
+	})
+    self._border = self._background:newConfig({
         type = "Rectangle",
 		x = '0.5',
 		y = '0.5',
 		w = '1',
 		h = '1',
+        mode = 'line',
 		color = BORDER_OFF_COLOR,
-	}, self._background)
-    self._labelName = self._parent:newConfig({
+	})
+    self._labelName = self._background:newConfig({
         type = "Text",
         x = '0.5',
         y = '0.5',
         w = 0,
         h = 0,
         text = "[" .. self._config.type .. "]",
-    }, self._background)
-    self._btnFold = self._parent:newConfig({
+    })
+    self._btnFold = self._background:newConfig({
         type = "Button",
         x = '0+15',
         y = '0.5',
         w = 15,
         h = 15,
-    }, self._background)
+    })
     self._btnFold:setIcon(self._config.open and "/media/up.png" or "/media/down.png")
     self._btnFold.onClick = function()
         self._config.open = not self._config.open
         g_tree:_updateTree()
     end
-    self._btnEdit = self._parent:newConfig({
+    self._btnEdit = self._background:newConfig({
         type = "Button",
         x = '1-15',
         y = '0.5',
         w = 15,
         h = 15,
-    }, self._background)
+    })
     self._btnEdit:setIcon("/media/edit.png")
     self._btnEdit.onClick = function()
         g_editor:setConf(self._config)
@@ -71,25 +72,8 @@ function Leaf:updateColor()
     self._border:setColor(g_editor._conf == self._config and BORDER_ON_COLOR or BORDER_OFF_COLOR)
 end
 
-function Leaf:update(dt)
-    self._background:update(dt)
-    self._border:update(dt)
-    self._labelName:update(dt)
-    self._btnFold:update(dt)
-    self._btnEdit:update(dt)
-end
-
-function Leaf:draw()
-    self._background:draw('fill')
-    self._border:draw('line')
-    self._labelName:draw('line')
-    self._btnFold:draw()
-    self._btnEdit:draw()
-end
-
 function Leaf:destroy()
-    self._btnFold:destroy()
-    self._btnEdit:destroy()
+    self._background:destroy()
 end
 
 return Leaf

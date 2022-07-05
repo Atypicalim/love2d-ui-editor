@@ -18,7 +18,6 @@ function Button:__init__(conf, parent)
 	end
 	self.btn.style.bgColor = {0.5, 0.5, 0.5}
 	self.btn:onRelease(function()
-		print('\n\n\n===>', self.canvas)
 		if self.onClick then
 			self.onClick()
 		elseif self.canvas then

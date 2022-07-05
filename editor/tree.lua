@@ -13,7 +13,14 @@ function Tree:__init__(parent)
 		y = '0.5',
 		w = '0.9',
 		h = '0.9',
-		color = rgba2hex(100, 100, 100, 150),
+		color = "#1e1e1e",
+	})
+    self._clipper = self._background:newConfig({
+        type = "Clipper",
+		x = '0.5',
+		y = '0.5',
+		w = '1',
+		h = '1',
 	})
     --
     self._btnUp = parent:newConfig({
@@ -51,7 +58,7 @@ function Tree:__init__(parent)
     end
     --
     self._treeIndent = 0
-    -- self:_updateTree()
+    self:_updateTree()
 end
 
 function Tree:updateColor()
@@ -87,31 +94,6 @@ function Tree:createLeaf(children)
         Leaf(v, x, y, self._leafW, self._leafH)
     end
     self._leafDepth = self._leafDepth - 1
-end
-
-function Tree:update(dt)
-    self._background:update(dt)
-    self._btnUp:update(dt)
-    self._btnDown:update(dt)
-    for i,v in ipairs(self._leafs or {}) do
-        v:update(dt)
-    end
-end
-
-function Tree:draw()
-    -- self._background:draw()
-    love.graphics.setScissor(
-        self._background:getLeft(),
-        self._background:getTop(),
-        self._background:getW(),
-        self._background:getH()
-    )
-    -- self._btnUp:draw()
-    -- self._btnDown:draw()
-    for i,v in ipairs(self._leafs or {}) do
-        v:draw(dt)
-    end
-    love.graphics.setScissor()
 end
 
 function Tree:wheelmoved(x, y)

@@ -14,10 +14,10 @@ function Rectangle:setColor(color)
 	self._r, self._g, self._b, self._a = self._r / 255, self._g / 255, self._b / 255, self._a / 255
 end
 
-function Rectangle:draw(mode)
+function Rectangle:draw()
 	if not self._isHide then
 		love.graphics.setColor(self._r, self._g, self._b, self._a)
-	    love.graphics.rectangle(mode or "fill", self:getLeft(), self:getTop(), self._w, self._h)
+		love.graphics.rectangle(self._conf.mode or "fill", self:getLeft(), self:getTop(), self._w, self._h)
 	end
 	Node.draw(self)
 end

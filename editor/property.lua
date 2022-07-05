@@ -7,7 +7,7 @@ local Property = class("Property")
 function Property:__init__(key, value, x, y, w, h)
     self._key = key
     self._value = value
-    self._parent = g_attribute._background
+    self._parent = g_attribute._clipper
     --
     local info = PROPERTY_NAME_INFO[key] or {}
     local length = 18 + (info.ignoreEdit and 3 or 0)
@@ -29,31 +29,32 @@ function Property:__init__(key, value, x, y, w, h)
 		w = w,
 		h = h,
 		color = rgba2hex(10, 10, 10, 150),
-	}, self._parent)
-    self._border = self._parent:newConfig({
+	})
+    self._border = self._background:newConfig({
         type = "Rectangle",
 		x = '0.5',
 		y = '0.5',
 		w = '1',
 		h = '1',
+        mode = 'line',
 		color = BORDER_OFF_COLOR,
-	}, self._background)
-    self._labelName = self._parent:newConfig({
+	})
+    self._labelName = self._background:newConfig({
         type = "Text",
         x = info.ignoreEdit and '0.5' or '0.5-12',
         y = '0.5',
         w = 0,
         h = 0,
         text = name,
-    }, self._background)
+    })
     if not info.ignoreEdit then
-        self._btnEdit = self._parent:newConfig({
+        self._btnEdit = self._background:newConfig({
             type = "Button",
             x = '1-15',
             y = '0.5',
             w = 15,
             h = 15,
-        }, self._background)
+        })
         self._btnEdit:setIcon("/media/edit.png")
         self._btnEdit.onClick = function()
             g_editor:setKey(key)
@@ -68,28 +69,8 @@ function Property:updateColor()
     self._border:setColor(g_editor._key == self._key and BORDER_ON_COLOR or BORDER_OFF_COLOR)
 end
 
-function Property:update(dt)
-    self._background:update(dt)
-    self._border:update(dt)
-    self._labelName:update(dt)
-    if self._btnEdit then
-        self._btnEdit:update(dt)
-    end
-end
-
-function Property:draw()
-    self._background:draw('fill')
-    self._border:draw('line')
-    self._labelName:draw('line')
-    if self._btnEdit then
-        self._btnEdit:draw()
-    end
-end
-
 function Property:destroy()
-    if self._btnEdit then
-        self._btnEdit:destroy()
-    end
+    self._background:destroy()
 end
 
 return Property

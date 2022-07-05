@@ -63,12 +63,6 @@ function Editor:update(dt)
     if self._template then
         self._template:update(dt)
     end
-    if self._tree then
-        self._tree:update(dt)
-    end
-    if self._attribute then
-        self._attribute:update(dt)
-    end
     if self._field then
         self._field:update(dt)
     end
@@ -81,14 +75,10 @@ function Editor:draw()
     else
         self._printer:print(g_egui:getById('nodeStage'), "please select a ui file ...")
     end
-    if self._tree then
-        self._tree:draw()
-    else
+    if not self._tree then
         self._printer:print(g_egui:getById('bgLeft'), "no tree ...")
     end
-    if self._attribute then
-        self._attribute:draw()
-    else
+    if not self._attribute then
         self._printer:print(g_egui:getById('bgRight'), "no attribute ...")
     end
     if self._field then

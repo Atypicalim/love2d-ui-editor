@@ -13,6 +13,7 @@ require 'nodes/text'
 require 'nodes/input'
 require 'nodes/rectangle'
 require 'nodes/canvas'
+require 'nodes/clipper'
 
 -- interfaces
 
