@@ -50,7 +50,8 @@ function Leaf:__init__(config, x, y, w, h)
         self._config.open = not self._config.open
         g_tree:_updateTree()
     end
-    self._btnEdit = Button(g_egui, {
+    self._btnEdit = self._parent:newConfig({
+        type = "Button",
         x = '1-15',
         y = '0.5',
         w = 15,

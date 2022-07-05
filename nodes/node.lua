@@ -6,6 +6,10 @@ Node = class("Node")
 
 function Node:__init__(conf, parent)
 	self._conf = conf
+	-- TODO validate with type key values
+	self._conf.hide = self._conf.hide == true
+	self._conf.children = self._conf.children or {}
+	--
 	self._parent = parent
 	self._children = {}
 	self:setA()
@@ -14,8 +18,10 @@ function Node:__init__(conf, parent)
 	--
 	self:_adjust()
 	--
-	self._isHide = self._conf.hide == true
-	self:addConfigs(self._conf.children or {})
+	self._isHide = self._conf.hide
+	for i,v in ipairs(self._conf.children) do
+		self:_parseConfig(v)
+	end
 end
 
 function Node:_adjust()
@@ -152,10 +158,6 @@ function Node:addTemplate(path)
 	assert(string.valid(path) and files.is_file(path), 'invalid ui path:' .. path)
 	local configs = table.read_from_file(path)
 	assert(configs ~= nil, 'invalid ui config! in:' .. path)
-	return self:addConfigs(configs)
-end
-
-function Node:addConfigs(configs)
 	if not table.is_array(configs) then
 		configs = {configs}
 	end
@@ -167,11 +169,17 @@ end
 
 function Node:newConfig(config)
 	assert(_G[config.type], string.format('node [%s] not found!', config.type))
+	table.insert(self._conf.children, config)
+	return self:_parseConfig(config)
+end
+
+function Node:_parseConfig(config)
 	local child = _G[config.type](config, self)
 	child.canvas = self.canvas or self
 	table.insert(self._children, child)
 	return child
 end
+
 
 function Node:getById(nodeId)
 	assert(string.valid(nodeId), 'invalid node id!')

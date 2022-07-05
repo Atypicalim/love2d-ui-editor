@@ -8,7 +8,8 @@ function Field:__init__(parent, yesFunc, noFunc)
     g_input = self
     self._parent = parent
     --
-    self._input = Input(g_egui, {
+    self._input = self._parent:newConfig({
+        type = "Input",
         x = '0.5',
         y = '0.5',
         w = '0.7',
@@ -16,7 +17,8 @@ function Field:__init__(parent, yesFunc, noFunc)
     }, self._parent)
     self._input:setText(tostring(g_editor._conf[g_editor._key]))
     --
-    self._btnOk = Button(g_egui, {
+    self._btnOk = self._parent:newConfig({
+        type = "Button",
         x = '0.9',
         y = '0.5',
         w = 25,
@@ -28,7 +30,8 @@ function Field:__init__(parent, yesFunc, noFunc)
         yesFunc(self._input:getText())
     end
     --
-    self._btnNo = Button(g_egui, {
+    self._btnNo = self._parent:newConfig({
+        type = "Button",
         x = '0.1',
         y = '0.5',
         w = 25,

@@ -7,7 +7,6 @@ local Tree = class("Tree")
 function Tree:__init__(parent)
     g_tree = self
     self._parent = parent
-    self._config = g_editor._template:getConf()
     self._background = parent:newConfig({
         type = "Rectangle",
 		x = '0.5',
@@ -15,7 +14,7 @@ function Tree:__init__(parent)
 		w = '0.9',
 		h = '0.9',
 		color = rgba2hex(100, 100, 100, 150),
-	}, self._parent)
+	})
     --
     self._btnUp = parent:newConfig({
         type = "Button",
@@ -24,7 +23,7 @@ function Tree:__init__(parent)
         w = 15,
         h = 15,
         color = rgba2hex(255, 0, 0),
-    }, self._parent)
+    })
     self._btnUp:setIcon("/media/angle_up.png")
     self._btnUp.onClick = function()
         if self._treeIndent > 0 then
@@ -41,7 +40,7 @@ function Tree:__init__(parent)
         w = 15,
         h = 15,
         color = rgba2hex(255, 0, 0),
-    }, self._parent)
+    })
     self._btnDown:setIcon("/media/angle_down.png")
     self._btnDown.onClick = function()
         if self._leafCount >= TREE_ITEM_COUNT then
@@ -52,7 +51,7 @@ function Tree:__init__(parent)
     end
     --
     self._treeIndent = 0
-    self:_updateTree()
+    -- self:_updateTree()
 end
 
 function Tree:updateColor()
@@ -75,7 +74,7 @@ function Tree:_updateTree()
     self._skippedCount = 0
     self._leafCount = 0
     self._leafDepth = 0
-    self:createLeaf(self._config)
+    self:createLeaf(g_editor._template:getConf().children or {})
     self:updateColor()
 end
 
@@ -94,22 +93,22 @@ function Tree:update(dt)
     self._background:update(dt)
     self._btnUp:update(dt)
     self._btnDown:update(dt)
-    for i,v in ipairs(self._leafs) do
+    for i,v in ipairs(self._leafs or {}) do
         v:update(dt)
     end
 end
 
 function Tree:draw()
-    self._background:draw()
+    -- self._background:draw()
     love.graphics.setScissor(
         self._background:getLeft(),
         self._background:getTop(),
         self._background:getW(),
         self._background:getH()
     )
-    self._btnUp:draw()
-    self._btnDown:draw()
-    for i,v in ipairs(self._leafs) do
+    -- self._btnUp:draw()
+    -- self._btnDown:draw()
+    for i,v in ipairs(self._leafs or {}) do
         v:draw(dt)
     end
     love.graphics.setScissor()
