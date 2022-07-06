@@ -9,11 +9,13 @@
     },
     [2] = {
         type = "Button",
-        id = 'idTest',
+        id = 'btnTest',
         x = "0.5",
         y = "0.5",
-        w = "0.5",
-        h = "0.5",
-        text = "Hello..."
+        w = 150,
+        h = 50,
+        color = "#ffaa77",
+        text = "hello...",
+        icon = "media/edit.png",
     }
 }

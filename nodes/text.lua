@@ -9,11 +9,11 @@ function Text:__init__(conf, parent)
 	Node.__init__(self, conf, parent)
 end
 
-function Text:_adjust()
+function Text:setXYWH(...)
+	Node.setXYWH(self, ...)
 	local font = love.graphics.getFont()
 	self._w = font:getWidth(self._text)
 	self._h = font:getHeight()
-	Node._adjust(self)
 end
 
 function Text:draw()

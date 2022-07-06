@@ -13,10 +13,7 @@ function Node:__init__(conf, parent)
 	self._parent = parent
 	self._children = {}
 	self:setA()
-	self:setXY()
-	self:setWH()
-	--
-	self:_adjust()
+	self:setXYWH()
 	--
 	self._isHide = self._conf.hide
 	for i,v in ipairs(self._conf.children) do
@@ -24,42 +21,77 @@ function Node:__init__(conf, parent)
 	end
 end
 
-function Node:_adjust()
-	if not self._ax or not self._x or not self._w then
-		return
-	end
+function Node:trigger(event, ...)
+	local args = {...}
+	if self[event] then self[event](unpack(args)) end
 end
 
-function Node:update()
-	for i,v in ipairs(self._children) do
-		v:update()
-	end
+function Node:update(dt)
+	for i,v in ipairs(self._children) do v:update(dt) end
 end
 
 function Node:draw()
-	if not self._isHide then
-		for i,v in ipairs(self._children) do
-			v:draw()
+	if self._isHide then return end
+	for i,v in ipairs(self._children) do v:draw() end
+end
+
+function Node:mousepressed(x, y, button)
+	for i=#self._children,1,-1 do self._children[i]:mousepressed(x, y, button) end
+	if self:isHover() then
+		self:trigger(NODE_EVENTS.ON_MOUSE_DOWN, x, y, button)
+		self._isMouseInWhenPress = true
+	else
+		self._isMouseInWhenPress = false
+	end
+end
+
+function Node:mousemoved(x, y, dx, dy, istouch)
+	for i=#self._children,1,-1 do self._children[i]:mousemoved(x, y, dx, dy, istouch) end
+	if self._isMouseInWhenMove then
+		if self:isHover() then
+			self:trigger(NODE_EVENTS.ON_MOUSE_MOVE, x, y, dx, dy, istouch)
+		else
+			self:trigger(NODE_EVENTS.ON_MOUSE_OUT, x, y, dx, dy, istouch)
+		end
+	else
+		if self:isHover() then
+			self:trigger(NODE_EVENTS.ON_MOUSE_IN, x, y, dx, dy, istouch)
+		end
+	end
+	self._isMouseInWhenMove = self:isHover()
+end
+
+function Node:mousereleased(x, y, button)
+	for i=#self._children,1,-1 do self._children[i]:mousereleased(x, y, button) end
+	if self:isHover() then
+		self:trigger(NODE_EVENTS.ON_MOUSE_UP, x, y, button)
+		if self._isMouseInWhenPress then
+			self:trigger(NODE_EVENTS.ON_CLICK, x, y, button)
+		end
+	else
+		if self._isMouseInWhenPress then
+			self:trigger(NODE_EVENTS.ON_CANCEL, x, y, button)
 		end
 	end
 end
 
-function Node:mousepressed(x, y, button)
-end
-
-function Node:mousereleased(x, y, button)
+function Node:wheelmoved(x, y)
+	for i=#self._children,1,-1 do self._children[i]:wheelmoved(x, y) end
+	if self._isMouseInWhenMove then
+		self:trigger(NODE_EVENTS.ON_WHEEL_MOVE, x, y)
+	end
 end
 
 function Node:keypressed(key, scancode, isrepeat)
+	for i=#self._children,1,-1 do self._children[i]:keypressed(key, scancode, isrepeat) end
 end
 
 function Node:keyreleased(key, scancode)
+	for i=#self._children,1,-1 do self._children[i]:keyreleased(key, scancode) end
 end
 
 function Node:textinput(text)
-end
-
-function Node:wheelmoved(x, y)
+	for i=#self._children,1,-1 do self._children[i]:textinput(text) end
 end
 
 function Node:hide()
@@ -79,7 +111,6 @@ function Node:setA(ax, ay)
 	ay = ay or self._conf.ay
 	self._ax = math.max(0, math.min(1, ax or 0.5))
 	self._ay = math.max(0, math.min(1, ay or 0.5))
-	self:_adjust()
 end
 
 function Node:setXYWH(x, y, w, h)
@@ -97,7 +128,9 @@ function Node:setXYWH(x, y, w, h)
 	self._h = is_number(self._conf.h) and self._conf.h or tools_calculate_number(self._parent:getH(), self._conf.h)
 	self._w = math.max(0, self._w)
 	self._h = math.max(0, self._h)
-	self:_adjust()
+	for i,v in ipairs(self._children) do
+		v:setXYWH()
+	end
 	return self
 end
 

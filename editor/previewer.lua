@@ -22,8 +22,9 @@ function Previewer:load()
         centered = true,
     })
     g_pgui = gui.newGUI():setXYWH(PREVIEW_WIDTH / 2, PREVIEW_HEIGHT / 2, PREVIEW_WIDTH, PREVIEW_HEIGHT):addTemplate(self._path)
-    g_pgui.onClick = function(id, node)
-        print(id, node)
+    local btnTest = g_pgui:getById("btnTest")
+    btnTest.onClick = function()
+        print("onclick---")
     end
 end
 

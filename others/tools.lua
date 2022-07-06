@@ -28,6 +28,21 @@ function rgba2hex(r, g, b, a)
     return hex
 end
 
+function rgba2love(...)
+    local rgba = {...}
+    if is_table(rgba[1]) then rgba = rgba[1] end
+    assert(#rgba == 4)
+    return {rgba[1] / 255, rgba[2] / 255, rgba[3] / 255, rgba[4] / 255}
+end
+
+function hex2new(hex, times)
+    local values = {hex2rgba(hex)}
+    for i=1,3 do
+        values[i] = math.min(255, values[i] * times)
+    end
+    return rgba2hex(unpack(values))
+end
+
 function tools_calculate_number(base, describe)
 	local equation = string.format("return %d * %s", base, describe)
 	local func = loadstring(equation)
