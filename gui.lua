@@ -2,8 +2,7 @@
 	gui
 ]]
 
-require('thirds/tools/test')
-require('thirds/gooi/gooi')
+require('tools/test')
 
 require 'others/constants'
 require 'others/tools'
@@ -63,7 +62,6 @@ function gui.cancelProxy(obj)
 end
 
 function gui.newGUI()
-	gooi.desktopMode()
 	local canvas = Canvas(self)
 	gui.useProxy(canvas)
 	return canvas

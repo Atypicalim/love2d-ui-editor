@@ -42,11 +42,6 @@ function Field:__init__(parent, yesFunc, noFunc)
     self._btnNo.onClick = function()
         noFunc(self._input:getText())
     end
-    -- focus text input
-    self._input.text.hasFocus = true
-    gooi.focused = self._input.text
-    -- love.keyboard.setTextInput(true)
-
 end
 
 function Field:update(dt)

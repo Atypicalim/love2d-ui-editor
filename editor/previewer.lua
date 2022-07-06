@@ -2,8 +2,7 @@
 	editor
 ]]
 
-require('thirds/tools/test')
-require('thirds/gooi/gooi')
+require('tools/test')
 
 local Previewer = class("Previewer")
 local gui = require('gui')
@@ -27,7 +26,7 @@ function Previewer:load()
     --     print("onclick---")
     -- end
     local inputTest = g_pgui:getById("inputTest")
-    -- love.keyboard.setTextInput(true)
+    -- love.keyboard.setTextInput(false)
 end
 
 function Previewer:keypressed(key, scancode, isrepeat)
@@ -35,21 +34,6 @@ function Previewer:keypressed(key, scancode, isrepeat)
         love.event.quit('restart')
         return
     end
-end
-
-function Previewer:mousepressed(x, y, button)
-	gooi.pressed()
-end
-
-function Previewer:mousereleased(x, y, button)
-	gooi.released()
-end
-
-function Previewer:mousemoved( x, y, dx, dy, istouch)
-end
-
-function Previewer:draw()
-	gooi.draw()
 end
 
 function Previewer:resize(width, height)

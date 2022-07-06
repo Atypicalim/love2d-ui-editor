@@ -2,8 +2,7 @@
 	editor
 ]]
 
-require('thirds/tools/test')
-require('thirds/gooi/gooi')
+require('tools/test')
 
 local Editor = class("Editor")
 local gui = require('gui')
@@ -59,7 +58,6 @@ function Editor:load()
 end
 
 function Editor:update(dt)
-	gooi.update(dt)
     if self._template then
         self._template:update(dt)
     end
@@ -69,7 +67,6 @@ function Editor:update(dt)
 end
 
 function Editor:draw()
-	gooi.draw()
     if self._template then
         self._template:draw()
     else
@@ -93,7 +90,6 @@ function Editor:draw()
 end
 
 function Editor:keypressed(key, scancode, isrepeat)
-	gooi.keypressed(key, scancode, isrepeat)
     if key == 'f5' then
         love.event.quit('restart')
         return
@@ -127,22 +123,6 @@ function Editor:keypressed(key, scancode, isrepeat)
             self:setConf(nil)
         end
     end
-end
-
-function Editor:keyreleased(key, scancode)
-	gooi.keyreleased(key, scancode)
-end
-
-function Editor:mousepressed(x, y, button)
-	gooi.pressed()
-end
-
-function Editor:mousereleased(x, y, button)
-	gooi.released()
-end
-
-function Editor:textinput(text)
-	gooi.textinput(text)
 end
 
 function Editor:resize(width, height)

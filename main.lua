@@ -14,3 +14,7 @@ function love.load()
         editor:load()
     end
 end
+
+function love.textinput(text)
+    print('-->input', text)
+end
