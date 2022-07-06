@@ -45,7 +45,7 @@ function Field:__init__(parent, yesFunc, noFunc)
     -- focus text input
     self._input.text.hasFocus = true
     gooi.focused = self._input.text
-    love.keyboard.setTextInput(true)
+    -- love.keyboard.setTextInput(true)
 
 end
 
@@ -70,10 +70,10 @@ end
 function Field:onKey(key)
     if key == 'escape' then
         self._btnNo.onClick()
-        love.keyboard.setTextInput(false)
+        -- love.keyboard.setTextInput(false)
     elseif key == 'return' then
         self._btnOk.onClick()
-        love.keyboard.setTextInput(false)
+        -- love.keyboard.setTextInput(false)
     else
         if love.keyboard.isDown('lctrl') or love.keyboard.isDown('rctrl') then
             if key == 'x' then

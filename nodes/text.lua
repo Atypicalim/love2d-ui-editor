@@ -9,6 +9,15 @@ function Text:__init__(conf, parent)
 	Node.__init__(self, conf, parent)
 end
 
+function Text:getText()
+	return self._text
+end
+
+function Text:setText(text)
+	self._text = text
+	self:setXYWH()
+end
+
 function Text:setXYWH(...)
 	Node.setXYWH(self, ...)
 	local font = love.graphics.getFont()
