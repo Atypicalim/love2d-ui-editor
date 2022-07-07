@@ -8,7 +8,7 @@ function Button:__init__(conf, parent)
 	Node.__init__(self, conf, parent)
 	--
 	self._isDisabled = self._conf.disable == true
-	self._conf.color = self._conf.color or "#00ff00ff"
+	self._conf.color = self._conf.color or "#555555aa"
 	if self._conf.color then
 		self._colorPressed = hex2new(self._conf.color, 1.2)
 		self._colorDisabled = hex2new(self._conf.color, 0.9)
@@ -19,7 +19,6 @@ function Button:__init__(conf, parent)
 		y = '0.5',
 		w = '1',
 		h = '1',
-		radius = self._conf.radius or 3,
 		color = self._isDisabled and self._colorDisabled or self._conf.color,
 	})
 	self._iconNode = self:newConfig({

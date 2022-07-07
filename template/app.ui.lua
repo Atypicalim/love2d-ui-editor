@@ -5,9 +5,44 @@
         y = "0.5",
         w = "0.7",
         h = "0.7",
-        color = "#5577ff"
+        color = "#557744"
     },
     [2] = {
+        type = "Ellipse",
+        x = "0.5",
+        y = "0.5",
+        w = "0.5",
+        h = "0.6",
+        color = "#227733"
+    },
+    [3] = {
+        type = "Polygon",
+        x = "0.5",
+        y = "0.5",
+        w = "0",
+        h = "0",
+        points = {0, -100, 100, 0, 50, 100, -50, 100, -100, 0},
+        color = "#5577ff"
+    },
+    [4] = {
+        type = "Line",
+        x = "0.5",
+        y = "0.5",
+        w = "0",
+        h = "0",
+        points = {0, -50, 50, 0, 25, 50, -25, 50, -50, 0},
+        color = "#ffaa00"
+    },
+    [5] = {
+        type = "Point",
+        x = "0.5",
+        y = "0.5",
+        w = "0",
+        h = "0",
+        points = {0, 0, -25, -25},
+        color = "#ff00ff"
+    },
+    [6] = {
         type = "Button",
         id = 'btnTest',
         x = "0.5",
@@ -18,7 +53,7 @@
         text = "YES",
         icon = "media/edit.png",
     },
-    [3] = {
+    [7] = {
         type = "Input",
         id = "inputTest",
         x = "0.5",
@@ -27,5 +62,39 @@
         h = 50,
         color = "#111111aa",
         text = "input...",
-    }
+    },
+    [8] = {
+        type = "Video",
+        x = "0.5",
+        y = "0.5",
+        w = "0.3",
+        h = "0.3",
+        path = "media/movie.ogg"
+    },
+    [9] = {
+        type = "Particle",
+        x = "0.5",
+        y = "0.5",
+        w = "0.5",
+        h = "0.5",
+        path = "media/preview.png",
+    },
+    [10] = {
+        type = "Text",
+        x = "0.5",
+        y = "0.5",
+        w = "0",
+        h = "0",
+        color = "#ff0000",
+        text = "TEXT..."
+    },
+    [11] = {
+        type = "Button",
+        id = "btnWorkspace",
+        x = 50,
+        y = 50,
+        w = 25,
+        h = 25,
+        icon = "media/folder.png",
+    },
 }

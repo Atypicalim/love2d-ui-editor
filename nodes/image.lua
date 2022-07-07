@@ -5,22 +5,15 @@
 Image = class("Image", Node)
 
 function Image:__init__(conf, parent)
-	self:setPath(conf.path)
 	Node.__init__(self, conf, parent)
-end
-
-function Image:setXYWH(x, y , will , h)
-	if self._image then
-		w = self._image:getWidth()
-		h = self._image:getHeight()
-	end
-	Node.setXYWH(self, x, y , w , h)
+	self:setPath(self._conf.path)
 end
 
 function Image:setPath(path)
 	self._path = path
 	if string.valid(path) then
 		self._image = love.graphics.newImage(path)
+		Node.setXYWH(self, nil, nil, self._image:getWidth(), self._image:getHeight())
 	else
 		self._image = nil
 	end

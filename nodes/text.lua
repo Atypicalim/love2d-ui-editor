@@ -5,9 +5,8 @@
 Text = class("Text", Node)
 
 function Text:__init__(conf, parent)
-	self._text = conf.text
-	self._font = love.graphics.newFont(conf.font_size or 18)
 	Node.__init__(self, conf, parent)
+	self:setText(self._conf.text)
 end
 
 function Text:getText()
@@ -16,20 +15,16 @@ end
 
 function Text:setText(text)
 	self._text = text
-	self:setXYWH()
-end
-
-function Text:setXYWH(...)
-	Node.setXYWH(self, ...)
-	self._w = self._font:getWidth(self._text)
-	self._h = self._font:getHeight()
+	self._font = love.graphics.newFont(self._conf.font_size or 12)
+	self._txt = love.graphics.newText(self._font, self._text)
+	self:setXYWH(nil, nil, self._txt:getWidth(), self._txt:getHeight())
 end
 
 function Text:draw()
-	if not self._isHide then
+	if not self._isHide and self._txt then
 	    love.graphics.setColor(0.7, 0.7, 0.7, 1)
 		love.graphics.setFont(self._font)
-		love.graphics.print(self._text, self:getLeft(), self:getTop())
+		love.graphics.draw(self._txt, self:getLeft(), self:getTop())
 	end
 	Node.draw(self)
 end
