@@ -201,13 +201,13 @@ function Node:isHover()
 end
 
 function Node:destroy()
-	-- items will be removed in destroy func of a child
-	-- https://stackoverflow.com/questions/12394841/safely-remove-items-from-an-array-table-while-iterating
-	for i=#self._children,1,-1 do
-		local v = self._children[i]
+	self._parent:remove(self)
+	local children = self._children
+	self._children = {}
+	for i=#children,1,-1 do
+		local v = children[i]
 		v:destroy()
 	end
-	self._parent:remove(self)
 end
 
 function Node:remove(child)
