@@ -18,8 +18,28 @@ require 'nodes/polygon'
 require 'nodes/line'
 require 'nodes/point'
 require 'nodes/particle'
-require 'nodes/canvas'
 require 'nodes/clipper'
+
+-- gui
+
+Gui = class("Gui", Node)
+
+function Gui:__init__()
+	Node.__init__(self, {
+		x = 0,
+		y = 0,
+		w = 0,
+		h = 0,
+	}, nil)
+end
+
+function Gui:draw()
+	if not self._isHide then
+		love.graphics.setColor(0.1, 0.1, 0.1, 150)
+	    love.graphics.rectangle("fill", self:getLeft(), self:getTop(), self:getW(), self:getH())
+	end
+	Node.draw(self)
+end
 
 -- interfaces
 
@@ -27,7 +47,7 @@ local gui = {}
 
 local proxyObjects = {}
 
-function gui._initProxy()
+local function _initProxy()
     for k,v in pairs(LOVE_PROXY_FUNCTIONS) do
         local originFunction
         if love[k] then
@@ -50,7 +70,7 @@ end
 function gui.useProxy(obj)
     assert(love ~= nil)
     if not love.usingProxy then
-        gui._initProxy()
+        _initProxy()
         love.usingProxy = true
     end
     if not table.find_value(proxyObjects, obj) then
@@ -68,14 +88,14 @@ function gui.cancelProxy(obj)
 end
 
 function gui.newGUI()
-	local canvas = Canvas(self)
-	gui.useProxy(canvas)
-	return canvas
+	local ui = Gui(self)
+	gui.useProxy(ui)
+	return ui
 end
 
-function gui.delGUI(canvas)
-	assert(canvas:getConf().type == 'Canvas')
-	gui.cancelProxy(canvas)
+function gui.delGUI(ui)
+	assert(ui.__name__ == Gui.__name__)
+	gui.cancelProxy(ui)
 end
 
 return gui

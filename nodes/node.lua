@@ -21,9 +21,31 @@ function Node:__init__(conf, parent)
 	end
 end
 
+function Node:_setLove(love)
+	self._love = love
+end
+
+function Node:getLove()
+	return self._love
+end
+
+function Node:getParent()
+	return self._parent
+end
+
 function Node:trigger(event, ...)
 	local args = {...}
-	if self[event] then self[event](unpack(args)) end
+	if self.__name__ ~= Gui.__name__ and self[event] then
+		self[event](unpack(args))
+	elseif self._parent then
+		local parent = self._parent
+		while parent:getParent() do
+			parent = parent:getParent()
+		end
+		if parent.__name__ == Gui.__name__ and parent[event] then
+			parent[event](self:getId(), self, unpack(args))
+		end
+	end
 end
 
 function Node:update(dt)

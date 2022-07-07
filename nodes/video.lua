@@ -7,7 +7,6 @@ Video = class("Video", Node)
 function Video:__init__(conf, parent)
 	Node.__init__(self, conf, parent)
 	self:setPath(self._conf.path)
-	self._video:play()
 end
 
 function Video:setPath(path)
@@ -18,6 +17,7 @@ function Video:setPath(path)
 	else
 		self._video = nil
 	end
+	self:_setLove(self._video)
 end
 
 function Video:getPath()

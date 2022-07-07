@@ -29,7 +29,6 @@ function Tree:__init__(parent)
         y = '0+15',
         w = 15,
         h = 15,
-        color = rgba2hex(255, 0, 0),
     })
     self._btnUp:setIcon("/media/angle_up.png")
     self._btnUp.onClick = function()
@@ -46,7 +45,6 @@ function Tree:__init__(parent)
         y = '1-15',
         w = 15,
         h = 15,
-        color = rgba2hex(255, 0, 0),
     })
     self._btnDown:setIcon("/media/angle_down.png")
     self._btnDown.onClick = function()

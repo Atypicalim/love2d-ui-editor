@@ -65,6 +65,7 @@
     },
     [8] = {
         type = "Video",
+        id = "idVideo",
         x = "0.5",
         y = "0.5",
         w = "0.3",
@@ -90,7 +91,7 @@
     },
     [11] = {
         type = "Button",
-        id = "btnWorkspace",
+        id = "idButton",
         x = 50,
         y = 50,
         w = 25,

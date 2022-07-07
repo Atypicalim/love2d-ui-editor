@@ -31,6 +31,7 @@ function Particle:setPath(path)
 	else
 		self._particle = nil
 	end
+	self:_setLove(self._particle)
 end
 
 function Particle:getPath()

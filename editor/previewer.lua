@@ -21,12 +21,15 @@ function Previewer:load()
         centered = true,
     })
     g_pgui = gui.newGUI():setXYWH(PREVIEW_WIDTH / 2, PREVIEW_HEIGHT / 2, PREVIEW_WIDTH, PREVIEW_HEIGHT):addTemplate(self._path)
-    -- local btnTest = g_pgui:getById("btnTest")
-    -- btnTest.onClick = function()
-    --     print("onclick---")
-    -- end
-    local inputTest = g_pgui:getById("inputTest")
-    -- love.keyboard.setTextInput(false)
+    local video = g_pgui:getById("idVideo")
+    local button = g_pgui:getById("idButton")
+    button.onClick = function()
+        if video:getLove():isPlaying() then
+            video:getLove():pause()
+        else
+            video:getLove():play()
+        end
+    end
 end
 
 function Previewer:keypressed(key, scancode, isrepeat)
