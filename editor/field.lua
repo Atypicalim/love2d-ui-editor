@@ -14,6 +14,7 @@ function Field:__init__(parent, yesFunc, noFunc)
         y = '0.5',
         w = '0.7',
         h = '0.5',
+        color = "#111111aa",
     }, self._parent)
     self._input:setText(tostring(g_editor._conf[g_editor._key]))
     --
@@ -65,32 +66,8 @@ end
 function Field:onKey(key)
     if key == 'escape' then
         self._btnNo.onClick()
-        -- love.keyboard.setTextInput(false)
     elseif key == 'return' then
         self._btnOk.onClick()
-        -- love.keyboard.setTextInput(false)
-    else
-        if love.keyboard.isDown('lctrl') or love.keyboard.isDown('rctrl') then
-            if key == 'x' then
-                love.system.setClipboardText(self._input:getText())
-                self._input:setText("")
-            elseif key == 'c' then
-                love.system.setClipboardText(self._input:getText())
-            elseif key == 'v' then
-                local txt = self._input:getText()
-                self._input:setText(txt .. love.system.getClipboardText())
-            end
-        else
-            if key == 'backspace' then
-                -- self._input.text:deleteBack()
-            elseif key == 'delete' then
-                -- self._input.text:deleteDel()
-            elseif key == 'right' then
-                -- self._input.text:moveRight()
-            elseif key == 'left' then
-                -- self._input.text:moveLeft()
-            end
-        end
     end
 end
 
