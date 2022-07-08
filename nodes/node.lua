@@ -6,9 +6,7 @@ Node = class("Node")
 
 function Node:__init__(conf, parent)
 	self._conf = conf
-	-- TODO validate with type key values
-	self._conf.hide = self._conf.hide == true
-	self._conf.children = self._conf.children or {}
+	self:_checkConf(nil)
 	--
 	self._parent = parent
 	self._children = {}
@@ -49,16 +47,16 @@ function Node:trigger(event, ...)
 end
 
 function Node:update(dt)
-	for i,v in ipairs(self._children) do v:update(dt) end
+	self:foreachChildren(false, function(v) v:update(dt) end)
 end
 
 function Node:draw()
 	if self._isHide then return end
-	for i,v in ipairs(self._children) do v:draw() end
+	self:foreachChildren(false, function(v) v:draw() end)
 end
 
 function Node:mousepressed(x, y, button)
-	for i=#self._children,1,-1 do self._children[i]:mousepressed(x, y, button) end
+	self:foreachChildren(true, function(v) v:mousepressed(x, y, button) end)
 	if self:isHover() then
 		self:trigger(NODE_EVENTS.ON_MOUSE_DOWN, x, y, button)
 		self._isMouseInWhenPress = true
@@ -68,7 +66,7 @@ function Node:mousepressed(x, y, button)
 end
 
 function Node:mousemoved(x, y, dx, dy, istouch)
-	for i=#self._children,1,-1 do self._children[i]:mousemoved(x, y, dx, dy, istouch) end
+	self:foreachChildren(true, function(v) v:mousemoved(x, y, dx, dy, istouch) end)
 	if self._isMouseInWhenMove then
 		if self:isHover() then
 			self:trigger(NODE_EVENTS.ON_MOUSE_MOVE, x, y, dx, dy, istouch)
@@ -84,7 +82,7 @@ function Node:mousemoved(x, y, dx, dy, istouch)
 end
 
 function Node:mousereleased(x, y, button)
-	for i=#self._children,1,-1 do self._children[i]:mousereleased(x, y, button) end
+	self:foreachChildren(true, function(v) v:mousereleased(x, y, button) end)
 	if self:isHover() then
 		self:trigger(NODE_EVENTS.ON_MOUSE_UP, x, y, button)
 		if self._isMouseInWhenPress then
@@ -98,22 +96,35 @@ function Node:mousereleased(x, y, button)
 end
 
 function Node:wheelmoved(x, y)
-	for i=#self._children,1,-1 do self._children[i]:wheelmoved(x, y) end
+	self:foreachChildren(true, function(v) v:wheelmoved(x, y) end)
 	if self._isMouseInWhenMove then
 		self:trigger(NODE_EVENTS.ON_WHEEL_MOVE, x, y)
 	end
 end
 
 function Node:keypressed(key, scancode, isrepeat)
-	for i=#self._children,1,-1 do self._children[i]:keypressed(key, scancode, isrepeat) end
+	self:foreachChildren(true, function(v) v:keypressed(key, scancode, isrepeat) end)
 end
 
 function Node:keyreleased(key, scancode)
-	for i=#self._children,1,-1 do self._children[i]:keyreleased(key, scancode) end
+	self:foreachChildren(true, function(v) v:keyreleased(key, scancode) end)
 end
 
 function Node:textinput(text)
-	for i=#self._children,1,-1 do self._children[i]:textinput(text) end
+	self:foreachChildren(true, function(v) v:textinput(text) end)
+end
+
+function Node:foreachChildren(isReverse, callback)
+	local children = self._children
+	if isReverse then
+		for i=#children,1,-1 do
+			if children[i] then callback(children[i]) end
+		end
+	else
+		for i=1,#children,1 do
+			if children[i] then callback(children[i]) end
+		end
+	end
 end
 
 function Node:hide()
@@ -200,19 +211,24 @@ function Node:isHover()
     return mouseX > self:getLeft() and mouseX < self:getRight() and mouseY > self:getTop() and mouseY < self:getBottom()
 end
 
-function Node:destroy()
-	self._parent:remove(self)
+function Node:onDestroy()
 	local children = self._children
 	self._children = {}
 	for i=#children,1,-1 do
 		local v = children[i]
-		v:destroy()
+		v:onDestroy()
 	end
 end
 
-function Node:remove(child)
-	local key = table.find_value(self._children or {}, child)
+function Node:deleteChild(child)
+	local key, value = table.find_value(self._children or {}, child)
 	table.remove(self._children or {}, key)
+	value:onDestroy()
+end
+
+function Node:removeSelf()
+	assert(self._parent ~= nil)
+	self._parent:deleteChild(self)
 end
 
 -- 
@@ -272,4 +288,19 @@ function Node:getByType(nodeType)
 		end
 	end
 	return nodes
+end
+
+function Node:refreshNode(updatedConf)
+	if updatedConf == nil or updatedConf == self._conf then
+		self:_checkConf()
+		self:foreachChildren(false, function(v) v:refreshNode(nil) end)
+	else
+		self:foreachChildren(false, function(v) v:refreshNode(updatedConf) end)
+	end
+end
+
+function Node:_checkConf()
+	-- TODO validate with type key values
+	self._conf.hide = self._conf.hide == true
+	self._conf.children = self._conf.children or {}
 end

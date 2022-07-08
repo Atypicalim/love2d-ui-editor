@@ -70,7 +70,7 @@ function Property:updateColor()
 end
 
 function Property:destroy()
-    self._background:destroy()
+    self._background:removeSelf()
 end
 
 return Property

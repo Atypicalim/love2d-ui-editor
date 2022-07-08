@@ -110,9 +110,9 @@ function Tree:destroy()
     for i,v in ipairs(self._leafs or {}) do
         v:destroy()
     end
-    self._background:destroy()
-    self._btnUp:destroy()
-    self._btnDown:destroy()
+    self._background:removeSelf()
+    self._btnUp:removeSelf()
+    self._btnDown:removeSelf()
 end
 
 return Tree

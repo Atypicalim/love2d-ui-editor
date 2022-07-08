@@ -132,9 +132,10 @@ function Editor:resize(width, height)
     local path = self._path
     local conf = self._conf
     local key = self._key
-    self:setPath(path)
-    self:setConf(conf)
-    self:setKey(key)
+    -- self:setPath(path)
+    -- self:setConf(conf)
+    -- self:setKey(key)
+    self._template:refreshNode()
 end
 
 function Editor:wheelmoved(x, y)
@@ -216,6 +217,7 @@ function Editor:setValue(textValue)
         g_editor._conf[g_editor._key] = newValue
     end
     g_attribute:_updateAttribute()
+    self._template:refreshNode(g_editor._conf)
 end
 
 function Editor:_updateDescribe()

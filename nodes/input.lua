@@ -155,7 +155,3 @@ function Input:_cutText(text, fromBeginning)
 	if length <= 1 then return "" end
 	return fromBeginning and string.sub(text, 2, length) or string.sub(text, 1, length - 1)
 end
-
-function Input:destroy()
-	Node.destroy(self)
-end

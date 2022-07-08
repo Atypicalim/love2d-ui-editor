@@ -24,7 +24,6 @@ function Field:__init__(parent, yesFunc, noFunc)
         y = '0.5',
         w = 25,
         h = 25,
-        color = rgba2hex(255, 0, 0),
     }, self._parent)
     self._btnOk:setIcon("/media/confirm.png")
     self._btnOk.onClick = function()
@@ -37,12 +36,12 @@ function Field:__init__(parent, yesFunc, noFunc)
         y = '0.5',
         w = 25,
         h = 25,
-        color = rgba2hex(255, 0, 0),
     }, self._parent)
     self._btnNo:setIcon("/media/cancel.png")
     self._btnNo.onClick = function()
         noFunc(self._input:getText())
     end
+    self._input:setFocus(true)
 end
 
 function Field:update(dt)
@@ -58,9 +57,9 @@ function Field:draw()
 end
 
 function Field:destroy()
-    self._input:destroy()
-    self._btnOk:destroy()
-    self._btnNo:destroy()
+    self._input:removeSelf()
+    self._btnOk:removeSelf()
+    self._btnNo:removeSelf()
 end
 
 function Field:onKey(key)

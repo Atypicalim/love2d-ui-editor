@@ -30,7 +30,6 @@ function Attribute:__init__(parent, setPropertyFunc)
         y = '0+15',
         w = 15,
         h = 15,
-        color = rgba2hex(255, 0, 0),
     })
     self._btnUp:setIcon("/media/angle_up.png")
     self._btnUp.onClick = function()
@@ -47,7 +46,6 @@ function Attribute:__init__(parent, setPropertyFunc)
         y = '1-15',
         w = 15,
         h = 15,
-        color = rgba2hex(255, 0, 0),
     })
     self._btnDown:setIcon("/media/angle_down.png")
     self._btnDown.onClick = function()
@@ -116,9 +114,9 @@ function Attribute:destroy()
     for i,v in ipairs(self._properties or {}) do
         v:destroy()
     end
-    self._background:destroy()
-    self._btnUp:destroy()
-    self._btnDown:destroy()
+    self._background:removeSelf()
+    self._btnUp:removeSelf()
+    self._btnDown:removeSelf()
 end
 
 return Attribute

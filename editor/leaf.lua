@@ -73,7 +73,7 @@ function Leaf:updateColor()
 end
 
 function Leaf:destroy()
-    self._background:destroy()
+    self._background:removeSelf()
 end
 
 return Leaf

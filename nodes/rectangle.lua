@@ -6,8 +6,6 @@ Rectangle = class("Rectangle", Node)
 
 function Rectangle:__init__(conf, parent)
 	Node.__init__(self, conf, parent)
-	self:setColor(self._conf.color)
-	self._radius = self._conf.radius or 0
 end
 
 function Rectangle:setColor(color)
@@ -20,4 +18,10 @@ function Rectangle:draw()
 		love.graphics.rectangle(self._conf.mode or "fill", self:getLeft(), self:getTop(), self:getW(), self:getH(), self._radius, self._radius)
 	end
 	Node.draw(self)
+end
+
+function Rectangle:_checkConf()
+	Node._checkConf(self)
+	self:setColor(self._conf.color or "#101010aa")
+	self._radius = self._conf.radius or 0
 end
