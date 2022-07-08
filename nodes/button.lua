@@ -20,7 +20,7 @@ function Button:__init__(conf, parent)
 		w = '1',
 		h = '1',
 		color = self._isDisabled and self._colorDisabled or self._conf.color,
-	})
+	}):setIgnoreEvents(true)
 	self._iconNode = self:newConfig({
 		type = "Image",
 		x = "0.5",
@@ -28,7 +28,7 @@ function Button:__init__(conf, parent)
 		w = "1",
 		h = "1",
 		path = self._conf.icon or "",
-	})
+	}):setIgnoreEvents(true)
 	self._textNode = self:newConfig({
 		type = "Text",
 		x = '0.5',
@@ -36,7 +36,7 @@ function Button:__init__(conf, parent)
 		w = 0,
 		h = 0,
 		text = self._conf.text or "",
-	})
+	}):setIgnoreEvents(true)
 	if self._conf.icon and self._conf.text then
 		local w, h = self._iconNode:getWH()
 		self._iconNode:setXY(w, '0.5')

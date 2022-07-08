@@ -145,6 +145,10 @@ function Editor:wheelmoved(x, y)
     if self._attribute then
         self._attribute:wheelmoved(x, y)
     end
+    -- TODO: treee
+    -- applyTransform
+    -- translate
+    -- scale
 end
 
 function Editor:setWorkspace(workspace)

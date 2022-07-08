@@ -98,4 +98,12 @@
         h = 25,
         icon = "media/folder.png",
     },
+    [12] = {
+        type = "Arc",
+        id = "idButton",
+        x = '0.5',
+        y = '0.925',
+        w = 25,
+        h = 25,
+    },
 }

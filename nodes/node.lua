@@ -31,19 +31,18 @@ function Node:getParent()
 	return self._parent
 end
 
+function Node:isIgnoreEvents()
+	return self._isIgnoreEvents == true
+end
+
+function Node:setIgnoreEvents(ignore)
+	self._isIgnoreEvents = ignore == true
+	return self
+end
+
 function Node:trigger(event, ...)
 	local args = {...}
-	if self.__name__ ~= Gui.__name__ and self[event] then
-		self[event](unpack(args))
-	elseif self._parent then
-		local parent = self._parent
-		while parent:getParent() do
-			parent = parent:getParent()
-		end
-		if parent.__name__ == Gui.__name__ and parent[event] then
-			parent[event](self:getId(), self, unpack(args))
-		end
-	end
+	if self[event] then self[event](unpack(args)) end
 end
 
 function Node:update(dt)
@@ -57,49 +56,18 @@ end
 
 function Node:mousepressed(x, y, button)
 	self:foreachChildren(true, function(v) v:mousepressed(x, y, button) end)
-	if self:isHover() then
-		self:trigger(NODE_EVENTS.ON_MOUSE_DOWN, x, y, button)
-		self._isMouseInWhenPress = true
-	else
-		self._isMouseInWhenPress = false
-	end
 end
 
 function Node:mousemoved(x, y, dx, dy, istouch)
 	self:foreachChildren(true, function(v) v:mousemoved(x, y, dx, dy, istouch) end)
-	if self._isMouseInWhenMove then
-		if self:isHover() then
-			self:trigger(NODE_EVENTS.ON_MOUSE_MOVE, x, y, dx, dy, istouch)
-		else
-			self:trigger(NODE_EVENTS.ON_MOUSE_OUT, x, y, dx, dy, istouch)
-		end
-	else
-		if self:isHover() then
-			self:trigger(NODE_EVENTS.ON_MOUSE_IN, x, y, dx, dy, istouch)
-		end
-	end
-	self._isMouseInWhenMove = self:isHover()
 end
 
 function Node:mousereleased(x, y, button)
 	self:foreachChildren(true, function(v) v:mousereleased(x, y, button) end)
-	if self:isHover() then
-		self:trigger(NODE_EVENTS.ON_MOUSE_UP, x, y, button)
-		if self._isMouseInWhenPress then
-			self:trigger(NODE_EVENTS.ON_CLICK, x, y, button)
-		end
-	else
-		if self._isMouseInWhenPress then
-			self:trigger(NODE_EVENTS.ON_CANCEL, x, y, button)
-		end
-	end
 end
 
 function Node:wheelmoved(x, y)
 	self:foreachChildren(true, function(v) v:wheelmoved(x, y) end)
-	if self._isMouseInWhenMove then
-		self:trigger(NODE_EVENTS.ON_WHEEL_MOVE, x, y)
-	end
 end
 
 function Node:keypressed(key, scancode, isrepeat)
@@ -125,6 +93,27 @@ function Node:foreachChildren(isReverse, callback)
 			if children[i] then callback(children[i]) end
 		end
 	end
+end
+
+function Node:foreachDescendants(isReverse, callback)
+	local children = self._children
+	if isReverse then
+		for i=#children,1,-1 do
+			if children[i] then
+				children[i]:foreachDescendants(isReverse, callback)
+				callback(children[i])
+			end
+		end
+	else
+		callback(self)
+		for i=1,#children,1 do
+			if children[i] then
+				callback(children[i])
+				children[i]:foreachDescendants(isReverse, callback)
+			end
+		end
+	end
+
 end
 
 function Node:hide()
