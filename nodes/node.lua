@@ -117,11 +117,16 @@ function Node:foreachDescendants(isReverse, callback)
 end
 
 function Node:hide()
-	self._isHide = true
+	return self:setVisible(false)
 end
 
 function Node:show()
-	self._isHide = false
+	return self:setVisible(true)
+end
+
+function Node:setVisible(isVisible)
+	self._isHide = not isVisible
+	return self
 end
 
 function Node:isVisible()
@@ -133,6 +138,7 @@ function Node:setA(ax, ay)
 	ay = ay or self._conf.ay
 	self._ax = math.max(0, math.min(1, ax or 0.5))
 	self._ay = math.max(0, math.min(1, ay or 0.5))
+	return self
 end
 
 function Node:setXYWH(x, y, w, h)
@@ -213,11 +219,13 @@ function Node:deleteChild(child)
 	local key, value = table.find_value(self._children or {}, child)
 	table.remove(self._children or {}, key)
 	value:onDestroy()
+	return self
 end
 
 function Node:removeSelf()
 	assert(self._parent ~= nil)
 	self._parent:deleteChild(self)
+	return self
 end
 
 -- 
@@ -286,10 +294,12 @@ function Node:refreshNode(updatedConf)
 	else
 		self:foreachChildren(false, function(v) v:refreshNode(updatedConf) end)
 	end
+	return self
 end
 
 function Node:_checkConf()
 	-- TODO validate with type key values
 	self._conf.hide = self._conf.hide == true
 	self._conf.children = self._conf.children or {}
+	return self
 end

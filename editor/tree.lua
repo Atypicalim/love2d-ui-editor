@@ -7,62 +7,58 @@ local Tree = class("Tree")
 function Tree:__init__(parent)
     g_tree = self
     self._parent = parent
-    self._background = parent:newConfig({
-        type = "Rectangle",
-		x = '0.5',
-		y = '0.5',
-		w = '0.9',
-		h = '0.9',
-		color = "#1e1e1e",
-	})
-    self._clipper = self._background:newConfig({
-        type = "Clipper",
-		x = '0.5',
-		y = '0.5',
-		w = '1',
-		h = '1',
-	})
+    self._background = parent:getById("bgTree"):show()
     --
-    self._btnUp = parent:newConfig({
-        type = "Button",
-        x = '0.5',
-        y = '0+15',
-        w = 15,
-        h = 15,
-    })
-    self._btnUp:setIcon("/media/angle_up.png")
+    self._btnUp = parent:getById("btnUp"):show()
     self._btnUp.onClick = function()
         if self._treeIndent > 0 then
             self._treeIndent = self._treeIndent - 1
             self:_updateTree()
-            g_editor:setConf(nil)
+            g_editor:setConf(nil, true)
         end
     end
     --
-    self._btnDown = parent:newConfig({
-        type = "Button",
-        x = '0.5',
-        y = '1-15',
-        w = 15,
-        h = 15,
-    })
-    self._btnDown:setIcon("/media/angle_down.png")
+    self._btnDown = parent:getById("btnDown"):show()
     self._btnDown.onClick = function()
         if self._leafCount >= TREE_ITEM_COUNT then
             self._treeIndent = self._treeIndent + 1
             self:_updateTree()
-            g_editor:setConf(nil)
+            g_editor:setConf(nil, true)
         end
+    end
+    --
+    self._nodeUi  = parent:getById('templateUi')
+    self._textUi = self._nodeUi:getById('text'):setText("[GUI]")
+    self._btnSelectUi = self._nodeUi:getById('btnSelect')
+    self._btnFoldUi = self._nodeUi:getById('btnFold')
+    self._btnEditUi = self._nodeUi:getById('btnEdit')
+    self._borderUi = self._nodeUi:getById('line')
+    self._btnSelectUi.onClick = function()
+        g_editor:setConf(g_editor.guiConf, true)
+    end
+    self._btnFoldUi.onClick = function()
+        self._isFoldAll = not self._isFoldAll
+        for i,v in ipairs(g_editor._template:getConf().children or {}) do
+            v.open = not self._isFoldAll
+        end
+        self._btnFoldUi:setIcon(self._isFoldAll and "/media/down.png" or "/media/up.png")
+        self._treeIndent = 0
+        self:_updateTree()
+
+    end
+    self._btnEditUi.onClick = function()
+        g_editor:setConf(g_editor.guiConf, false)
     end
     --
     self._treeIndent = 0
     self:_updateTree()
 end
 
-function Tree:updateColor()
+function Tree:updateStatus()
     for i,v in ipairs(self._leafs or {}) do
-        v:updateColor()
+        v:updateStatus()
     end
+    self._borderUi:setColor(g_editor._conf == g_editor.guiConf and BORDER_ON_COLOR or BORDER_OFF_COLOR)
 end
 
 function Tree:_updateTree()
@@ -80,7 +76,7 @@ function Tree:_updateTree()
     self._leafCount = 0
     self._leafDepth = 0
     self:createLeaf(g_editor._template:getConf().children or {})
-    self:updateColor()
+    self:updateStatus()
 end
 
 function Tree:createLeaf(children)
@@ -110,9 +106,9 @@ function Tree:destroy()
     for i,v in ipairs(self._leafs or {}) do
         v:destroy()
     end
-    self._background:removeSelf()
-    self._btnUp:removeSelf()
-    self._btnDown:removeSelf()
+    self._background:hide()
+    self._btnUp:hide()
+    self._btnDown:hide()
 end
 
 return Tree

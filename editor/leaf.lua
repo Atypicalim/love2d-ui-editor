@@ -6,7 +6,7 @@ local Leaf = class("Leaf")
 
 function Leaf:__init__(config, x, y, w, h)
     self._config = config
-    self._parent = g_tree._clipper
+    self._parent = g_tree._parent:getById('clipperTree')
     --
     if g_tree._skippedCount < g_tree._treeIndent then
         g_tree._skippedCount = g_tree._skippedCount + 1
@@ -14,53 +14,28 @@ function Leaf:__init__(config, x, y, w, h)
         return
     end
     --
-    self._background = self._parent:newConfig({
-        type = "Rectangle",
+    self._node = self._parent:newConfig({
+        type = "Node",
 		x = x,
 		y = y,
 		w = w,
 		h = h,
-		color = rgba2hex(10 * g_tree._leafDepth, 10 * g_tree._leafDepth, 10 * g_tree._leafDepth, 150),
-	})
-    self._border = self._background:newConfig({
-        type = "Rectangle",
-		x = '0.5',
-		y = '0.5',
-		w = '1',
-		h = '1',
-        mode = 'line',
-		color = BORDER_OFF_COLOR,
-	})
-    self._labelName = self._background:newConfig({
-        type = "Text",
-        x = '0.5',
-        y = '0.5',
-        w = 0,
-        h = 0,
-        text = "[" .. self._config.type .. "]",
-    })
-    self._btnFold = self._background:newConfig({
-        type = "Button",
-        x = '0+15',
-        y = '0.5',
-        w = 15,
-        h = 15,
-    })
-    self._btnFold:setIcon(self._config.open and "/media/up.png" or "/media/down.png")
+	}):addTemplate('./editor/editor_leaf.ui.lua')
+    self._bg = self._node:getById('bg'):setColor(rgba2hex(10 * g_tree._leafDepth, 10 * g_tree._leafDepth, 10 * g_tree._leafDepth, 150))
+    self._border = self._node:getById('line'):setColor(BORDER_OFF_COLOR)
+    self._labelName = self._node:getById('text'):setText("[" .. self._config.type .. "]")
+    self._btnSelect = self._node:getById('btnSelect')
+    self._btnFold = self._node:getById('btnFold'):setIcon(self._config.open and "/media/up.png" or "/media/down.png")
+    self._btnEdit = self._node:getById('btnEdit'):setIcon("/media/edit.png")
+    self._btnSelect.onClick = function()
+        g_editor:setConf(self._config, true)
+    end
     self._btnFold.onClick = function()
         self._config.open = not self._config.open
         g_tree:_updateTree()
     end
-    self._btnEdit = self._background:newConfig({
-        type = "Button",
-        x = '1-15',
-        y = '0.5',
-        w = 15,
-        h = 15,
-    })
-    self._btnEdit:setIcon("/media/edit.png")
     self._btnEdit.onClick = function()
-        g_editor:setConf(self._config)
+        g_editor:setConf(self._config, false)
     end
     --
     table.insert(g_tree._leafs, self)
@@ -68,12 +43,12 @@ function Leaf:__init__(config, x, y, w, h)
     g_tree:createLeaf(self._config.open and self._config.children or {})
 end
 
-function Leaf:updateColor()
+function Leaf:updateStatus()
     self._border:setColor(g_editor._conf == self._config and BORDER_ON_COLOR or BORDER_OFF_COLOR)
 end
 
 function Leaf:destroy()
-    self._background:removeSelf()
+    self._node:removeSelf()
 end
 
 return Leaf

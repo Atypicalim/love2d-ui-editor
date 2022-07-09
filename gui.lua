@@ -20,6 +20,7 @@ require 'nodes/line'
 require 'nodes/point'
 require 'nodes/particle'
 require 'nodes/clipper'
+require 'nodes/template'
 
 -- gui
 
@@ -91,9 +92,15 @@ function Gui:mousereleased(x, y, button)
             return true
         end
     end)
-    if releaseddNode and self._pressedNode == releaseddNode then
-        releaseddNode:trigger(NODE_EVENTS.ON_CLICK, x, y, button)
-        self:trigger(NODE_EVENTS.ON_CLICK, releaseddNode, x, y, button)
+    if releaseddNode then
+        releaseddNode:trigger(NODE_EVENTS.ON_MOUSE_UP, x, y, button)
+        if self._pressedNode == releaseddNode then
+            releaseddNode:trigger(NODE_EVENTS.ON_CLICK, x, y, button)
+            self:trigger(NODE_EVENTS.ON_CLICK, releaseddNode, x, y, button)
+        elseif self._pressedNode then
+            self._pressedNode:trigger(NODE_EVENTS.ON_CANCEL, x, y, button)
+            self:trigger(NODE_EVENTS.ON_CANCEL, self._pressedNode, x, y, button)
+        end
     elseif self._pressedNode then
         self._pressedNode:trigger(NODE_EVENTS.ON_CANCEL, x, y, button)
         self:trigger(NODE_EVENTS.ON_CANCEL, self._pressedNode, x, y, button)

@@ -50,10 +50,12 @@ end
 
 function Button:setDisable(isDisable)
 	self._isDisabled = isDisable == true
+	return self
 end
 
 function Button:setIcon(path)
 	self._iconNode:setPath(path)
+	return self
 end
 
 function Button:trigger(event, ...)

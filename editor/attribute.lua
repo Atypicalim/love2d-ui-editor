@@ -8,89 +8,95 @@ function Attribute:__init__(parent, setPropertyFunc)
     g_attribute = self
     self._parent = parent
     self._setPropertyFunc = setPropertyFunc
-    self._background = parent:newConfig({
-        type = "Rectangle",
-		x = '0.5',
-		y = '0.5',
-		w = '0.9',
-		h = '0.9',
-		color = "#1e1e1e",
-	})
-    self._clipper = self._background:newConfig({
-        type = "Clipper",
-		x = '0.5',
-		y = '0.5',
-		w = '1',
-		h = '1',
-	})
+    self._background = parent:getById("bgAttribute"):show()
     --
-    self._btnUp = parent:newConfig({
-        type = "Button",
-        x = '0.5',
-        y = '0+15',
-        w = 15,
-        h = 15,
-    })
-    self._btnUp:setIcon("/media/angle_up.png")
+    self._btnUp = parent:getById("btnUp"):show()
     self._btnUp.onClick = function()
-        if self._propertyIndent > 0 then
-            self._propertyIndent = self._propertyIndent - 1
+        if self._attributeIndent > 0 then
+            self._attributeIndent = self._attributeIndent - 1
             self:_updateAttribute()
             g_editor:setKey(nil)
         end
     end
     --
-    self._btnDown = parent:newConfig({
-        type = "Button",
-        x = '0.5',
-        y = '1-15',
-        w = 15,
-        h = 15,
-    })
-    self._btnDown:setIcon("/media/angle_down.png")
+    self._btnDown = parent:getById("btnDown"):show()
     self._btnDown.onClick = function()
-        if self._propertyCount >= ATTRIBUTE_PROPERTY_COUNT then
-            self._propertyIndent = self._propertyIndent + 1
+        if self._attributesCount >= ATTRIBUTE_ITEM_COUNT then
+            self._attributeIndent = self._attributeIndent + 1
             self:_updateAttribute()
             g_editor:setKey(nil)
         end
     end
     --
-    self._propertyIndent = 0
+    self._textAttribute = parent:getById("textAttribute")
+    --
+    self._nodeProp  = parent:getById('templateProp')
+    self._textProp = self._nodeProp:getById('text'):setText("Prop")
+    self._btnEditProp = self._nodeProp:getById('btnEdit')
+    self._borderProp = self._nodeProp:getById('line')
+    self._btnEditProp.onClick = function()
+        g_editor:setConf(g_editor._conf, false)
+    end
+    --
+    self._nodeCtrl  = parent:getById('templateCtrl')
+    self._textCtrl = self._nodeCtrl:getById('text'):setText("Ctrl")
+    self._btnEditCtrl = self._nodeCtrl:getById('btnEdit'):setIcon("/media/plus.png")
+    self._borderCtrl = self._nodeCtrl:getById('line')
+    self._btnEditCtrl.onClick = function()
+        g_editor:setConf(g_editor._conf, true)
+    end
+    --
+    self._attributeIndent = 0
     self:_updateAttribute()
 end
 
-function Attribute:updateColor()
-    for i,v in ipairs(self._properties or {}) do
-        v:updateColor()
+function Attribute:updateStatus()
+    for i,v in ipairs(self._attributes or {}) do
+        v:updateStatus()
     end
+    self._textAttribute:setText(g_editor:isSelect() and "Controls" or "Properties")
+    self._borderCtrl:setVisible(g_editor:isSelect())
+    self._borderProp:setVisible(not g_editor:isSelect() and g_editor._conf ~= nil)
 end
 
 function Attribute:_updateAttribute()
-    for i,v in ipairs(self._properties or {}) do
+    for i,v in ipairs(self._attributes or {}) do
         v:destroy()
     end
-    self._properties = {}
+    self._attributes = {}
     local bgW = self._background:getW()
     local bgH = self._background:getH()
-    self._propertyW = bgW * 0.9
-    self._propertyH = (bgH - ATTRIBUTE_PROPERTY_MARGIN * ATTRIBUTE_PROPERTY_COUNT * 2) / ATTRIBUTE_PROPERTY_COUNT
-    self._propertyX = bgW / 2
-    self._propertyPadding = (bgH - self._propertyH * ATTRIBUTE_PROPERTY_COUNT) / 2
+    self._attributeW = bgW * 0.9
+    self._attributeH = (bgH - ATTRIBUTE_ITEM_MARGIN * ATTRIBUTE_ITEM_COUNT * 2) / ATTRIBUTE_ITEM_COUNT
     self._skippedCount = 0
-    self._propertyCount = 0
-    self:createProperty(g_editor._conf)
-    self:updateColor()
+    self._attributesCount = 0
+    if g_editor:isSelect() then
+        self:createControl(CONTROL_CONF_MAP)
+    else
+        self:createProperty(g_editor._conf)
+    end
+    self:updateStatus()
 end
 
 function Attribute:createProperty(config)
     for i,key in ipairs(PROPERTY_NAME_ORDER) do
-        if self._propertyCount >= ATTRIBUTE_PROPERTY_COUNT then break end
+        if self._attributesCount >= ATTRIBUTE_ITEM_COUNT then break end
         local value = config[key]
         local info = PROPERTY_NAME_INFO[key] or {}
         if not info.ignoreProperty and value ~= nil then
-            local y = self._propertyH / 2 + ATTRIBUTE_PROPERTY_MARGIN + (self._propertyH + ATTRIBUTE_PROPERTY_MARGIN * 2) * (#self._properties)
-            Property(key, value, '0.5', y, self._propertyW, self._propertyH)
+            local y = self._attributeH / 2 + ATTRIBUTE_ITEM_MARGIN + (self._attributeH + ATTRIBUTE_ITEM_MARGIN * 2) * (#self._attributes)
+            Property(key, value, '0.5', y, self._attributeW, self._attributeH)
+        end
+    end
+end
+
+function Attribute:createControl(config)
+    for i,name in ipairs(CONTROL_NAME_ORDER) do
+        if self._attributesCount >= ATTRIBUTE_ITEM_COUNT then break end
+        local conf = config[name]
+        if conf ~= nil then
+            local y = self._attributeH / 2 + ATTRIBUTE_ITEM_MARGIN + (self._attributeH + ATTRIBUTE_ITEM_MARGIN * 2) * (#self._attributes)
+            Control(name, conf, '0.5', y, self._attributeW, self._attributeH)
         end
     end
 end
@@ -111,12 +117,12 @@ function Attribute:wheelmoved(x, y)
 end
 
 function Attribute:destroy()
-    for i,v in ipairs(self._properties or {}) do
+    for i,v in ipairs(self._attributes or {}) do
         v:destroy()
     end
-    self._background:removeSelf()
-    self._btnUp:removeSelf()
-    self._btnDown:removeSelf()
+    self._background:hide()
+    self._btnUp:hide()
+    self._btnDown:hide()
 end
 
 return Attribute

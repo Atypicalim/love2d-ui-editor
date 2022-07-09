@@ -11,6 +11,7 @@ Printer = require('editor/printer')
 Leaf = require('editor/leaf')
 Tree = require('editor/tree')
 Property = require('editor/property')
+Control = require('editor/control')
 Attribute = require('editor/attribute')
 Field = require('editor/field')
 
@@ -22,6 +23,7 @@ function Editor:__init__()
     self._path = nil
     self._conf = nil
     self._key = nil
+    self._selecting = false
     --
     self._template = nil
     self._tree = nil
@@ -30,6 +32,10 @@ function Editor:__init__()
     self._describe = ""
     self._messages = {}
     -- 
+    self.guiConf = {
+        w = 500,
+        h = 500,
+    }
 end
 
 function Editor:load()
@@ -52,7 +58,7 @@ function Editor:load()
     self:pushMessage('welcome!')
     self:setWorkspace(files.cwd() .. "/template/")
     -- self:setPath("./template/app.ui.lua")
-    -- self:setConf(self._template:getConf()[1])
+    -- self:setConf(self._template:getConf()[1], true)
     -- self:setKey('color')
     self:setPath("./editor/editor.ui.lua")
 end
@@ -119,23 +125,30 @@ function Editor:keypressed(key, scancode, isrepeat)
         return
     end
     if key == 'escape' then
-        if self._conf then
-            self:setConf(nil)
+        if self._key then
+            self:setKey(nil)
+        elseif self._conf then
+            self:setConf(nil, true)
         end
     end
 end
 
 function Editor:resize(width, height)
     g_egui:setXYWH(width / 2, height / 2, width, height)
-    local parent = g_egui:getById('nodeStage')
-    self._template:setXYWH(parent:getX(), parent:getY(), parent:getW() - 100, parent:getH() - 100)
-    local path = self._path
-    local conf = self._conf
-    local key = self._key
-    -- self:setPath(path)
-    -- self:setConf(conf)
-    -- self:setKey(key)
-    self._template:refreshNode()
+    if self._template then
+        local parent = g_egui:getById('nodeStage')
+        self._template:setXYWH(parent:getX(), parent:getY(), parent:getW() - 100, parent:getH() - 100)
+        self._template:refreshNode()
+    end
+    if self._tree then
+        self._tree:_updateTree()
+    end
+    if self._attribute then
+        self._attribute:_updateAttribute()
+    end
+    if self._field then
+        self:setKey(nil)
+    end
 end
 
 function Editor:wheelmoved(x, y)
@@ -162,11 +175,14 @@ function Editor:setWorkspace(workspace)
 end
 
 function Editor:setPath(path)
+    if self._template then
+        gui.delGUI(self._template)
+    end
     if self._tree then
         self._tree:destroy()
     end
     self._path = path
-    self:setConf(nil)
+    self:setConf(nil, true)
     if not self._path or not files.is_file(self._path) then
         self._template = nil
         self._tree = nil
@@ -177,19 +193,24 @@ function Editor:setPath(path)
     end
 end
 
-function Editor:setConf(conf)
+function Editor:isSelect(select)
+    return self._selecting == true
+end
+
+function Editor:setConf(conf, select)
     if self._attribute then
         self._attribute:destroy()
     end
-    self._conf = conf
+    self._conf = conf or g_editor.guiConf
+    self._selecting = select == true
     self:setKey(nil)
     if self._tree then
-        self._tree:updateColor()
+        self._tree:updateStatus()
     end
     if not self._conf then
         self._attribute = nil
     else
-        self._attribute = Attribute(g_egui:getById('boxProp'))
+        self._attribute = Attribute(g_egui:getById('boxAttribute'))
     end
 end
 
@@ -199,7 +220,7 @@ function Editor:setKey(key)
     end
     self._key = key
     if self._attribute then
-        self._attribute:updateColor()
+        self._attribute:updateStatus()
     end
     if not self._key then
         self._field = nil

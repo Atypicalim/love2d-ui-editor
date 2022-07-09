@@ -10,6 +10,7 @@ end
 
 function Rectangle:setColor(color)
 	self._color = rgba2love(hex2rgba(color))
+	return self
 end
 
 function Rectangle:draw()
