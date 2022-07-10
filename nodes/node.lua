@@ -6,17 +6,25 @@ Node = class("Node")
 
 function Node:__init__(conf, parent)
 	self._conf = conf
+	self._parent = parent
 	self:_checkConf(nil)
 	--
-	self._parent = parent
 	self._children = {}
 	self:setA()
 	self:setXYWH()
 	--
-	self._isHide = self._conf.hide
 	for i,v in ipairs(self._conf.children) do
 		self:_parseConfig(v)
 	end
+end
+
+function Node:_checkConf()
+	-- TODO validate with type key values
+	self._conf.hide = self._conf.hide == true
+	self._conf.children = self._conf.children or {}
+	--
+	self._isHide = self._conf.hide
+	return self
 end
 
 function Node:_setLove(love)
@@ -86,11 +94,11 @@ function Node:foreachChildren(isReverse, callback)
 	local children = self._children
 	if isReverse then
 		for i=#children,1,-1 do
-			if children[i] then callback(children[i]) end
+			if children[i] then callback(children[i], i) end
 		end
 	else
 		for i=1,#children,1 do
-			if children[i] then callback(children[i]) end
+			if children[i] then callback(children[i], i) end
 		end
 	end
 end
@@ -244,16 +252,24 @@ function Node:addTemplate(path)
 	return self
 end
 
-function Node:newConfig(config)
+function Node:newConfig(config, index)
 	assert(_G[config.type], string.format('node [%s] not found!', config.type))
-	table.insert(self._conf.children, config)
-	return self:_parseConfig(config)
+	if index then
+		table.insert(self._conf.children, index, config)
+	else
+		table.insert(self._conf.children, config)
+	end
+	return self:_parseConfig(config, index)
 end
 
-function Node:_parseConfig(config)
+function Node:_parseConfig(config, index)
 	local child = _G[config.type](config, self)
 	child.canvas = self.canvas or self
-	table.insert(self._children, child)
+	if index then
+		table.insert(self._children, index, child)
+	else
+		table.insert(self._children, child)
+	end
 	return child
 end
 
@@ -294,12 +310,5 @@ function Node:refreshNode(updatedConf)
 	else
 		self:foreachChildren(false, function(v) v:refreshNode(updatedConf) end)
 	end
-	return self
-end
-
-function Node:_checkConf()
-	-- TODO validate with type key values
-	self._conf.hide = self._conf.hide == true
-	self._conf.children = self._conf.children or {}
 	return self
 end

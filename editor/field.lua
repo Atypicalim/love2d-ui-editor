@@ -15,7 +15,7 @@ function Field:__init__(parent, yesFunc, noFunc)
         w = '0.7',
         h = '0.5',
         color = "#111111aa",
-    }, self._parent)
+    })
     self._input:setText(tostring(g_editor._conf[g_editor._key]))
     --
     self._btnOk = self._parent:newConfig({
@@ -24,7 +24,7 @@ function Field:__init__(parent, yesFunc, noFunc)
         y = '0.5',
         w = 25,
         h = 25,
-    }, self._parent)
+    })
     self._btnOk:setIcon("/media/confirm.png")
     self._btnOk.onClick = function()
         yesFunc(self._input:getText())
@@ -36,7 +36,7 @@ function Field:__init__(parent, yesFunc, noFunc)
         y = '0.5',
         w = 25,
         h = 25,
-    }, self._parent)
+    })
     self._btnNo:setIcon("/media/cancel.png")
     self._btnNo.onClick = function()
         noFunc(self._input:getText())

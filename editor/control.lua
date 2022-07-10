@@ -23,15 +23,15 @@ function Control:__init__(name, conf, x, y, w, h)
 	}):addTemplate('./editor/editor_ctrl.ui.lua')
     self._border = self._node:getById('line'):setColor(BORDER_OFF_COLOR)
     self._labelName = self._node:getById('text'):setText("[" .. name .. "]")
-    -- self._node:getById('btnAddBefore').onClick = function()
-    --     -- 
-    -- end
-    -- self._node:getById('btnAddIn').onClick = function()
-    --     -- 
-    -- end
-    -- self._node:getById('btnAddAfter').onClick = function()
-    --     -- 
-    -- end
+    self._node:getById('btnAddBefore').onClick = function()
+        g_editor:addControl(name, -1)
+    end
+    self._node:getById('btnAddIn').onClick = function()
+        g_editor:addControl(name, 0)
+    end
+    self._node:getById('btnAddAfter').onClick = function()
+        g_editor:addControl(name, 1)
+    end
     --
     table.insert(g_attribute._attributes, self)
     g_attribute._attributesCount = g_attribute._attributesCount + 1

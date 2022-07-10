@@ -14,7 +14,7 @@ function Tree:__init__(parent)
         if self._treeIndent > 0 then
             self._treeIndent = self._treeIndent - 1
             self:_updateTree()
-            g_editor:setConf(nil, true)
+            -- g_editor:setConf(nil, true)
         end
     end
     --
@@ -23,7 +23,7 @@ function Tree:__init__(parent)
         if self._leafCount >= TREE_ITEM_COUNT then
             self._treeIndent = self._treeIndent + 1
             self:_updateTree()
-            g_editor:setConf(nil, true)
+            -- g_editor:setConf(nil, true)
         end
     end
     --

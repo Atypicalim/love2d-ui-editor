@@ -6,42 +6,20 @@ Button = class("Button", Node)
 
 function Button:__init__(conf, parent)
 	Node.__init__(self, conf, parent)
-	--
+end
+
+function Button:_checkConf()
+	Node._checkConf(self)
 	self._isDisabled = self._conf.disable == true
 	self._conf.color = self._conf.color or "#555555aa"
 	if self._conf.color then
-		self._colorPressed = hex2new(self._conf.color, 1.2)
-		self._colorDisabled = hex2new(self._conf.color, 0.9)
+		self._colorNormal = rgba2love(hex2rgba(self._conf.color))
+		self._colorPressed = rgba2love(hex2rgba(hex2new(self._conf.color, 1.2)))
+		self._colorDisabled = rgba2love(hex2rgba(hex2new(self._conf.color, 0.9)))
 	end
-	self._colorNode = self:newConfig({
-		type = "Rectangle",
-		x = '0.5',
-		y = '0.5',
-		w = '1',
-		h = '1',
-		color = self._isDisabled and self._colorDisabled or self._conf.color,
-	}):setIgnoreEvents(true)
-	self._iconNode = self:newConfig({
-		type = "Image",
-		x = "0.5",
-		y = "0.5",
-		w = "1",
-		h = "1",
-		path = self._conf.icon or "",
-	}):setIgnoreEvents(true)
-	self._textNode = self:newConfig({
-		type = "Text",
-		x = '0.5',
-		y = '0.5',
-		w = 0,
-		h = 0,
-		text = self._conf.text or "",
-	}):setIgnoreEvents(true)
-	if self._conf.icon and self._conf.text then
-		local w, h = self._iconNode:getWH()
-		self._iconNode:setXY(w, '0.5')
-		self._textNode:setXY(string.format('0.5+%d', w), '0.5')
-	end
+	self._colorTarget = self._isDisabled and self._colorDisabled or self._colorNormal
+	self:setIcon(self._conf.icon)
+	self:setText(self._conf.text)
 end
 
 function Button:isDisabled()
@@ -54,19 +32,50 @@ function Button:setDisable(isDisable)
 end
 
 function Button:setIcon(path)
-	self._iconNode:setPath(path)
+	self._path = path
+	if string.valid(path) then
+		self._image = love.graphics.newImage(path)
+		self._imageW = self._image:getWidth()
+		self._imageH = self._image:getHeight()
+	else
+		self._image = nil
+	end
 	return self
+end
+
+function Button:setText(text)
+	self._text = text
+	if string.valid(text) then
+		self._font = love.graphics.newFont(self._conf.font_size or 12)
+		self._txt = love.graphics.newText(self._font, self._text)
+		self._textW = self._txt:getWidth()
+		self._textH = self._txt:getHeight()
+	else
+		self._font = nil
+		self._txt = nil
+	end
 end
 
 function Button:trigger(event, ...)
 	Node.trigger(self, event, ...)
 	if event == NODE_EVENTS.ON_MOUSE_DOWN then
-		if self._conf.color then
-			self._colorNode:setColor(self._colorPressed)
-		end
+		self._colorTarget = self._colorPressed
 	elseif event == NODE_EVENTS.ON_MOUSE_OUT or event == NODE_EVENTS.ON_MOUSE_UP then
-		if self._conf.color then
-			self._colorNode:setColor(self._conf.color)
+		self._colorTarget = self._colorNormal
+	end
+end
+
+function Button:draw()
+	if not self._isHide then
+		love.graphics.setColor(unpack(self._colorTarget))
+		love.graphics.rectangle("fill", self:getLeft(), self:getTop(), self:getW(), self:getH())
+		if self._image then
+			love.graphics.draw(self._image, self:getX() - self._imageW / 2, self:getY() - self._imageH / 2)
+		elseif self._text then
+			love.graphics.setColor(1, 1, 1, 1)
+			love.graphics.setFont(self._font)
+			love.graphics.draw(self._txt, self:getX() - self._textW / 2, self:getY() - self._textH / 2)
 		end
 	end
+	Node.draw(self)
 end

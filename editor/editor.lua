@@ -135,20 +135,7 @@ end
 
 function Editor:resize(width, height)
     g_egui:setXYWH(width / 2, height / 2, width, height)
-    if self._template then
-        local parent = g_egui:getById('nodeStage')
-        self._template:setXYWH(parent:getX(), parent:getY(), parent:getW() - 100, parent:getH() - 100)
-        self._template:refreshNode()
-    end
-    if self._tree then
-        self._tree:_updateTree()
-    end
-    if self._attribute then
-        self._attribute:_updateAttribute()
-    end
-    if self._field then
-        self:setKey(nil)
-    end
+    self:_refreshEditor()
 end
 
 function Editor:wheelmoved(x, y)
@@ -188,7 +175,11 @@ function Editor:setPath(path)
         self._tree = nil
     else
         local parent = g_egui:getById('nodeStage')
-        self._template = gui.newGUI():setXYWH(parent:getX(), parent:getY(), parent:getW() - 100, parent:getH() - 100):addTemplate(self._path)
+        local x = parent:getX()
+        local y = parent:getY()
+        local w = parent:getW() - 100
+        local h = parent:getH() - 100
+        self._template = gui.newGUI():setXYWH(x, y, w, h):addTemplate(self._path)
         self._tree = Tree(g_egui:getById('boxTree'))
     end
 end
@@ -403,6 +394,73 @@ function Editor:pushMessage(message)
         end
     end
     self._messages = new
+end
+
+function Editor:addControl(name, position)
+    --
+    local targetNode = nil
+    local targetIndex = nil
+    --
+    local parent = nil
+    local current = nil
+    local index = nil
+    local found = false
+    self._template:foreachDescendants(false, function(descendant)
+        descendant:foreachChildren(false, function(child, i)
+            if child:getConf() == self._conf then
+                found = true
+                parent = descendant
+                current = child
+                index = i
+            end
+        end)
+        return found
+    end)
+    if found then
+        if position == 0 then
+            targetNode = current
+            targetIndex = #targetNode:getChildren() + 1
+        elseif position == -1 then
+            targetNode = parent
+            targetIndex = index
+        elseif position == 1 then
+            targetNode = parent
+            targetIndex = index + 1
+        end
+    elseif self._conf == self.guiConf then
+        targetNode = self._template
+        targetIndex = position == -1 and 1 or (#targetNode:getChildren() + 1)
+    end
+    if not targetNode or not targetIndex then
+        self:pushMessage('add control failed, target not found!')
+        return
+    end
+    targetNode:newConfig({
+        type = "Text",
+        x = "0.5",
+        y = "0.5",
+        w = "1",
+        h = "1",
+        text = "insert...",
+    }, targetIndex)
+    self:_refreshEditor()
+end
+
+function Editor:_refreshEditor()
+    if self._template then
+        local parent = g_egui:getById('nodeStage')
+        self._template:setXYWH(parent:getX(), parent:getY(), parent:getW() - 100, parent:getH() - 100)
+        self._template:refreshNode()
+    end
+    if self._tree then
+        self._tree:_updateTree()
+    end
+    if self._attribute then
+        self._attribute:_updateAttribute()
+    end
+    if self._field then
+        self:setKey(nil)
+    end
 end
 
 return Editor
