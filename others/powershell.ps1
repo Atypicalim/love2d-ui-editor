@@ -9,6 +9,11 @@ param(
 [string]$arg5
 )
 
+Function return_result([string]$result)
+{
+    Write-Host "[result[$result]result]"
+}
+
 Function select_file($windowTitle, $filterDesc, $startFolder)
 {
     Add-Type -AssemblyName System.Windows.Forms
@@ -18,10 +23,13 @@ Function select_file($windowTitle, $filterDesc, $startFolder)
     $OpenFileDialog.filter = $filterDesc
     If ($OpenFileDialog.ShowDialog() -eq "Cancel") 
     {
-    Return ""
+        return_result ""
     }
-    $Global:SelectedFile = $OpenFileDialog.FileName
-    Return $SelectedFile
+    Else
+    {
+        $Global:SelectedFile = $OpenFileDialog.FileName
+        return_result $SelectedFile
+    }
 }
 
 function save_file($windowTitle, $filterDesc, $startFolder) 
@@ -32,37 +40,35 @@ function save_file($windowTitle, $filterDesc, $startFolder)
     $OpenFileDialog.initialDirectory = $startFolder
     $OpenFileDialog.filter = $filterDesc
     $OpenFileDialog.ShowDialog() |  Out-Null
-    return $OpenFileDialog.filename
+    return_result $OpenFileDialog.filename
 }
 
 Function select_folder($windowTitle, $startFolder)
 {
     [System.Reflection.Assembly]::LoadWithPartialName("System.windows.forms")|Out-Null
-
     $foldername = New-Object System.Windows.Forms.FolderBrowserDialog
     $foldername.Description = $windowTitle
     $foldername.rootfolder = "MyComputer"
     $foldername.SelectedPath = $startFolder
-
     if($foldername.ShowDialog() -eq "OK")
     {
         $folder += $foldername.SelectedPath
     }
-    return $folder
+    return_result $folder
 }
 
 Function show_eror($title, $message, $buttons, $iconDesc)
 {
     Add-Type -AssemblyName System.Windows.Forms
     $msgBoxInput =  [System.Windows.Forms.MessageBox]::Show($message, $title, $buttons, $iconDesc)
-    return $msgBoxInput
+    return_result $msgBoxInput
 }
 
 Function show_input($title, $message, $default)
 {
     Add-Type -AssemblyName Microsoft.VisualBasic
     $inputText = [Microsoft.VisualBasic.Interaction]::InputBox($message, $title, $default)
-    return $inputText
+    return_result $inputText
 }
 
 & $funcName $arg1 $arg2 $arg3 $arg4 $arg5

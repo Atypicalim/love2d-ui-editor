@@ -28,17 +28,23 @@ PROPERTY_NAME_ORDER = {
 	'h',
 	'text',
 	'icon',
+	'path',
 	'color',
 	'open',
+	'points',
+	'children',
 }
 
 PROPERTY_NAME_INFO = {
 	['open'] = {
 		ignoreProperty = true,
 	},
+	['children'] = {
+		ignoreProperty = true,
+	},
 	['type'] = {
 		ignoreEdit = true,
-	}
+	},
 }
 
 BORDER_OFF_COLOR = "#000000"

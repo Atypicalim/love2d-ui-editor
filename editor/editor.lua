@@ -50,8 +50,8 @@ function Editor:load()
     local height = love.graphics.getHeight()
     --
     g_egui = gui.newGUI():setXYWH(width / 2, height / 2, width, height):addTemplate("./editor/editor.ui.lua")
-    g_egui.onClick = function(id, node)
-        self:_onClick(id, node)
+    g_egui.onClick = function(node)
+        self:_onClick(node:getId(), node)
     end
     self._printer = Printer(g_egui)
     --
@@ -365,7 +365,7 @@ function Editor:_tryCreateFile()
 end
 
 function Editor:_trySaveFile(toNewFile)
-    local config = self._template:getConf()
+    local config = self._template:getConf().children or {}
     local content = table.string(config, nil, PROPERTY_NAME_ORDER)
 
     if toNewFile then

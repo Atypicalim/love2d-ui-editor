@@ -43,12 +43,6 @@ function hex2new(hex, times)
     return rgba2hex(unpack(values))
 end
 
-function tools_calculate_number(base, describe)
-	local equation = string.format("return %d * %s", base, describe)
-	local func = loadstring(equation)
-    return func()
-end
-
 function tools_execute_powershell(func, ...)
     local cmd = func
     local agrs = {...}
@@ -57,7 +51,7 @@ function tools_execute_powershell(func, ...)
     end
     local isOk, r = tools.execute([[ powershell.exe -file ./others/powershell.ps1 ]] .. cmd)
     assert(isOk, 'powershell execute failed:' .. cmd)
-    return string.trim(r)
+    return r:match(".*%[result%[(.*)%]result%].*")
 end
 
 function tools_windows_validate_folder(folder)
