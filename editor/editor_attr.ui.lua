@@ -16,7 +16,7 @@
 		w = '1',
 		h = '1',
         mode = 'line',
-		color = "#ffffffaa",
+		color = "#ffffff55",
 	},
     {
         type = "Text",

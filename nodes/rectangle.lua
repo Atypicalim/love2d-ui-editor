@@ -16,6 +16,7 @@ end
 function Rectangle:draw()
 	if not self._isHide then
 		love.graphics.setColor(unpack(self._color))
+		love.graphics.setLineWidth(self._conf.thickness or 2)
 		love.graphics.rectangle(self._conf.mode or "fill", self:getLeft(), self:getTop(), self:getW(), self:getH(), self._radius, self._radius)
 	end
 	Node.draw(self)

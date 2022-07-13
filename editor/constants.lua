@@ -47,8 +47,8 @@ PROPERTY_NAME_INFO = {
 	},
 }
 
-BORDER_OFF_COLOR = "#000000"
-BORDER_ON_COLOR = "#ffffff"
+BORDER_OFF_COLOR = "#000000ee"
+BORDER_ON_COLOR = "#ffffffee"
 
 CONTROL_NAME_ORDER = {
 	"Point",

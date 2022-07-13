@@ -14,6 +14,7 @@ Property = require('editor/property')
 Control = require('editor/control')
 Attribute = require('editor/attribute')
 Field = require('editor/field')
+Auxiliary = require('editor/auxiliary')
 
 function Editor:__init__()
     gui.useProxy(self)
@@ -36,6 +37,7 @@ function Editor:__init__()
         w = 500,
         h = 500,
     }
+    self.auxiliary = Auxiliary()
 end
 
 function Editor:load()
@@ -181,6 +183,9 @@ function Editor:setPath(path)
         local h = parent:getH() - 100
         self._template = gui.newGUI():setXYWH(x, y, w, h):addTemplate(self._path)
         self._tree = Tree(g_egui:getById('boxTree'))
+        self._template.onClick = function(node)
+            self:setConf(node:getConf(), false)
+        end
     end
 end
 

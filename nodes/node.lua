@@ -55,11 +55,17 @@ end
 
 function Node:update(dt)
 	self:foreachChildren(false, function(v) v:update(dt) end)
+	if g_editor and g_editor._conf == self._conf then
+		g_editor.auxiliary:onUpdate(self, dt)
+	end
 end
 
 function Node:draw()
 	if self._isHide then return end
 	self:foreachChildren(false, function(v) v:draw() end)
+	if g_editor and g_editor._conf == self._conf then
+		g_editor.auxiliary:omDraw(self)
+	end
 end
 
 function Node:mousepressed(x, y, button)
