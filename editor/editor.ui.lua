@@ -6,7 +6,7 @@
         y = '0.025+10',
         w = "1",
         h = "0.05+20",
-        color = "#0a0a0a",
+        bg = "#0a0a0a",
         open = true,
         children = {
             {
@@ -86,8 +86,8 @@
                 id = "txtTitle",
                 x = '1-150',
                 y = '0.5',
-                w = 0,
-                h = 0,
+                w = '0',
+                h = '0',
                 text = "Title",
             },
             {
@@ -117,7 +117,7 @@
         y = '0.475+10',
         w = "0.8-200",
         h = "0.85-20",
-        color = "#2c2c2c",
+        bg = "#2c2c2c",
     },
     {
         type = "Rectangle",
@@ -126,7 +126,7 @@
         y = '0.525+10',
         w = "0.1+100",
         h = "0.95-20",
-        color = "#1e1e1e",
+        bg = "#1e1e1e",
         children = {
             {
                 type = "Rectangle",
@@ -135,15 +135,15 @@
                 y = '0.5+15',
                 w = "0.9",
                 h = "1-30",
-                color = "#0a0a0a",
+                bg = "#0a0a0a",
                 children = {
                     {
                         type = "Text",
                         id = "textTree",
                         x = "0.5",
                         y = '0-15',
-                        w = 0,
-                        h = 25,
+                        w = '0',
+                        h = '0+25',
                         text = "Tree",
                     },
                     {
@@ -180,7 +180,7 @@
                         y = "0.525+5",
                         w = "0.9",
                         h = "0.9",
-                        color = "#1e1e1e",
+                        bg = "#1e1e1e",
                         children = {
                             {
                                 type = "Clipper",
@@ -203,7 +203,7 @@
         y = '0.525+10',
         w = "0.1+100",
         h = "0.95-20",
-        color = "#1e1e1e",
+        bg = "#1e1e1e",
         children = {
             {
                 type = "Rectangle",
@@ -212,15 +212,15 @@
                 y = '0.5+15',
                 w = "0.9",
                 h = "1-30",
-                color = "#0a0a0a",
+                bg = "#0a0a0a",
                 children = {
                     {
                         type = "Text",
                         id = "textAttribute",
                         x = "0.5",
                         y = '0-15',
-                        w = 0,
-                        h = 25,
+                        w = '0',
+                        h = '0+25',
                         text = "Attribute"
                     },
                     {
@@ -228,8 +228,8 @@
                         id = "btnUp",
                         x = '0.1',
                         y = "0.025+10",
-                        w = 15,
-                        h = 15,
+                        w = '0+15',
+                        h = '0+15',
                         icon = "/media/angle_up.png",
                     },
                     {
@@ -266,7 +266,7 @@
                         y = "0.525+5",
                         w = "0.9",
                         h = "0.9",
-                        color = "#1e1e1e",
+                        bg = "#1e1e1e",
                         children = {
                             {
                                 type = "Clipper",
@@ -289,6 +289,6 @@
         y = '0.95',
         w = "0.8-200",
         h = "0.1",
-        color = "#0a0a0a",
+        bg = "#0a0a0a",
     },
 }

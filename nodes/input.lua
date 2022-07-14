@@ -5,7 +5,7 @@
 Input = class("Input", Node)
 
 function Input:__init__(conf, parent)
-	self._font = love.graphics.newFont(conf.font_size or 18)
+	self._font = love.graphics.newFont(conf.size or 18)
 	Node.__init__(self, conf, parent)
 	self._cursorPosition = 0
 	self._inputPadding = 5

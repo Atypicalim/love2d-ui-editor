@@ -14,7 +14,7 @@ function Field:__init__(parent, yesFunc, noFunc)
         y = '0.5',
         w = '0.7',
         h = '0.5',
-        color = "#111111aa",
+        bg = "#111111aa",
     })
     self._input:setText(tostring(g_editor._conf[g_editor._key]))
     --

@@ -15,6 +15,7 @@ end
 function Arc:draw()
 	if not self._isHide then
 		love.graphics.setColor(unpack(self._color))
+		love.graphics.setLineWidth(self._conf.thickness or 2)
 		love.graphics.arc(
 			self._conf.mode or "fill", self:getX(), self:getY(),
 			(self:getW() + self:getH()) / 2,
@@ -26,5 +27,5 @@ end
 
 function Arc:_checkConf()
 	Node._checkConf(self)
-	self:setColor(self._conf.color or "#101010aa")
+	self:setColor(self._conf.bg or "#101010aa")
 end

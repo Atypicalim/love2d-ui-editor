@@ -26,13 +26,47 @@ PROPERTY_NAME_ORDER = {
 	'y',
 	'w',
 	'h',
-	'text',
-	'icon',
-	'path',
-	'color',
+	"ax",
+	"ay",
 	'open',
+	"hide",
+	'path',
+	'icon',
+	'text',
+	'size',
+	'color',
+	'thickness',
 	'points',
+	'mode',
+	'disable',
+	'quad',
 	'children',
+	'count',
+	'life_min',
+	'life_max',
+	'emission',
+	'acceleration_x_min',
+	'acceleration_x_max',
+	'acceleration_y_min',
+	'acceleration_y_min',
+}
+
+CONTROL_NAME_ORDER = {
+	'Node',
+	'Point',
+	'Line',
+    'Rectangle',
+    'Ellipse',
+    'Polygon',
+    'Arc',
+    'Text',
+    'Input',
+    'Button',
+    'Image',
+    'Video',
+    'Particle',
+    'Template',
+    'Clipper',
 }
 
 PROPERTY_NAME_INFO = {
@@ -49,27 +83,3 @@ PROPERTY_NAME_INFO = {
 
 BORDER_OFF_COLOR = "#000000ee"
 BORDER_ON_COLOR = "#ffffffee"
-
-CONTROL_NAME_ORDER = {
-	"Point",
-	"Line",
-}
-
-CONTROL_CONF_COMMON = {
-	id = "empty",
-	x = "0.5",
-	y = "0.5",
-	y = "1",
-	h = "1",
-}
-CONTROL_CONF_MAP = {
-	['Point'] = {},
-	['Line'] = {},
-}
-for name,conf in pairs(CONTROL_CONF_MAP) do
-	for k,v in pairs(CONTROL_CONF_COMMON) do
-		if conf[k] == nil then
-			conf[k] = v
-		end
-	end
-end

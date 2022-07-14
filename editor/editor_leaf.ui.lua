@@ -6,7 +6,7 @@
 		y = '0.5',
 		w = '1',
 		h = '1',
-		color = "#101010aa",
+		bg = "#101010aa",
 	},
     {
         type = "Rectangle",
@@ -16,15 +16,15 @@
 		w = '1',
 		h = '1',
         mode = 'line',
-		color = "#ffffff55",
+		bg = "#ffffff55",
 	},
     {
         type = "Text",
         id = "text",
         x = '0.5',
         y = '0.5',
-        w = 0,
-        h = 0,
+        w = '0',
+        h = '0',
         text = "[...]",
     },
     {
@@ -34,7 +34,7 @@
         y = '0.5',
         w = '1',
         h = '1',
-        color = "#00000000",
+        bg = "#00000000",
     },
     {
         type = "Button",

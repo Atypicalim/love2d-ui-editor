@@ -7,10 +7,10 @@ local Printer = class("Printer")
 function Printer:__init__(parent)
     self._text = parent:newConfig({
         type = "Text",
-        x = 0,
-        y = 0,
-        w = 0,
-        h = 0,
+        x = '0',
+        y = '0',
+        w = '0',
+        h = '0',
         text = "printer ...",
     })
 end

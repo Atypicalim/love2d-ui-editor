@@ -24,6 +24,6 @@ end
 
 function Rectangle:_checkConf()
 	Node._checkConf(self)
-	self:setColor(self._conf.color or "#101010aa")
+	self:setColor(self._conf.bg or "#101010aa")
 	self._radius = self._conf.radius or 0
 end

@@ -6,7 +6,7 @@ Ellipse = class("Ellipse", Node)
 
 function Ellipse:__init__(conf, parent)
 	Node.__init__(self, conf, parent)
-	self:setColor(self._conf.color)
+	self:setColor(self._conf.bg)
 end
 
 function Ellipse:setColor(color)
@@ -16,6 +16,7 @@ end
 function Ellipse:draw()
 	if not self._isHide then
 		love.graphics.setColor(unpack(self._color))
+		love.graphics.setLineWidth(self._conf.thickness or 2)
 		love.graphics.ellipse(self._conf.mode or "fill", self:getX(), self:getY(), self:getW() / 2, self:getH() / 2)
 	end
 	Node.draw(self)

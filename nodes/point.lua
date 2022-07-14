@@ -8,15 +8,15 @@ function Point:__init__(conf, parent)
 	Node.__init__(self, conf, parent)
 	self:setColor(self._conf.color)
 	self:setPoints(self._conf.points)
-	self:setSize(self._conf.size)
+	self:setThickness(self._conf.thickness)
 end
 
 function Point:setColor(color)
 	self._color = rgba2love(hex2rgba(color))
 end
 
-function Point:setSize(size)
-	self._size = size or 2
+function Point:setThickness(thickness)
+	self._thickness = thickness or 2
 end
 
 function Point:setPoints(points)
@@ -48,7 +48,7 @@ end
 
 function Point:draw()
 	if not self._isHide then
-		love.graphics.setPointSize(self._size)
+		love.graphics.setPointSize(self._thickness)
 		love.graphics.setColor(unpack(self._color))
 		love.graphics.points(unpack(self._points))
 	end

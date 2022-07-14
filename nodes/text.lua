@@ -15,7 +15,7 @@ end
 
 function Text:setText(text)
 	self._text = text
-	self._font = love.graphics.newFont(self._conf.font_size or 12)
+	self._font = love.graphics.newFont(self._conf.size or 12)
 	self._txt = love.graphics.newText(self._font, self._text)
 	self:setXYWH(nil, nil, self._txt:getWidth(), self._txt:getHeight())
 	self:_setLove(self._txt)

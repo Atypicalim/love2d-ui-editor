@@ -18,8 +18,30 @@ function Node:__init__(conf, parent)
 	end
 end
 
+function Node:_error(...)
+	local msg = string.format("[Node:%s] ", self.__name__) .. string.format(...)
+	error(msg)
+end
+
 function Node:_checkConf()
-	-- TODO validate with type key values
+	-- validate with type key values
+	if self.__name__ ~= 'Gui' then
+		local defaultConf = CONTROL_CONF_MAP[self.__name__]
+		assert(defaultConf ~= nil, 'default values not found')
+		defaultConf= table.copy(defaultConf)
+		for k,v in pairs(self._conf) do
+			if k == 'x' or k == 'y' or k == 'w' or k == 'h' then
+				if not is_number(v) and not string.valid(v) then
+					self:_error("invalid value [%s] for [%s]", tostring(v), k)
+				end
+			else
+				if type(v) ~= type(defaultConf[k]) then
+					self:_error("invalid value [%s] for [%s]", tostring(v), k)
+				end
+			end
+		end
+	end
+	--
 	self._conf.hide = self._conf.hide == true
 	self._conf.children = self._conf.children or {}
 	--

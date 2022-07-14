@@ -11,11 +11,11 @@ end
 function Button:_checkConf()
 	Node._checkConf(self)
 	self._isDisabled = self._conf.disable == true
-	self._conf.color = self._conf.color or "#555555aa"
-	if self._conf.color then
-		self._colorNormal = rgba2love(hex2rgba(self._conf.color))
-		self._colorPressed = rgba2love(hex2rgba(hex2new(self._conf.color, 1.2)))
-		self._colorDisabled = rgba2love(hex2rgba(hex2new(self._conf.color, 0.9)))
+	self._conf.bg = self._conf.bg or "#555555aa"
+	if self._conf.bg then
+		self._colorNormal = rgba2love(hex2rgba(self._conf.bg))
+		self._colorPressed = rgba2love(hex2rgba(hex2new(self._conf.bg, 1.2)))
+		self._colorDisabled = rgba2love(hex2rgba(hex2new(self._conf.bg, 0.9)))
 	end
 	self._colorTarget = self._isDisabled and self._colorDisabled or self._colorNormal
 	self:setIcon(self._conf.icon)
@@ -46,7 +46,7 @@ end
 function Button:setText(text)
 	self._text = text
 	if string.valid(text) then
-		self._font = love.graphics.newFont(self._conf.font_size or 12)
+		self._font = love.graphics.newFont(self._conf.size or 12)
 		self._txt = love.graphics.newText(self._font, self._text)
 		self._textW = self._txt:getWidth()
 		self._textH = self._txt:getHeight()

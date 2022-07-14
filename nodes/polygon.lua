@@ -6,7 +6,7 @@ Polygon = class("Polygon", Node)
 
 function Polygon:__init__(conf, parent)
 	Node.__init__(self, conf, parent)
-	self:setColor(self._conf.color)
+	self:setColor(self._conf.bg)
 	self:setPoints(self._conf.points)
 end
 
@@ -44,6 +44,7 @@ end
 function Polygon:draw()
 	if not self._isHide then
 		love.graphics.setColor(unpack(self._color))
+		love.graphics.setLineWidth(self._conf.thickness or 2)
 		love.graphics.polygon(self._conf.mode or "fill", unpack(self._points))
 	end
 	Node.draw(self)
