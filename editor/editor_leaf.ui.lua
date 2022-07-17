@@ -43,7 +43,7 @@
         y = '0.5',
         w = 15,
         h = 15,
-        icon = "/media/up.png",
+        icon = "media/up.png",
     },
     {
         type = "Button",
@@ -52,6 +52,6 @@
         y = '0.5',
         w = 15,
         h = 15,
-        icon = "/media/edit.png",
+        icon = "media/edit.png",
     },
 }

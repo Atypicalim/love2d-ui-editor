@@ -2,10 +2,10 @@
 	editor
 ]]
 
-require('tools/test')
+require('tools/tools')
 
 local Editor = class("Editor")
-local gui = require('gui')
+local gui = require('gui/gui')
 require('editor/constants')
 require('editor/tools')
 Printer = require('editor/printer')
@@ -326,11 +326,59 @@ function Editor:_onClick(id, event)
         self:pushMessage('preview opened!')
         return
     elseif id == 'btnBuild' then
-        self:pushMessage('copying files...')
-        files.copy("./gui.lua", self._workspace .. "gui.lua")
-        files.sync("./gui/", self._workspace .. "gui/")
-        self:pushMessage('building program...')
-        print('\n\n\n-->', self._workspace)
+        local guiFolder = self._workspace .. "gui/"
+        local toolsFolder = self._workspace .. "tools/"
+        local releaseFolder = self._workspace .. "release/"
+        local appZip = self._workspace .. "app.zip"
+        local function clear(removeRelase)
+            os.execute("rm -rf " .. guiFolder)
+            os.execute("rm -rf " .. toolsFolder)
+            if removeRelase then os.execute("rm -rf " .. releaseFolder) end
+            files.delete(appZip)
+        end
+        clear(true)
+        -- 
+        self:pushMessage('running build...')
+        files.sync("./gui/", guiFolder)
+        files.sync("./tools/", toolsFolder)
+        local isOk, out
+        --
+        isOk, out = tools.execute([[cd ]] .. self._workspace .. [[ && zip -9 -r "]] .. appZip .. [[" ./]])
+        if not isOk then
+            self:pushMessage('zip command failed...')
+            print(out)
+            return
+        end
+        --
+        isOk, out = tools_where_is("love")
+        if not isOk then
+            self:pushMessage('love not found...')
+            print(out)
+            return
+        end
+        --
+        files.sync(files.get_folder(out), releaseFolder)
+        os.rename(appZip, releaseFolder .. 'app.love')
+        isOk, out = tools.execute([[cd ]] .. releaseFolder .. [[ && cmd /c copy /b love.exe+app.love app.exe]])
+        if not isOk then
+            self:pushMessage('zip command failed...')
+            print(out)
+            return
+        end
+        --
+        clear(false)
+        os.remove(releaseFolder .. "app.love")
+        os.remove(releaseFolder .. "Uninstall.exe")
+        os.remove(releaseFolder .. "love.exe")
+        os.remove(releaseFolder .. "lovec.exe")
+        os.remove(releaseFolder .. "love.ico")
+        os.remove(releaseFolder .. "game.ico")
+        os.remove(releaseFolder .. "readme.txt")
+        os.remove(releaseFolder .. "license.txt")
+        os.remove(releaseFolder .. "changes.txt")
+        -- 
+        self:pushMessage('Finished!')
+        tools_platform_open_path(releaseFolder)
         return
     end
 end

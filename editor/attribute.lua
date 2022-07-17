@@ -40,7 +40,7 @@ function Attribute:__init__(parent, setPropertyFunc)
     --
     self._nodeCtrl  = parent:getById('templateCtrl')
     self._textCtrl = self._nodeCtrl:getById('text'):setText("Ctrl")
-    self._btnEditCtrl = self._nodeCtrl:getById('btnEdit'):setIcon("/media/plus.png")
+    self._btnEditCtrl = self._nodeCtrl:getById('btnEdit'):setIcon("media/plus.png")
     self._borderCtrl = self._nodeCtrl:getById('line')
     self._btnEditCtrl.onClick = function()
         g_editor:setConf(g_editor._conf, true)

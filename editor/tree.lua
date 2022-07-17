@@ -41,7 +41,7 @@ function Tree:__init__(parent)
         for i,v in ipairs(g_editor._template:getConf().children or {}) do
             v.open = not self._isFoldAll
         end
-        self._btnFoldUi:setIcon(self._isFoldAll and "/media/down.png" or "/media/up.png")
+        self._btnFoldUi:setIcon(self._isFoldAll and "media/down.png" or "media/up.png")
         self._treeIndent = 0
         self:_updateTree()
 

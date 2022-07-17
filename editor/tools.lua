@@ -80,3 +80,11 @@ end
 function tools_platform_open_url(url)
     return tools.execute([[start https://github.com/kompasim/love2d-ui-editor]])
 end
+
+function tools_where_is(program)
+    if tools.is_windows() then
+        return tools.execute([[where "]] .. program .. [["]])
+    else
+        return tools.execute([[which "]] .. program .. [["]])
+    end
+end

@@ -34,6 +34,6 @@
         y = '0.5',
         w = 15,
         h = 15,
-        icon = "/media/edit.png",
+        icon = "media/edit.png",
     },
 }

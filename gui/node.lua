@@ -293,8 +293,11 @@ end
 
 function Node:addTemplate(path)
 	path = tostring(path)
-	assert(string.valid(path) and files.is_file(path), 'invalid ui path:' .. path)
-	local configs = table.read_from_file(path)
+	if path:sub(1, 1) == "." then
+		path = path:sub(2, -1)
+	end
+	assert(string.valid(path) and love.filesystem.getInfo(path) ~= nil, 'invalid ui path:' .. path)
+	local configs = string.table(love.filesystem.read(path))
 	assert(configs ~= nil, 'invalid ui config! in:' .. path)
 	if not table.is_array(configs) then
 		configs = {configs}

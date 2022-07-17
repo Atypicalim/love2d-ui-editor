@@ -153,7 +153,7 @@
                         y = "0.025+10",
                         w = 15,
                         h = 15,
-                        icon = "/media/angle_up.png",
+                        icon = "media/angle_up.png",
                     },
                     {
                         type = "Template",
@@ -171,7 +171,7 @@
                         y = "0.025+10",
                         w = 15,
                         h = 15,
-                        icon = "/media/angle_down.png",
+                        icon = "media/angle_down.png",
                     },
                     {  
                         type = "Rectangle",
@@ -230,7 +230,7 @@
                         y = "0.025+10",
                         w = '0+15',
                         h = '0+15',
-                        icon = "/media/angle_up.png",
+                        icon = "media/angle_up.png",
                     },
                     {
                         type = "Template",
@@ -257,7 +257,7 @@
                         y = "0.025+10",
                         w = 15,
                         h = 15,
-                        icon = "/media/angle_down.png",
+                        icon = "media/angle_down.png",
                     },
                     {  
                         type = "Rectangle",

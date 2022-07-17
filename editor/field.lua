@@ -25,7 +25,7 @@ function Field:__init__(parent, yesFunc, noFunc)
         w = 25,
         h = 25,
     })
-    self._btnOk:setIcon("/media/confirm.png")
+    self._btnOk:setIcon("media/confirm.png")
     self._btnOk.onClick = function()
         yesFunc(self._input:getText())
     end
@@ -37,7 +37,7 @@ function Field:__init__(parent, yesFunc, noFunc)
         w = 25,
         h = 25,
     })
-    self._btnNo:setIcon("/media/cancel.png")
+    self._btnNo:setIcon("media/cancel.png")
     self._btnNo.onClick = function()
         noFunc(self._input:getText())
     end

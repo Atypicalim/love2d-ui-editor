@@ -5,7 +5,7 @@
 package.path = package.path .. ";../?.lua"
 
 
-local gui = require('../gui')
+local gui = require('./gui/gui')
 local WIDTH = 500
 local HEIGHT = 500
 

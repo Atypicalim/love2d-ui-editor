@@ -2,7 +2,7 @@
 	gui
 ]]
 
-require('tools/test')
+require('tools/tools')
 
 require 'gui/constants'
 require 'gui/tools'
