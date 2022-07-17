@@ -11,7 +11,7 @@ end
 
 function Video:setPath(path)
 	self._path = path
-	if string.valid(path) then
+	if string.valid(path) and files.is_file(path) then
 		self._video = love.graphics.newVideo(path)
 		Node.setXYWH(self, nil, nil, self._video:getWidth(), self._video:getHeight())
 	else
@@ -27,6 +27,8 @@ end
 function Video:draw()
 	if not self._isHide and self._video then
 		love.graphics.draw(self._video, self:getLeft(), self:getTop())
+	elseif not self._isHide then
+		self:_draw()
 	end
 	Node.draw(self)
 end

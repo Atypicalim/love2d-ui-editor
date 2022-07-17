@@ -42,6 +42,8 @@ function Image:draw()
 		else
 			love.graphics.draw(self._image, self:getLeft(), self:getTop())
 		end
+	elseif not self._hide then
+		self:_draw()
 	end
 	Node.draw(self)
 end

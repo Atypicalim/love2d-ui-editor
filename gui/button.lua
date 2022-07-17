@@ -33,7 +33,7 @@ end
 
 function Button:setIcon(path)
 	self._path = path
-	if string.valid(path) then
+	if string.valid(path) and files.is_file(path) then
 		self._image = love.graphics.newImage(path)
 		self._imageW = self._image:getWidth()
 		self._imageH = self._image:getHeight()

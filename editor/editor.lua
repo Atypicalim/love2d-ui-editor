@@ -7,6 +7,7 @@ require('tools/test')
 local Editor = class("Editor")
 local gui = require('gui')
 require('editor/constants')
+require('editor/tools')
 Printer = require('editor/printer')
 Leaf = require('editor/leaf')
 Tree = require('editor/tree')
@@ -325,7 +326,11 @@ function Editor:_onClick(id, event)
         self:pushMessage('preview opened!')
         return
     elseif id == 'btnBuild' then
-        --
+        self:pushMessage('copying files...')
+        files.copy("./gui.lua", self._workspace .. "gui.lua")
+        files.sync("./gui/", self._workspace .. "gui/")
+        self:pushMessage('building program...')
+        print('\n\n\n-->', self._workspace)
         return
     end
 end

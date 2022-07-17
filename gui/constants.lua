@@ -43,10 +43,12 @@ CONTROL_CONF_COMMON = {
 CONTROL_CONF_MAP = {
     ['Node'] = {},
 	['Point'] = {
+        color = "#101010ff",
         thickness = 5,
         points = {0, 0},
     },
 	['Line'] = {
+        color = "#101010ff",
         thickness = 5,
         points = {0, 0, 50, 50},
     },

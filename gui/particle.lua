@@ -16,7 +16,7 @@ end
 
 function Particle:setPath(path)
 	self._path = path
-	if string.valid(path) then
+	if string.valid(path) and files.is_file(path) then
 		local img = love.graphics.newImage(self._path)
 		self._particle = love.graphics.newParticleSystem(img, self._conf.count or 32)
 		self._particle:setParticleLifetime(self._conf.life_min or 2, self._conf.life_max or 5) -- Particles live at least 2s and at most 5s.

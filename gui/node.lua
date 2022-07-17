@@ -18,6 +18,11 @@ function Node:__init__(conf, parent)
 	end
 end
 
+function Node:_draw()
+	love.graphics.setColor(0.1, 0.1, 0.1, 0.9)
+	love.graphics.rectangle("fill", self:getLeft(), self:getTop(), self:getW(), self:getH())
+end
+
 function Node:_error(...)
 	local msg = string.format("[Node:%s] ", self.__name__) .. string.format(...)
 	error(msg)
