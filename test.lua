@@ -2,7 +2,5 @@
     test codes
 ]]
 
-require 'tools/test'
-
-local folder = files.cwd():sub(1, -2):gsub('/', '\\')
-tools_platform_select_folder(nil, folder)
+package.path = package.path .. ";" .. os.getenv("MY_LUA_HOME") .. "/?.lua"
+require 'pure-lua-tools/test'

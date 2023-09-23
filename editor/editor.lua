@@ -2,12 +2,9 @@
 	editor
 ]]
 
-require('tools/tools')
-
-local Editor = class("Editor")
 local gui = require('gui/gui')
+local Editor = class("Editor")
 require('editor/constants')
-require('editor/tools')
 Printer = require('editor/printer')
 Leaf = require('editor/leaf')
 Tree = require('editor/tree')
@@ -266,7 +263,7 @@ function Editor:_onClick(id, event)
         love.event.quit()
         return
     elseif id == 'btnGithub' then
-        if tools_platform_open_url(EDITOR_GITHUB_URL) then
+        if tools.open_url(EDITOR_GITHUB_URL) then
             self:pushMessage('github opened in browser!')
         else
             self:pushMessage('github open failed!')
@@ -298,7 +295,7 @@ function Editor:_onClick(id, event)
     end
     --
     if id == 'btnExplorer' then
-        local isOk, out = tools_platform_open_path(self._workspace)
+        local isOk, out = dialog.open_path(self._workspace)
         if isOk then
             self:pushMessage('workspace opened in explorer!')
         else
@@ -350,7 +347,7 @@ function Editor:_onClick(id, event)
             return
         end
         --
-        isOk, out = tools_where_is("love")
+        isOk, out = tools.where_is("love")
         if not isOk then
             self:pushMessage('love not found...')
             print(out)
@@ -378,13 +375,13 @@ function Editor:_onClick(id, event)
         os.remove(releaseFolder .. "changes.txt")
         -- 
         self:pushMessage('Finished!')
-        tools_platform_open_path(releaseFolder)
+        dialog.open_path(releaseFolder)
         return
     end
 end
 
 function Editor:_tryOpenWorkspace()
-    local folder = tools_platform_select_folder('please select a love2d project or empty folder as workspace:', files.cwd())
+    local folder = dialog.select_folder('please select a love2d project or empty folder as workspace:', files.cwd())
     if not string.valid(folder) or not files.is_folder(folder) then
         self:pushMessage('invalid folder!')
         return
@@ -402,7 +399,7 @@ function Editor:_tryOpenWorkspace()
 end
 
 function Editor:_tryOpenFile()
-    local path = tools_platform_select_file('please select a ui file to open:', '*.ui.lua|*.ui.lua', self._workspace)
+    local path = dialog.select_file('please select a ui file to open:', '*.ui.lua|*.ui.lua', self._workspace)
     if not string.valid(path) or not files.is_file(path) then
         self:pushMessage('invalid path to open!')
         return
@@ -412,7 +409,7 @@ function Editor:_tryOpenFile()
 end
 
 function Editor:_tryCreateFile()
-    local path = tools_platform_save_file('please enter a file to create ui:', '*.ui.lua|*.ui.lua', self._workspace)
+    local path = dialog.select_save('please enter a file to create ui:', '*.ui.lua|*.ui.lua', self._workspace)
     if not string.valid(path) then
         self:pushMessage('invalid path to create!')
         return
@@ -427,7 +424,7 @@ function Editor:_trySaveFile(toNewFile)
     local content = table.string(config, nil, PROPERTY_NAME_ORDER)
 
     if toNewFile then
-        local path = tools_platform_save_file('please enter a file to save ui:', '*.ui.lua|*.ui.lua', self._workspace)
+        local path = dialog.select_save('please enter a file to save ui:', '*.ui.lua|*.ui.lua', self._workspace)
         if not string.valid(path) then
             self:pushMessage('invalid path to save!')
         else

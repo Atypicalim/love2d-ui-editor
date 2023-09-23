@@ -2,10 +2,8 @@
 	editor
 ]]
 
-require('tools/tools')
-
-local Previewer = class("Previewer")
 local gui = require('gui/gui')
+local Previewer = class("Previewer")
 
 function Previewer:__init__(path)
     self._path = path or './template/app.ui.lua'
