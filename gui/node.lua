@@ -17,22 +17,17 @@ function Node:__init__(conf, parent)
 end
 
 function Node:addTemplate(path)
-	path = tostring(path)
-	assert(string.valid(path), 'invalid gui path:' .. path)
-	local configs = nil
-	if g_editor then
-		assert(files.is_file(path), 'invalid gui file:' .. path)
-		configs = table.read_from_file(path)
-	else
-		if path:sub(1, 1) == "." then
-			path = path:sub(2, -1)
-		end
-		assert( love.filesystem.getInfo(path) ~= nil, 'invalid gui file:' .. path)
-		configs = string.table(love.filesystem.read(path))
-	end
-	assert(configs ~= nil, 'invalid gui configs! in:' .. path)
+	local configs = read_template(path)
 	for i,config in ipairs(configs) do
 		self:addConfig(config)
+	end
+	return self
+end
+
+function Node:_parseTemplate(path)
+	local configs = read_template(path)
+	for i,config in ipairs(configs) do
+		self:_parseConfig(config)
 	end
 	return self
 end
@@ -42,7 +37,7 @@ function Node:addConfig(config)
 	return self:_parseConfig(config)
 end
 
-function Node:_parseConfig(config, index)
+function Node:_parseConfig(config)
 	if not _G[config.type] then
 		error('invalid gui node! content:' .. table.string(config))
 	end
