@@ -11,41 +11,47 @@ function Node:__init__(conf, parent)
 	self:_checkConf(nil)
 	self:setA()
 	self:setXYWH()
-	self:addConfigs(self._conf.children)
+	for i,config in ipairs(self._conf.children) do
+		self:_parseConfig(config)
+	end
 end
 
 function Node:addTemplate(path)
 	path = tostring(path)
+	assert(string.valid(path), 'invalid gui path:' .. path)
 	local configs = nil
 	if g_editor then
-		assert(string.valid(path) and files.is_file(path), 'invalid ui path:' .. path)
+		assert(files.is_file(path), 'invalid gui file:' .. path)
 		configs = table.read_from_file(path)
 	else
 		if path:sub(1, 1) == "." then
 			path = path:sub(2, -1)
 		end
-		assert(string.valid(path) and love.filesystem.getInfo(path) ~= nil, 'invalid ui path:' .. path)
+		assert( love.filesystem.getInfo(path) ~= nil, 'invalid gui file:' .. path)
 		configs = string.table(love.filesystem.read(path))
 	end
-	assert(configs ~= nil, 'invalid gui file! in:' .. path)
-	self:addConfigs(configs)
-	return self
-end
-
-function Node:addConfigs(configs)
-	assert(is_table(configs), 'invalid gui configs!')
+	assert(configs ~= nil, 'invalid gui configs! in:' .. path)
 	for i,config in ipairs(configs) do
-		local node = self:addConfig(config)
-		assert(node ~= nil, 'invalid gui config!')
+		self:addConfig(config)
 	end
 	return self
 end
 
 function Node:addConfig(config)
-	assert(_G[config.type], string.format('node [%s] not found!', config.type))
-	local child = _G[config.type](config, self)
-	table.insert(self._children, child)
-	return child
+	table.insert(self._conf.children, config)
+	return self:_parseConfig(config)
+end
+
+function Node:_parseConfig(config, index)
+	if not _G[config.type] then
+		error('invalid gui node! content:' .. table.string(config))
+	end
+	local node = _G[config.type](config, self)
+	if not node then
+		error('invalid gui config! content:' .. table.string(config))
+	end
+	table.insert(self._children, node)
+	return node
 end
 
 function Node:_draw()
