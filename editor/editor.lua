@@ -490,7 +490,7 @@ function Editor:addControl(name, position)
         self:pushMessage('add control failed, target not found!')
         return
     end
-    targetNode:newConfig({
+    targetNode:addConfig({
         type = "Text",
         x = "0.5",
         y = "0.5",

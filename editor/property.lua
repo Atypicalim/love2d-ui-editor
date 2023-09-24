@@ -22,7 +22,7 @@ function Property:__init__(key, value, x, y, w, h)
         return
     end
     --
-    self._node = self._parent:newConfig({
+    self._node = self._parent:addConfig({
         type = "Node",
 		x = x,
 		y = y,

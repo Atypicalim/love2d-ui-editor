@@ -14,7 +14,7 @@ function Leaf:__init__(config, x, y, w, h)
         return
     end
     --
-    self._node = self._parent:newConfig({
+    self._node = self._parent:addConfig({
         type = "Node",
 		x = x,
 		y = y,

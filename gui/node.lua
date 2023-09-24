@@ -7,15 +7,45 @@ Node = class("Node")
 function Node:__init__(conf, parent)
 	self._conf = conf
 	self._parent = parent
-	self:_checkConf(nil)
-	--
 	self._children = {}
+	self:_checkConf(nil)
 	self:setA()
 	self:setXYWH()
-	--
-	for i,v in ipairs(self._conf.children) do
-		self:_parseConfig(v)
+	self:addConfigs(self._conf.children)
+end
+
+function Node:addTemplate(path)
+	path = tostring(path)
+	local configs = nil
+	if g_editor then
+		assert(string.valid(path) and files.is_file(path), 'invalid ui path:' .. path)
+		configs = table.read_from_file(path)
+	else
+		if path:sub(1, 1) == "." then
+			path = path:sub(2, -1)
+		end
+		assert(string.valid(path) and love.filesystem.getInfo(path) ~= nil, 'invalid ui path:' .. path)
+		configs = string.table(love.filesystem.read(path))
 	end
+	assert(configs ~= nil, 'invalid gui file! in:' .. path)
+	self:addConfigs(configs)
+	return self
+end
+
+function Node:addConfigs(configs)
+	assert(is_table(configs), 'invalid gui configs!')
+	for i,config in ipairs(configs) do
+		local node = self:addConfig(config)
+		assert(node ~= nil, 'invalid gui config!')
+	end
+	return self
+end
+
+function Node:addConfig(config)
+	assert(_G[config.type], string.format('node [%s] not found!', config.type))
+	local child = _G[config.type](config, self)
+	table.insert(self._children, child)
+	return child
 end
 
 function Node:_draw()
@@ -290,51 +320,6 @@ function Node:removeSelf()
 end
 
 -- 
-
-function Node:addTemplate(path)
-	path = tostring(path)
-	local configs = nil
-	if g_editor then
-		assert(string.valid(path) and files.is_file(path), 'invalid ui path:' .. path)
-		configs = table.read_from_file(path)
-	else
-		if path:sub(1, 1) == "." then
-			path = path:sub(2, -1)
-		end
-		assert(string.valid(path) and love.filesystem.getInfo(path) ~= nil, 'invalid ui path:' .. path)
-		configs = string.table(love.filesystem.read(path))
-	end
-	assert(configs ~= nil, 'invalid ui config! in:' .. path)
-	if not table.is_array(configs) then
-		configs = {configs}
-	end
-	for i,v in ipairs(configs) do
-		self:newConfig(v)
-	end
-	return self
-end
-
-function Node:newConfig(config, index)
-	assert(_G[config.type], string.format('node [%s] not found!', config.type))
-	if index then
-		table.insert(self._conf.children, index, config)
-	else
-		table.insert(self._conf.children, config)
-	end
-	return self:_parseConfig(config, index)
-end
-
-function Node:_parseConfig(config, index)
-	local child = _G[config.type](config, self)
-	child.canvas = self.canvas or self
-	if index then
-		table.insert(self._children, index, child)
-	else
-		table.insert(self._children, child)
-	end
-	return child
-end
-
 
 function Node:getById(nodeId)
 	assert(string.valid(nodeId), 'invalid node id!')

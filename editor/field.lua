@@ -8,7 +8,7 @@ function Field:__init__(parent, yesFunc, noFunc)
     g_input = self
     self._parent = parent
     --
-    self._input = self._parent:newConfig({
+    self._input = self._parent:addConfig({
         type = "Input",
         x = '0.5',
         y = '0.5',
@@ -18,7 +18,7 @@ function Field:__init__(parent, yesFunc, noFunc)
     })
     self._input:setText(tostring(g_editor._conf[g_editor._key]))
     --
-    self._btnOk = self._parent:newConfig({
+    self._btnOk = self._parent:addConfig({
         type = "Button",
         x = '0.9',
         y = '0.5',
@@ -30,7 +30,7 @@ function Field:__init__(parent, yesFunc, noFunc)
         yesFunc(self._input:getText())
     end
     --
-    self._btnNo = self._parent:newConfig({
+    self._btnNo = self._parent:addConfig({
         type = "Button",
         x = '0.1',
         y = '0.5',
