@@ -26,6 +26,7 @@ PROPERTY_NAME_ORDER = {
 	'y',
 	'w',
 	'h',
+	'bg',
 	"ax",
 	"ay",
 	'open',
