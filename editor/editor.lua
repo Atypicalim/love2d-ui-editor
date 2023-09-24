@@ -336,8 +336,7 @@ function Editor:_onClick(id, event)
         clear(true)
         -- 
         self:pushMessage('running build...')
-        files.sync("./gui/", guiFolder)
-        files.sync("./tools/", toolsFolder)
+        error('TODO:move gui and tools to target folder!!!')
         local isOk, out
         --
         isOk, out = tools.execute([[cd ]] .. self._workspace .. [[ && zip -9 -r "]] .. appZip .. [[" ./]])

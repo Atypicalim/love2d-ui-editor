@@ -51,6 +51,7 @@ function read_template(path)
 		assert(files.is_file(path), 'invalid gui file:' .. path)
 		configs = table.read_from_file(path)
 	else
+        -- TODO: check file path and info
 		if path:sub(1, 1) == "." then
 			path = path:sub(2, -1)
 		end
