@@ -43,6 +43,33 @@ function hex2new(hex, times)
     return rgba2hex(unpack(values))
 end
 
+function describe2xywh(isXW, describe, pWidth, pHeight)
+    assert(string.valid(describe), 'empty describe to calculate!')
+    describe = describe:upper():trim()
+    --
+    local num = tonumber(describe)
+    if num and num > 1 and tostring(num) == describe then
+        return num
+    end
+    --
+    local reg = "^%s*([WH])%s*%*"
+    local exp = string.match(describe, reg)
+    local flt = string.gsub(describe, reg, "")
+    if exp then
+        isXW = exp == "W"
+    end
+    -- 
+    local val = isXW and pWidth or pHeight
+    local cal = string.format("return %f * %s", val, flt)
+    local fun = loadstring(cal) or function() end
+    local res = fun()
+    if not res then
+        print('invalid describe value of:' .. describe)
+        error('invalid describe to calculate!')
+    end
+    return res
+end
+
 function read_template(path)
     path = tostring(path)
 	assert(string.valid(path), 'invalid gui path:' .. path)

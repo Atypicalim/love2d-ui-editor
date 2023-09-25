@@ -213,39 +213,27 @@ function Node:setA(ax, ay)
 	return self
 end
 
-function Node:_calculateNumber(useWidth, describe)
-	assert(string.valid(describe))
-	local calculation = nil
-	if string.find(describe, "*") then
-		local args = string.explode(describe, "*")
-		assert(#args == 2)
-		local useFlag = string.lower(args[1])
-		if useFlag == "w" then
-			useWidth = true
-		elseif useFlag == "h" then
-			useWidth = false
-		end
-		calculation = args[2]
-	else
-		calculation = describe
+function Node:_calculateDescribe(isXW, describe)
+	if is_number(describe) then
+		return describe
 	end
-	local equation = string.format("return %d * %s", useWidth and self._parent:getW() or self._parent:getH(), calculation)
-	local func = loadstring(equation)
-    return func()
+	return describe2xywh(isXW, describe, self._parent:getW(), self._parent:getH())
+
 end
+
 function Node:setXYWH(x, y, w, h)
 	self._conf.x = x or self._conf.x
 	self._conf.y = y or self._conf.y
-	self._x = is_number(self._conf.x) and self._conf.x or self:_calculateNumber(true, self._conf.x)
-	self._y = is_number(self._conf.y) and self._conf.y or self:_calculateNumber(false, self._conf.y)
+	self._x = self:_calculateDescribe(true, self._conf.x)
+	self._y = self:_calculateDescribe(false, self._conf.y)
 	if self._parent then
 		self._x = self._x + self._parent:getLeft()
 		self._y = self._y + self._parent:getTop()
 	end
 	self._conf.w = w or self._conf.w
 	self._conf.h = h or self._conf.h
-	self._w = is_number(self._conf.w) and self._conf.w or self:_calculateNumber(true, self._conf.w)
-	self._h = is_number(self._conf.h) and self._conf.h or self:_calculateNumber(false, self._conf.h)
+	self._w = self:_calculateDescribe(true, self._conf.w)
+	self._h = self:_calculateDescribe(false, self._conf.h)
 	self._w = math.max(0, self._w)
 	self._h = math.max(0, self._h)
 	for i,v in ipairs(self._children) do
