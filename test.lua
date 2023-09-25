@@ -2,5 +2,5 @@
     test codes
 ]]
 
-package.path = package.path .. ";" .. os.getenv("MY_LUA_HOME") .. "/?.lua"
+package.path = package.path .. ";" .. "G:/Tests/LuaTest/?.lua"
 require 'pure-lua-tools/test'

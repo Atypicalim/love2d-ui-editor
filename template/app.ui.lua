@@ -98,12 +98,16 @@
         h = 25,
         icon = "media/folder.png",
     },
-    [12] = {
-        type = "Arc",
-        id = "idButton",
-        x = '0.5',
-        y = '0.925',
-        w = 25,
-        h = 25,
+    [12] =     {
+        type = "Check",
+        id = "nodeLayer",
+        x = '0.7',
+        y = '0.5',
+        w = "100",
+        h = '100',
+        bg = "#ff0aff",
+        img_on = "media/check_off.png",
+        img_off = "media/check_on.png",
     },
+
 }

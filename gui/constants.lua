@@ -77,22 +77,31 @@ CONTROL_CONF_MAP = {
         size = 12,
         text = "text...",
     },
-    ['Input'] = {
-        color = "#101010ff",
-        size = 12,
-        text = "text...",
-    },
-    ['Button'] = {
-        text = "text...",
-        icon = "",
-        disable = false,
-    },
     ['Image'] = {
         path ="",
         quad = {0, 0, 100, 100},
     },
     ['Video'] = {
         path = "",
+    },
+    ['Input'] = {
+        color = "#101010ff",
+        size = 12,
+        text = "text...",
+    },
+    ['Layer'] = {
+        disable = false,
+    },
+    ['Check'] = {
+        disable = false,
+        checked = false,
+        img_on = "media/check_off.png",
+        img_off = "media/check_on.png",
+    },
+    ['Button'] = {
+        text = "text...",
+        icon = "",
+        disable = false,
     },
     ['Particle'] = {
         color = "#ffffffff",

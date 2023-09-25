@@ -2,17 +2,19 @@
 	gui
 ]]
 
-package.path = package.path .. ";" .. os.getenv("MY_LUA_HOME") .. "/?.lua"
+package.path = package.path .. ";" .. "G:/Tests/LuaTest/?.lua"
 require 'pure-lua-tools/test'
 
 require 'gui/constants'
 require 'gui/tools'
 require 'gui/node'
-require 'gui/button'
 require 'gui/text'
 require 'gui/image'
 require 'gui/video'
 require 'gui/input'
+require 'gui/layer'
+require 'gui/check'
+require 'gui/button'
 require 'gui/rectangle'
 require 'gui/ellipse'
 require 'gui/polygon'
