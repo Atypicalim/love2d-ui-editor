@@ -14,7 +14,7 @@ function Control:__init__(name, conf, x, y, w, h)
         return
     end
     --
-    self._node = self._parent:addConfig({
+    self._node = self._parent:addChild({
         type = "Node",
 		x = x,
 		y = y,

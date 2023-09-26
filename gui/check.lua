@@ -6,17 +6,9 @@ Check = class("Check", Node)
 
 function Check:__init__(conf, parent)
 	Node.__init__(self, conf, parent)
-	self._layer = self:_parseConfig({
-		type = "Layer",
-		w = "100",
-		h = '100',
-	})
-	self._imgOff = self:_parseConfig({
-        type = "Image",
-    })
-	self._imgOn = self:_parseConfig({
-        type = "Image",
-    })
+	self._layer = self:newLayer({w = "50", h = '50',})
+	self._imgOff = self:newImage({})
+	self._imgOn = self:newImage({})
 	self._layer.onClick = function()
 		self._conf.checked = not self._isChecked
 		self:_consumeConf()
@@ -31,8 +23,8 @@ function Check:_consumeConf()
 	self._isDisabled = self._conf.disable == true
 	self._isChecked = self._conf.checked == true
 	self._lyrColor = self._conf.color
-	self._imgOff = self._conf.img_off
-	self._imgOn = self._conf.img_on
+	self._pathOff = self._conf.img_off
+	self._pathOn = self._conf.img_on
 	return self
 end
 
@@ -85,8 +77,8 @@ end
 
 function Check:_updateInner()
 	self._layer:setColor(self._lyrColor)
-	self._imgOn:setPath(self._imgOn)
-	self._imgOff:setPath(self._imgOff)
+	self._imgOn:setPath(self._pathOn)
+	self._imgOff:setPath(self._pathOff)
 	return self
 end
 

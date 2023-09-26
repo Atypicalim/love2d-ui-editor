@@ -6,6 +6,7 @@ Button = class("Button", Node)
 
 function Button:__init__(conf, parent)
 	Node.__init__(self, conf, parent)
+	self._touchy = true
 end
 
 function Button:_consumeConf()

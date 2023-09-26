@@ -6,6 +6,7 @@ Layer = class("Layer", Node)
 
 function Layer:__init__(conf, parent)
 	Node.__init__(self, conf, parent)
+	self._touchy = true
 end
 
 function Layer:_consumeConf()

@@ -10,9 +10,10 @@ function Node:__init__(conf, parent)
 	self._conf = table.copy(CONTROL_CONF_MAP[self._name]):merge(conf or {})
 	self._parent = parent
 	self._children = {}
+	self._touchy = false
 	self:_consumeConf()
 	for i,config in ipairs(self._conf.children) do
-		self:_parseConfig(config)
+		self:createChild(config)
 	end
 end
 
@@ -50,25 +51,25 @@ end
 function Node:addTemplate(path)
 	local configs = read_template(path)
 	for i,config in ipairs(configs) do
-		self:addConfig(config)
+		self:addChild(config)
 	end
 	return self
 end
 
-function Node:_parseTemplate(path)
+function Node:_createTemplate(path)
 	local configs = read_template(path)
 	for i,config in ipairs(configs) do
-		self:_parseConfig(config)
+		self:createChild(config)
 	end
 	return self
 end
 
-function Node:addConfig(config)
+function Node:addChild(config)
 	table.insert(self._conf.children, config)
-	return self:_parseConfig(config)
+	return self:createChild(config)
 end
 
-function Node:_parseConfig(config)
+function Node:createChild(config)
 	if not _G[config.type] then
 		error('invalid gui node! content:' .. table.string(config))
 	end
@@ -108,12 +109,12 @@ function Node:getParent()
 	return self._parent
 end
 
-function Node:isIgnoreEvents()
-	return self._isIgnoreEvents == true
+function Node:isTouchy()
+	return self._touchy == true
 end
 
-function Node:setIgnoreEvents(ignore)
-	self._isIgnoreEvents = ignore == true
+function Node:setTouchy(touchy)
+	self._touchy = touchy == true
 	return self
 end
 

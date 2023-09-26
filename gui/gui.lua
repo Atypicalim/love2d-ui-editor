@@ -49,7 +49,7 @@ end
 function Gui:mousepressed(x, y, button)
     local pressedNode = nil
 	self:foreachDescendants(true, function(v)
-        if not pressedNode and v:isHover() and not v:isIgnoreEvents() then
+        if not pressedNode and v:isHover() and v:isTouchy() then
             pressedNode = v
             return true
         end
@@ -65,7 +65,7 @@ end
 function Gui:mousemoved(x, y, dx, dy, istouch)
     local movedNode = nil
 	self:foreachDescendants(true, function(v)
-        if not movedNode and v:isHover() and not v:isIgnoreEvents() then
+        if not movedNode and v:isHover() and v:isTouchy() then
             movedNode = v
             return true
         end
@@ -90,7 +90,7 @@ end
 function Gui:mousereleased(x, y, button)
     local releaseddNode = nil
 	self:foreachDescendants(true, function(v)
-        if not releaseddNode and v:isHover() and not v:isIgnoreEvents() then
+        if not releaseddNode and v:isHover() and v:isTouchy() then
             releaseddNode = v
             return true
         end
@@ -129,7 +129,9 @@ for ctrl,_ in pairs(CONTROL_CONF_MAP) do
         assert(cls ~= nil, 'control not found for ctrl:' .. ctrl)
         assert(Node['new' .. ctrl] == nil, 'multiple new func for ctrl:', ctrl)
         Node['new' .. ctrl] = function(self, conf)
-            return cls(conf, self)
+            assert(conf.type == nil, 'multiple type value for ctrl:', ctrl)
+            conf.type = ctrl
+            return self:createChild(conf)
         end
     end
 end
