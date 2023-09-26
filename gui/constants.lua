@@ -77,7 +77,7 @@ CONTROL_CONF_MAP = {
         points = {0, 0, 50, 50, -50, 50},
     },
     ['Text'] = {
-        color = "#101010ff",
+        color = "#ffffffff",
         size = 12,
         text = "text...",
     },
@@ -91,7 +91,7 @@ CONTROL_CONF_MAP = {
     ['Input'] = {
         color = "#101010ff",
         size = 12,
-        text = "text...",
+        text = "input...",
     },
     ['Layer'] = {
         disable = false,
@@ -106,8 +106,8 @@ CONTROL_CONF_MAP = {
     },
     ['Button'] = {
         disable = false,
-        color = "#101010ff",
-        text = "text...",
+        color = "#88888877",
+        text = "",
         icon = "",
     },
     ['Particle'] = {

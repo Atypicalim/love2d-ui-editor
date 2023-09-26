@@ -121,6 +121,19 @@ function Gui:setTarget()
     return self._movedNode
 end
 
+-- helper
+
+for ctrl,_ in pairs(CONTROL_CONF_MAP) do
+    if ctrl ~= "Gui" then
+        local cls = _G[ctrl]
+        assert(cls ~= nil, 'control not found for ctrl:' .. ctrl)
+        assert(Node['new' .. ctrl] == nil, 'multiple new func for ctrl:', ctrl)
+        Node['new' .. ctrl] = function(self, conf)
+            return cls(conf, self)
+        end
+    end
+end
+
 -- interfaces
 
 local gui = {}

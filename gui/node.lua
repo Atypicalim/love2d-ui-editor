@@ -6,7 +6,8 @@ Node = class("Node")
 
 function Node:__init__(conf, parent)
 	--
-	self._conf = table.copy(CONTROL_CONF_MAP[self.__name__]):merge(conf)
+	self._name = self.__name__
+	self._conf = table.copy(CONTROL_CONF_MAP[self._name]):merge(conf or {})
 	self._parent = parent
 	self._children = {}
 	self:_consumeConf()
@@ -235,7 +236,7 @@ end
 function Node:setXY(x, y)
 	return self:setXYWH(x, y, nil, nil)
 end
-function Node:getXY() return self._x, self._y end
+function Node:getXY() return self:getX(), self:getY() end
 function Node:setX(x) return self:setXY(x, nil) end
 function Node:setY(y) return self:setXY(nil, y) end
 function Node:getX() return self._x end
@@ -244,7 +245,7 @@ function Node:getY() return self._y end
 function Node:setWH(w, h)
 	return self:setXYWH(nil, nil, w, h)
 end
-function Node:getWH() return self._w, self._h end
+function Node:getWH() return self:getW(), self:getH() end
 function Node:setW(w) return self:setXY(w, nil) end
 function Node:setH(h) return self:setXY(nil, h) end
 function Node:getW() return self._w end

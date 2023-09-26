@@ -13,8 +13,8 @@ function Button:_consumeConf()
 	self._isDisabled = self._conf.disable == true
 	--
 	self._colorNormal = rgba2love(hex2rgba(self._conf.color))
-	self._colorPressed = rgba2love(hex2rgba(hex2new(self._conf.color, 1.2)))
-	self._colorDisabled = rgba2love(hex2rgba(hex2new(self._conf.color, 0.9)))
+	self._colorPressed = rgba2love(hex2rgba(hex2new(self._conf.color, 0.9)))
+	self._colorDisabled = rgba2love(hex2rgba(hex2new(self._conf.color, 0.7)))
 	self._colorTarget = self._isDisabled and self._colorDisabled or self._colorNormal
 	--
 	if string.valid(self._conf.icon) then

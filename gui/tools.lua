@@ -38,8 +38,9 @@ end
 function hex2new(hex, times)
     local values = {hex2rgba(hex)}
     for i=1,3 do
-        values[i] = math.min(255, values[i] * times)
+        values[i] = math.max(0, math.min(255, values[i] / 2))
     end
+    values[4] = math.max(0, math.min(255, values[4] * times))
     return rgba2hex(unpack(values))
 end
 
