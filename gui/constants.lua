@@ -29,11 +29,11 @@ NODE_EVENTS = {
 CONTROL_CONF_COMMON = {
     type = nil,
 	id = "empty",
-    bg = "101010cc",
+    bg = "10101077",
 	x = "0.5",
 	y = "0.5",
-	w = "0.75",
-	h = "0.75",
+	w = "0.9",
+	h = "0.9",
     ax = "0.5",
     ay = "0.5",
     open = true,
@@ -42,33 +42,37 @@ CONTROL_CONF_COMMON = {
 }
 CONTROL_CONF_MAP = {
     ['Node'] = {},
+    ['Gui'] = {},
 	['Point'] = {
         color = "#101010ff",
         thickness = 5,
         points = {0, 0},
     },
 	['Line'] = {
-        color = "#101010ff",
+        color = "#00ffffff",
         thickness = 5,
         points = {0, 0, 50, 50},
     },
     ['Rectangle'] = {
-        mode = "line",
+        fill = false,
+        color = "#ff00ffff",
         thickness = 2,
-
+        radius = 0,
     },
     ['Ellipse'] = {
-        color = "#101010ff",
-        mode = "line",
+        fill = false,
+        color = "#0000ffff",
         thickness = 2,
     },
     ['Polygon'] = {
-        mode = "line",
+        fill = false,
+        color = "#00ff00ff",
         thickness = 2,
         points = {0, 0, 50, 50, -50, 50},
     },
     ['Arc'] = {
-        mode = "line",
+        fill = false,
+        color = "#ff0000ff",
         thickness = 2,
         points = {0, 0, 50, 50, -50, 50},
     },
@@ -91,17 +95,20 @@ CONTROL_CONF_MAP = {
     },
     ['Layer'] = {
         disable = false,
+        color = "#101010ff",
     },
     ['Check'] = {
         disable = false,
+        color = "#101010ff",
         checked = false,
         img_on = "media/check_off.png",
         img_off = "media/check_on.png",
     },
     ['Button'] = {
+        disable = false,
+        color = "#101010ff",
         text = "text...",
         icon = "",
-        disable = false,
     },
     ['Particle'] = {
         color = "#ffffffff",

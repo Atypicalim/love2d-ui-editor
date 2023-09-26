@@ -11,17 +11,13 @@ function Line:__init__(conf, parent)
 	self:setThickness(self._conf.thickness)
 end
 
-function Line:setColor(color)
-	self._color = rgba2love(hex2rgba(color))
-end
-
-function Line:setThickness(thickness)
-	self._thickness = thickness or 2
-end
-
-function Line:setPoints(points)
-	assert(is_table(points), 'invalid points value')
+function Line:_consumeConf()
+	Node._consumeConf(self)
+	self._color = rgba2love(hex2rgba(self._conf.color))
+	self._thickness = self._conf.thickness
+	self._mode = self._conf.fill and 'fill' or 'line'
 	self._points = {}
+	local points = self._conf.points
 	local count = math.floor(#points / 2)
 	for i=1,count*2,2 do
 		local x = points[i]
@@ -44,13 +40,32 @@ function Line:setPoints(points)
 		table.insert(self._points, x)
 		table.insert(self._points, y)
 	end
+	return self
+end
+
+function Line:setColor(color)
+	self._conf.color = color
+	self:_consumeConf()
+	return self
+end
+
+function Line:setThickness(thickness)
+	self._conf.thickness = thickness
+	self:_consumeConf()
+	return self
+end
+
+function Line:setPoints(points)
+	self._conf.points = points
+	self:_consumeConf()
+	return self
 end
 
 function Line:draw()
+	Node.draw(self)
 	if not self._isHide then
 		love.graphics.setLineWidth(self._thickness)
 		love.graphics.setColor(unpack(self._color))
 		love.graphics.line(unpack(self._points))
 	end
-	Node.draw(self)
 end

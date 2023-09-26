@@ -5,15 +5,45 @@
 Node = class("Node")
 
 function Node:__init__(conf, parent)
-	self._conf = conf
+	--
+	self._conf = table.copy(CONTROL_CONF_MAP[self.__name__]):merge(conf)
 	self._parent = parent
 	self._children = {}
-	self:_checkConf(nil)
-	self:setA()
-	self:setXYWH()
+	self:_consumeConf()
 	for i,config in ipairs(self._conf.children) do
 		self:_parseConfig(config)
 	end
+end
+
+function Node:_consumeConf()
+	-- 
+	for k,v in pairs(self._conf) do
+		if k == 'x' or k == 'y' or k == 'w' or k == 'h' then
+			self:_assert(is_number(v) or string.valid(v), "invalid value [%s] for [%s]", tostring(v), k)
+		else
+			self:_assert(type(v) ~= type(conf), "invalid value [%s] for [%s]", tostring(v), k)
+		end
+	end
+	-- 
+	self._isHide = self._conf.hide == true
+	self._ax = math.max(0, math.min(1, self._conf.ax or 0.5))
+	self._ay = math.max(0, math.min(1, self._conf.ay or 0.5))
+	self._x = describe2xywh(true, self._conf.x, self:_parentW(), self:_parentH()) + self:_parentLeft()
+	self._y = describe2xywh(false, self._conf.y, self:_parentW(), self:_parentH()) + self:_parentTop()
+	self._w = math.max(0, describe2xywh(true, self._conf.w, self:_parentW(), self:_parentH()))
+	self._h = math.max(0, describe2xywh(false, self._conf.h, self:_parentW(), self:_parentH()))
+	--
+	for i,v in ipairs(self._children) do
+		v:_consumeConf()
+	end
+	--
+	return self
+end
+
+function Node:generateConf()
+	local conf = {}
+	
+	return {}
 end
 
 function Node:addTemplate(path)
@@ -50,7 +80,7 @@ function Node:_parseConfig(config)
 end
 
 function Node:_draw()
-	love.graphics.setColor(0.1, 0.1, 0.1, 0.9)
+	love.graphics.setColor(0.1, 0.1, 0.1, 0.3)
 	love.graphics.rectangle("fill", self:getLeft(), self:getTop(), self:getW(), self:getH())
 end
 
@@ -59,30 +89,10 @@ function Node:_error(...)
 	error(msg)
 end
 
-function Node:_checkConf()
-	-- validate with type key values
-	if self.__name__ ~= 'Gui' then
-		local defaultConf = CONTROL_CONF_MAP[self.__name__]
-		assert(defaultConf ~= nil, 'default values not found')
-		defaultConf= table.copy(defaultConf)
-		for k,v in pairs(self._conf) do
-			if k == 'x' or k == 'y' or k == 'w' or k == 'h' then
-				if not is_number(v) and not string.valid(v) then
-					self:_error("invalid value [%s] for [%s]", tostring(v), k)
-				end
-			else
-				if type(v) ~= type(defaultConf[k]) then
-					self:_error("invalid value [%s] for [%s]", tostring(v), k)
-				end
-			end
-		end
+function Node:_assert(bCheck, ...)
+	if bCheck ~= true then
+		self:_error(...)
 	end
-	--
-	self._conf.hide = self._conf.hide == true
-	self._conf.children = self._conf.children or {}
-	--
-	self._isHide = self._conf.hide
-	return self
 end
 
 function Node:_setLove(love)
@@ -197,6 +207,7 @@ function Node:show()
 end
 
 function Node:setVisible(isVisible)
+	assert(is_boolean(isVisible), 'invalid bool for node')
 	self._isHide = not isVisible
 	return self
 end
@@ -206,57 +217,36 @@ function Node:isVisible()
 end
 
 function Node:setA(ax, ay)
-	ax = ax or self._conf.ax
-	ay = ay or self._conf.ay
-	self._ax = math.max(0, math.min(1, ax or 0.5))
-	self._ay = math.max(0, math.min(1, ay or 0.5))
+	self._conf.ax = ax or self._conf.ax
+	self._conf.ay = ay or self._conf.ay
+	self:_consumeConf()
 	return self
-end
-
-function Node:_calculateDescribe(isXW, describe)
-	if is_number(describe) then
-		return describe
-	end
-	return describe2xywh(isXW, describe, self._parent:getW(), self._parent:getH())
-
 end
 
 function Node:setXYWH(x, y, w, h)
 	self._conf.x = x or self._conf.x
 	self._conf.y = y or self._conf.y
-	self._x = self:_calculateDescribe(true, self._conf.x)
-	self._y = self:_calculateDescribe(false, self._conf.y)
-	if self._parent then
-		self._x = self._x + self._parent:getLeft()
-		self._y = self._y + self._parent:getTop()
-	end
 	self._conf.w = w or self._conf.w
 	self._conf.h = h or self._conf.h
-	self._w = self:_calculateDescribe(true, self._conf.w)
-	self._h = self:_calculateDescribe(false, self._conf.h)
-	self._w = math.max(0, self._w)
-	self._h = math.max(0, self._h)
-	for i,v in ipairs(self._children) do
-		v:setXYWH()
-	end
+	self:_consumeConf()
 	return self
 end
 
 function Node:setXY(x, y)
-	return self:setXYWH(x, y, self._conf.w, self._conf.h)
+	return self:setXYWH(x, y, nil, nil)
 end
 function Node:getXY() return self._x, self._y end
-function Node:setX(x) return self:setXY(x, self._conf.y) end
-function Node:setY(y) return self:setXY(self._conf.x, y) end
+function Node:setX(x) return self:setXY(x, nil) end
+function Node:setY(y) return self:setXY(nil, y) end
 function Node:getX() return self._x end
 function Node:getY() return self._y end
 
 function Node:setWH(w, h)
-	return self:setXYWH(self._conf.x, self._conf.y, w, h)
+	return self:setXYWH(nil, nil, w, h)
 end
 function Node:getWH() return self._w, self._h end
-function Node:setW(w) return self:setXY(w, self._conf.h) end
-function Node:setH(h) return self:setXY(self._conf.w, h) end
+function Node:setW(w) return self:setXY(w, nil) end
+function Node:setH(h) return self:setXY(nil, h) end
 function Node:getW() return self._w end
 function Node:getH() return self._h end
 
@@ -264,6 +254,19 @@ function Node:getLeft() return self._x - self._w * self._ax end
 function Node:getRight() return self._x + self._w * ((1 - self._ax)) end
 function Node:getTop() return self._y - self._h * self._ay end
 function Node:getBottom() return self._y + self._h * (1 - self._ay) end
+
+function Node:_parentLeft()
+	return self._parent and self._parent:getLeft() or 0
+end
+function Node:_parentTop()
+	return self._parent and self._parent:getTop() or 0
+end
+function Node:_parentW()
+	return self._parent and self._parent:getW() or 0
+end
+function Node:_parentH()
+	return self._parent and self._parent:getH() or 0
+end
 
 function Node:getConf()
 	return self._conf
@@ -341,7 +344,7 @@ end
 
 function Node:refreshNode(updatedConf)
 	if updatedConf == nil or updatedConf == self._conf then
-		self:_checkConf()
+		self:_consumeConf()
 		self:foreachChildren(false, function(v) v:refreshNode(nil) end)
 	else
 		self:foreachChildren(false, function(v) v:refreshNode(updatedConf) end)

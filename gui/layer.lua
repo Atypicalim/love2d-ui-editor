@@ -8,17 +8,17 @@ function Layer:__init__(conf, parent)
 	Node.__init__(self, conf, parent)
 end
 
-function Layer:_checkConf()
-	Node._checkConf(self)
+function Layer:_consumeConf()
+	Node._consumeConf(self)
 	self._isDisabled = self._conf.disable == true
-	self._conf.bg = self._conf.bg or "#33333333"
-	if self._conf.bg then
-		self._color = rgba2love(hex2rgba(self._conf.bg))
-	end
+	self._color = rgba2love(hex2rgba(self._conf.color))
+	return self
 end
 
 function Layer:setColor(color)
-	self._color = rgba2love(hex2rgba(color))
+	self._conf.color = color
+	self:_consumeConf()
+	return self
 end
 
 function Layer:isDisabled()
@@ -26,14 +26,21 @@ function Layer:isDisabled()
 end
 
 function Layer:setDisable(isDisable)
-	self._isDisabled = isDisable == true
+	self._conf.disable = isDisable == true
+	self:_consumeConf()
+	return self
+end
+
+function Layer:setEnable(isEnable)
+	self._conf.disable = isEnable ~= true
+	self:_consumeConf()
 	return self
 end
 
 function Layer:draw()
+	Node.draw(self)
 	if not self._isHide then
-		love.graphics.setColor(rgba2love(hex2rgba(self._conf.bg)))
+		love.graphics.setColor(unpack(self._color))
 		love.graphics.rectangle("fill", self:getLeft(), self:getTop(), self:getW(), self:getH())
 	end
-	Node.draw(self)
 end

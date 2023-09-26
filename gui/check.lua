@@ -8,43 +8,32 @@ function Check:__init__(conf, parent)
 	Node.__init__(self, conf, parent)
 	self._layer = self:_parseConfig({
 		type = "Layer",
-		id = "checkLayer",
-		x = '0.5',
-		y = '0.5',
-		w = "h*0.7",
-		h = 'h*0.7',
-		bg = "#777777aa",
+		w = "100",
+		h = '100',
 	})
 	self._imgOff = self:_parseConfig({
         type = "Image",
-        id = "checkImg1",
-        x = "0.5",
-        y = "0.5",
-        w = "0.9",
-        h = "0.9",
-        path = self._conf.img_off,
     })
 	self._imgOn = self:_parseConfig({
         type = "Image",
-        id = "checkImg2",
-        x = "0.5",
-        y = "0.5",
-        w = "0.9",
-        h = "0.9",
-        path = self._conf.img_on,
     })
-	self._layer:setColor(self._conf.bg)
 	self._layer.onClick = function()
-		self._isChecked = not self._isChecked
-		self:_updateStatus()
+		self._conf.checked = not self._isChecked
+		self:_consumeConf()
+		self:_updateState()
 	end
-	self:_updateStatus()
+	self:_updateState()
+	self:_updateInner()
 end
 
-function Check:_checkConf()
-	Node._checkConf(self)
+function Check:_consumeConf()
+	Node._consumeConf(self)
 	self._isDisabled = self._conf.disable == true
 	self._isChecked = self._conf.checked == true
+	self._lyrColor = self._conf.color
+	self._imgOff = self._conf.img_off
+	self._imgOn = self._conf.img_on
+	return self
 end
 
 function Check:isDisabled()
@@ -52,44 +41,57 @@ function Check:isDisabled()
 end
 
 function Check:setDisable(isDisable)
-	self._isDisabled = isDisable == true
+	self._conf.disable = isDisable == true
+	self:_consumeConf()
+	return self
+end
+
+function Check:setEnable(isEnable)
+	self._conf.disable = isEnable ~= true
+	self:_consumeConf()
 	return self
 end
 
 function Check:setColor(color)
-	self._layer:setColor(color)
-end
-
-function Check:getColor()
-	return self._layer:getColor()
+	self._conf.color = color
+	self:_consumeConf()
+	return self
 end
 
 function Check:setImageOff(path)
-	self._imgOff:setPath(path)
-end
-
-function Check:getImageOff()
-	return self._imgOff:getPath()
+	self._conf.img_off = path
+	self:_consumeConf()
+	self:_updateInner()
+	return self
 end
 
 function Check:setImageOn(path)
-	self._imgOn:setPath(path)
-end
-
-function Check:getImageOn()
-	return self._imgOn:getPath()
+	self._conf.img_on = path
+	self:_consumeConf()
+	self:_updateInner()
+	return self
 end
 
 function Check:setChecked(isChecked)
-	self._isChecked = isChecked
-	self:_updateStatus()
+	self._conf.checked = true
+	self:_consumeConf()
+	self:_updateState()
+	return self
 end
 
 function Check:isChecked()
 	return self._isChecked
 end
 
-function Check:_updateStatus()
+function Check:_updateInner()
+	self._layer:setColor(self._lyrColor)
+	self._imgOn:setPath(self._imgOn)
+	self._imgOff:setPath(self._imgOff)
+	return self
+end
+
+function Check:_updateState()
 	self._imgOff:setVisible(not self._isChecked)
 	self._imgOn:setVisible(self._isChecked)
+	return self
 end

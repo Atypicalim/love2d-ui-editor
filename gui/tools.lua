@@ -44,6 +44,11 @@ function hex2new(hex, times)
 end
 
 function describe2xywh(isXW, describe, pWidth, pHeight)
+    -- 
+    if is_number(describe) then
+        return describe
+    end
+    -- 
     assert(string.valid(describe), 'empty describe to calculate!')
     describe = describe:upper():trim()
     --

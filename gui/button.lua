@@ -8,18 +8,36 @@ function Button:__init__(conf, parent)
 	Node.__init__(self, conf, parent)
 end
 
-function Button:_checkConf()
-	Node._checkConf(self)
+function Button:_consumeConf()
+	Node._consumeConf(self)
 	self._isDisabled = self._conf.disable == true
-	self._conf.bg = self._conf.bg or "#555555aa"
-	if self._conf.bg then
-		self._colorNormal = rgba2love(hex2rgba(self._conf.bg))
-		self._colorPressed = rgba2love(hex2rgba(hex2new(self._conf.bg, 1.2)))
-		self._colorDisabled = rgba2love(hex2rgba(hex2new(self._conf.bg, 0.9)))
-	end
+	--
+	self._colorNormal = rgba2love(hex2rgba(self._conf.color))
+	self._colorPressed = rgba2love(hex2rgba(hex2new(self._conf.color, 1.2)))
+	self._colorDisabled = rgba2love(hex2rgba(hex2new(self._conf.color, 0.9)))
 	self._colorTarget = self._isDisabled and self._colorDisabled or self._colorNormal
-	self:setIcon(self._conf.icon)
-	self:setText(self._conf.text)
+	--
+	if string.valid(self._conf.icon) then
+		self._icon = love.graphics.newImage(self._conf.icon)
+		self._iconW = self._icon:getWidth()
+		self._iconH = self._icon:getHeight()
+	else
+		self._icon = nil
+		self._iconW = 0
+		self._iconH = 0
+	end
+	--
+	if string.valid(self._conf.text) then
+		self._font = love.graphics.newFont(self._conf.size or 12)
+		self._text = love.graphics.newText(self._font, self._conf.text)
+		self._textW = self._text:getWidth()
+		self._textH = self._text:getHeight()
+	else
+		self._font = nil
+		self._text = nil
+		self._textW = 0
+		self._textH = 0
+	end
 end
 
 function Button:isDisabled()
@@ -27,33 +45,33 @@ function Button:isDisabled()
 end
 
 function Button:setDisable(isDisable)
-	self._isDisabled = isDisable == true
+	self._conf.disable = isDisable == true
+	self:_consumeConf()
+	return self
+end
+
+function Button:setEnable(isEnable)
+	self._conf.disable = isEnable ~= true
+	self:_consumeConf()
+	return self
+end
+
+function Button:setColor(color)
+	self._conf.color = color
+	self:_consumeConf()
 	return self
 end
 
 function Button:setIcon(path)
-	self._path = path
-	if string.valid(path) and files.is_file(path) then
-		self._image = love.graphics.newImage(path)
-		self._imageW = self._image:getWidth()
-		self._imageH = self._image:getHeight()
-	else
-		self._image = nil
-	end
+	self._conf.icon = path
+	self:_consumeConf()
 	return self
 end
 
 function Button:setText(text)
-	self._text = text
-	if string.valid(text) then
-		self._font = love.graphics.newFont(self._conf.size or 12)
-		self._txt = love.graphics.newText(self._font, self._text)
-		self._textW = self._txt:getWidth()
-		self._textH = self._txt:getHeight()
-	else
-		self._font = nil
-		self._txt = nil
-	end
+	self._conf.text = text
+	self:_consumeConf()
+	return self
 end
 
 function Button:trigger(event, ...)
@@ -69,12 +87,12 @@ function Button:draw()
 	if not self._isHide then
 		love.graphics.setColor(unpack(self._colorTarget))
 		love.graphics.rectangle("fill", self:getLeft(), self:getTop(), self:getW(), self:getH())
-		if self._image then
-			love.graphics.draw(self._image, self:getX() - self._imageW / 2, self:getY() - self._imageH / 2)
+		if self._icon then
+			love.graphics.draw(self._icon, self:getX() - self._iconW / 2, self:getY() - self._iconH / 2)
 		elseif self._text then
 			love.graphics.setColor(1, 1, 1, 1)
 			love.graphics.setFont(self._font)
-			love.graphics.draw(self._txt, self:getX() - self._textW / 2, self:getY() - self._textH / 2)
+			love.graphics.draw(self._text, self:getX() - self._textW / 2, self:getY() - self._textH / 2)
 		end
 	end
 	Node.draw(self)
