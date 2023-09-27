@@ -4,13 +4,13 @@
 
 Button = class("Button", Node)
 
-function Button:__init__(conf, parent)
-	Node.__init__(self, conf, parent)
+function Button:_onInit()
+	Node._onInit(self)
 	self._touchy = true
 end
 
-function Button:_consumeConf()
-	Node._consumeConf(self)
+function Button:_parseConf()
+	Node._parseConf(self)
 	self._isDisabled = self._conf.disable == true
 	--
 	self._colorNormal = rgba2love(hex2rgba(self._conf.color))
@@ -47,31 +47,31 @@ end
 
 function Button:setDisable(isDisable)
 	self._conf.disable = isDisable == true
-	self:_consumeConf()
+	self:_setDirty()
 	return self
 end
 
 function Button:setEnable(isEnable)
 	self._conf.disable = isEnable ~= true
-	self:_consumeConf()
+	self:_setDirty()
 	return self
 end
 
 function Button:setColor(color)
 	self._conf.color = color
-	self:_consumeConf()
+	self:_setDirty()
 	return self
 end
 
 function Button:setIcon(path)
 	self._conf.icon = path
-	self:_consumeConf()
+	self:_setDirty()
 	return self
 end
 
 function Button:setText(text)
 	self._conf.text = text
-	self:_consumeConf()
+	self:_setDirty()
 	return self
 end
 
@@ -84,7 +84,8 @@ function Button:trigger(event, ...)
 	end
 end
 
-function Button:draw()
+function Button:_doDraw()
+	Node._doDraw(self)
 	if not self._isHide then
 		love.graphics.setColor(unpack(self._colorTarget))
 		love.graphics.rectangle("fill", self:getLeft(), self:getTop(), self:getW(), self:getH())
@@ -96,5 +97,4 @@ function Button:draw()
 			love.graphics.draw(self._text, self:getX() - self._textW / 2, self:getY() - self._textH / 2)
 		end
 	end
-	Node.draw(self)
 end

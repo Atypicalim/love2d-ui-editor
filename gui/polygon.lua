@@ -4,14 +4,12 @@
 
 Polygon = class("Polygon", Node)
 
-function Polygon:__init__(conf, parent)
-	Node.__init__(self, conf, parent)
-	self:setColor(self._conf.bg)
-	self:setPoints(self._conf.points)
+function Polygon:_onInit()
+	Node._onInit(self)
 end
 
-function Polygon:_consumeConf()
-	Node._consumeConf(self)
+function Polygon:_parseConf()
+	Node._parseConf(self)
 	self._color = rgba2love(hex2rgba(self._conf.color))
 	self._thickness = self._conf.thickness
 	self._mode = self._conf.fill and 'fill' or 'line'
@@ -44,30 +42,30 @@ end
 
 function Polygon:setColor(color)
 	self._conf.color = color
-	self:_consumeConf()
+	self:_setDirty()
 	return self
 end
 
 function Polygon:setThickness(thickness)
 	self._conf.thickness = thickness
-	self:_consumeConf()
+	self:_setDirty()
 	return self
 end
 
 function Polygon:setFill(isFill)
 	self._conf.fill = isFill
-	self:_consumeConf()
+	self:_setDirty()
 	return self
 end
 
 function Polygon:setPoints(points)
 	self._conf.points = points
-	self:_consumeConf()
+	self:_setDirty()
 	return self
 end
 
-function Polygon:draw()
-	Node.draw(self)
+function Polygon:_doDraw()
+	Node._doDraw(self)
 	if not self._isHide then
 		love.graphics.setColor(unpack(self._color))
 		love.graphics.setLineWidth(self._thickness)

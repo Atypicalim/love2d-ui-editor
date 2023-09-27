@@ -4,17 +4,17 @@
 
 Clipper = class("Clipper", Node)
 
-function Clipper:__init__(conf, parent)
-	Node.__init__(self, conf, parent)
+function Clipper:_onInit()
+	Node._onInit(self)
 end
 
-function Clipper:draw()
+function Clipper:_doDraw()
+	Node._doDraw(self)
     love.graphics.setScissor(
         self:getLeft(),
         self:getTop(),
         self:getW(),
         self:getH()
     )
-	Node.draw(self)
-    love.graphics.setScissor()
 end
+

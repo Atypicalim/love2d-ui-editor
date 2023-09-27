@@ -7,7 +7,7 @@ Auxiliary = class("Auxiliary")
 function Auxiliary:__init__()
 end
 
-function Auxiliary:onUpdate(node, dt)
+function Auxiliary:omUpdate(node, dt)
 end
 
 function Auxiliary:omDraw(node)

@@ -4,16 +4,25 @@
 
 Input = class("Input", Node)
 
-function Input:__init__(conf, parent)
-	self._font = love.graphics.newFont(conf.size or 18)
-	Node.__init__(self, conf, parent)
+function Input:_onInit()
+	Node._onInit(self)
+	self._touchy = true
+	--
 	self._cursorPosition = 0
 	self._inputPadding = 5
 	self._cursorChar1 = "|"
 	self._cursorChar2 = " "
 	self._cursorTime = 0
 	self._cursorVisible = true
-	self:setText(self._conf.text or "")
+	--
+	self:_doCalculate()
+	self:_moveCursor(0)
+end
+
+function Input:_parseConf()
+	Node._parseConf(self)
+	self._realText = self._conf.text
+	self._font = love.graphics.newFont(self._conf.size or 18)
 end
 
 function Input:mousepressed(...)
@@ -33,9 +42,9 @@ end
 
 function Input:setText(text)
 	assert(text ~= nil)
-	self._realText = text
-	self:_doCalculate()
-	self:_moveCursor(0)
+	self._conf.text = text
+	self:_setDirty()
+	return slef
 end
 
 function Input:_doExplode()
@@ -65,7 +74,8 @@ function Input:_doCalculate()
 	end
 end
 
-function Input:update(dt)
+function Input:_doUpdate(dt)
+	Node._doUpdate(self, dt)
 	self._cursorTime = self._cursorTime + dt
 	if self._cursorTime > 0.5 then
 		self._cursorVisible = not self._cursorVisible
@@ -73,7 +83,8 @@ function Input:update(dt)
 	end
 end
 
-function Input:draw()
+function Input:_doDraw()
+	Node._doDraw(self)
 	if not self._isHide then
 		love.graphics.setColor(0.1, 0.1, 0.1, 0.8)
 		love.graphics.rectangle("fill", self:getLeft(), self:getTop(), self:getW(), self:getH())
@@ -96,7 +107,6 @@ function Input:draw()
 		love.graphics.print(string.format("%s%s%s", self._leftText, cursor, self._rightText), x, y)
 		love.graphics.setScissor()
 	end
-	Node.draw(self)
 end
 
 function Input:setFocus(isFocused)
@@ -104,6 +114,7 @@ function Input:setFocus(isFocused)
 end
 
 function Input:keypressed(key, scancode, isrepeat)
+	Node.keypressed(self, key, scancode, isrepeat)
 	if not self._isFocused then return end
 	if love.keyboard.isDown('lctrl') or love.keyboard.isDown('rctrl') then
 		if key == 'x' then

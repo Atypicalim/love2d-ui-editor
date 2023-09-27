@@ -4,12 +4,12 @@
 
 Text = class("Text", Node)
 
-function Text:__init__(conf, parent)
-	Node.__init__(self, conf, parent)
+function Text:_onInit()
+	Node._onInit(self)
 end
 
-function Text:_consumeConf()
-	Node._consumeConf(self)
+function Text:_parseConf()
+	Node._parseConf(self)
 	self._color = rgba2love(hex2rgba(self._conf.color))
 	self._font = love.graphics.newFont(self._conf.size or 12)
 	self._text = love.graphics.newText(self._font, self._conf.text)
@@ -20,19 +20,19 @@ end
 
 function Text:setColor(color)
 	self._conf.color = color
-	self:_consumeConf()
+	self:_setDirty()
 	return self
 end
 
 function Text:setSize(size)
 	self._conf.size = size
-	self:_consumeConf()
+	self:_setDirty()
 	return self
 end
 
 function Text:setText(text)
 	self._conf.text = text
-	self:_consumeConf()
+	self:_setDirty()
 	return self
 end
 
@@ -40,8 +40,8 @@ function Text:getText()
 	return self._conf.text
 end
 
-function Text:draw()
-	Node.draw(self)
+function Text:_doDraw()
+	Node._doDraw(self)
 	if not self._isHide and self._text then
 	    love.graphics.setColor(unpack(self._color))
 		love.graphics.setFont(self._font)

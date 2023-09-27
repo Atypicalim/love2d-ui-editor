@@ -5,20 +5,37 @@
 Node = class("Node")
 
 function Node:__init__(conf, parent)
-	--
+	self:_doInit()
 	self._name = self.__name__
 	self._conf = table.copy(CONTROL_CONF_MAP[self._name]):merge(conf or {})
 	self._parent = parent
 	self._children = {}
 	self._touchy = false
-	self:_consumeConf()
+	self._isDirty = false
+	self._isMessy = true
+	self:_parseConf()
 	for i,config in ipairs(self._conf.children) do
 		self:createChild(config)
 	end
+	self:_onInit()
 end
 
-function Node:_consumeConf()
-	-- 
+function Node:_doInit()
+end
+
+function Node:_onInit()
+end
+
+function Node:_setDirty()
+	self._isDirty = true
+	self._isMessy = true
+	self:foreachChildren(false, function(v)
+		v:_setDirty()
+	end)
+	return self
+end
+
+function Node:_parseConf()
 	for k,v in pairs(self._conf) do
 		if k == 'x' or k == 'y' or k == 'w' or k == 'h' then
 			self:_assert(is_number(v) or string.valid(v), "invalid value [%s] for [%s]", tostring(v), k)
@@ -34,12 +51,6 @@ function Node:_consumeConf()
 	self._y = describe2xywh(false, self._conf.y, self:_parentW(), self:_parentH()) + self:_parentTop()
 	self._w = math.max(0, describe2xywh(true, self._conf.w, self:_parentW(), self:_parentH()))
 	self._h = math.max(0, describe2xywh(false, self._conf.h, self:_parentW(), self:_parentH()))
-	--
-	for i,v in ipairs(self._children) do
-		v:_consumeConf()
-	end
-	--
-	return self
 end
 
 function Node:generateConf()
@@ -81,11 +92,6 @@ function Node:createChild(config)
 	return node
 end
 
-function Node:_draw()
-	love.graphics.setColor(0.1, 0.1, 0.1, 0.3)
-	love.graphics.rectangle("fill", self:getLeft(), self:getTop(), self:getW(), self:getH())
-end
-
 function Node:_error(...)
 	local msg = string.format("[Node:%s] ", self.__name__) .. string.format(...)
 	error(msg)
@@ -95,14 +101,6 @@ function Node:_assert(bCheck, ...)
 	if bCheck ~= true then
 		self:_error(...)
 	end
-end
-
-function Node:_setLove(love)
-	self._love = love
-end
-
-function Node:getLove()
-	return self._love
 end
 
 function Node:getParent()
@@ -124,18 +122,44 @@ function Node:trigger(event, ...)
 end
 
 function Node:update(dt)
+	self:_doUpdate(dt)
+	local isChange = self._isDirty
+	if self._isDirty then
+		self._isDirty = false
+	end
+	if isChange then
+		self:_parseConf()
+	end
 	self:foreachChildren(false, function(v) v:update(dt) end)
 	if g_editor and g_editor._conf == self._conf then
-		g_editor.auxiliary:onUpdate(self, dt)
+		g_editor.auxiliary:omUpdate(self, dt)
 	end
+	self:_onUpdate(dt, isChange)
+end
+
+function Node:_doUpdate(dt, isChange)
+end
+
+function Node:_onUpdate(dt, isChange)
 end
 
 function Node:draw()
-	if self._isHide then return end
+	self:_doDraw()
+	local isChange = self._isMessy
+	if self._isMessy then
+		self._isMessy = false
+	end
 	self:foreachChildren(false, function(v) v:draw() end)
 	if g_editor and g_editor._conf == self._conf then
 		g_editor.auxiliary:omDraw(self)
 	end
+	self:_onDraw(isChange)
+end
+
+function Node:_doDraw()
+end
+
+function Node:_onDraw()
 end
 
 function Node:mousepressed(x, y, button)
@@ -210,7 +234,8 @@ end
 
 function Node:setVisible(isVisible)
 	assert(is_boolean(isVisible), 'invalid bool for node')
-	self._isHide = not isVisible
+	self._conf.hide = not isVisible
+	self:_setDirty()
 	return self
 end
 
@@ -221,7 +246,7 @@ end
 function Node:setA(ax, ay)
 	self._conf.ax = ax or self._conf.ax
 	self._conf.ay = ay or self._conf.ay
-	self:_consumeConf()
+	self:_setDirty()
 	return self
 end
 
@@ -230,7 +255,7 @@ function Node:setXYWH(x, y, w, h)
 	self._conf.y = y or self._conf.y
 	self._conf.w = w or self._conf.w
 	self._conf.h = h or self._conf.h
-	self:_consumeConf()
+	self:_setDirty()
 	return self
 end
 
@@ -346,7 +371,7 @@ end
 
 function Node:refreshNode(updatedConf)
 	if updatedConf == nil or updatedConf == self._conf then
-		self:_consumeConf()
+		self:_setDirty()
 		self:foreachChildren(false, function(v) v:refreshNode(nil) end)
 	else
 		self:foreachChildren(false, function(v) v:refreshNode(updatedConf) end)

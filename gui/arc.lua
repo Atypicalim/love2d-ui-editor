@@ -4,12 +4,12 @@
 
 Arc = class("Arc", Node)
 
-function Arc:__init__(conf, parent)
-	Node.__init__(self, conf, parent)
+function Arc:_onInit()
+	Node._onInit(self)
 end
 
-function Arc:_consumeConf()
-	Node._consumeConf(self)
+function Arc:_parseConf()
+	Node._parseConf(self)
 	self._color = rgba2love(hex2rgba(self._conf.color))
 	self._thickness = self._conf.thickness
 	self._mode = self._conf.fill and 'fill' or 'line'
@@ -21,24 +21,24 @@ end
 
 function Arc:setColor(color)
 	self._conf.color = color
-	self:_consumeConf()
+	self:_setDirty()
 	return self
 end
 
 function Arc:setThickness(thickness)
 	self._conf.thickness = thickness
-	self:_consumeConf()
+	self:_setDirty()
 	return self
 end
 
 function Arc:setFill(isFill)
 	self._conf.fill = isFill
-	self:_consumeConf()
+	self:_setDirty()
 	return self
 end
 
-function Arc:draw()
-	Node.draw(self)
+function Arc:_doDraw()
+	Node._doDraw(self)
 	if not self._isHide then
 		love.graphics.setColor(unpack(self._color))
 		love.graphics.setLineWidth(self._thickness)

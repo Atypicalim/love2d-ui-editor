@@ -21,9 +21,9 @@ NODE_EVENTS = {
     ON_MOUSE_OUT = "onMouseOut",
     ON_MOUSE_UP = "onMouseUp",
     ON_MOUSE_DOWN = "onMouseDown",
+    ON_WHEEL_MOVE = "onWheelMove",
     ON_CLICK = "onClick",
     ON_CANCEL = "onCancel",
-    ON_WHEEL_MOVE = "onWheelMove",
 }
 
 CONTROL_CONF_COMMON = {

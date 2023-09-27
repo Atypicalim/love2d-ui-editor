@@ -46,79 +46,59 @@ function Gui:draw()
 	Node.draw(self)
 end
 
-function Gui:mousepressed(x, y, button)
-    local pressedNode = nil
+function Gui:_getHoverTouchyNode()
+    local node = nil
 	self:foreachDescendants(true, function(v)
-        if not pressedNode and v:isHover() and v:isTouchy() then
-            pressedNode = v
+        if not node and v:isHover() and v:isTouchy() then
+            node = v
             return true
         end
     end)
-    if pressedNode then
-        pressedNode:trigger(NODE_EVENTS.ON_MOUSE_DOWN, x, y, button)
-    end
-    self._pressedNode = pressedNode
-    Node.mousepressed(self, x, y, button)
-    self:trigger(NODE_EVENTS.ON_MOUSE_DOWN, x, y, button)
+    return node
 end
 
-function Gui:mousemoved(x, y, dx, dy, istouch)
-    local movedNode = nil
-	self:foreachDescendants(true, function(v)
-        if not movedNode and v:isHover() and v:isTouchy() then
-            movedNode = v
-            return true
-        end
-    end)
+function Gui:_safeTriggerNodeEvent(event, node, ...)
+    self:trigger(event, node, ...)
+    if node then node:trigger(event, ...) end
+end
+
+-- x, y, button
+function Gui:mousepressed(...)
+    self._pressedNode = self:_getHoverTouchyNode()
+    self:_safeTriggerNodeEvent(NODE_EVENTS.ON_MOUSE_DOWN, self._pressedNode, ...)
+    Node.mousepressed(self, ...)
+end
+
+-- x, y, dx, dy, istouch
+function Gui:mousemoved(...)
+    local movedNode = self:_getHoverTouchyNode()
     if movedNode and not self._movedNode then
-        movedNode:trigger(NODE_EVENTS.ON_MOUSE_IN, x, y, dx, dy, istouch)
-        self:trigger(NODE_EVENTS.ON_MOUSE_IN, movedNode, x, y, dx, dy, istouch)
+        self:_safeTriggerNodeEvent(NODE_EVENTS.ON_MOUSE_IN, movedNode, ...)
     elseif not movedNode and self._movedNode then
-        self._movedNode:trigger(NODE_EVENTS.ON_MOUSE_OUT, x, y, dx, dy, istouch)
-        self:trigger(NODE_EVENTS.ON_MOUSE_OUT, self._movedNode, x, y, dx, dy, istouch)
+        self:_safeTriggerNodeEvent(NODE_EVENTS.ON_MOUSE_OUT, self._movedNode, ...)
     elseif self._movedNode ~= movedNode then
-        self._movedNode:trigger(NODE_EVENTS.ON_MOUSE_OUT, x, y, dx, dy, istouch)
-        self:trigger(NODE_EVENTS.ON_MOUSE_OUT, self._movedNode, x, y, dx, dy, istouch)
-        movedNode:trigger(NODE_EVENTS.ON_MOUSE_IN, x, y, dx, dy, istouch)
-        self:trigger(NODE_EVENTS.ON_MOUSE_IN, movedNode, x, y, dx, dy, istouch)
+        self:_safeTriggerNodeEvent(NODE_EVENTS.ON_MOUSE_OUT, self._movedNode, ...)
+        self:_safeTriggerNodeEvent(NODE_EVENTS.ON_MOUSE_IN, movedNode, ...)
     end
     self._movedNode = movedNode
-    Node.mousemoved(self, x, y, dx, dy, istouch)
-    self:trigger(NODE_EVENTS.ON_MOUSE_MOVE, x, y, dx, dy, istouch)
+    self:_safeTriggerNodeEvent(NODE_EVENTS.ON_MOUSE_MOVE, self._movedNode, ...)
+    Node.mousemoved(self, ...)
 end
 
-function Gui:mousereleased(x, y, button)
-    local releaseddNode = nil
-	self:foreachDescendants(true, function(v)
-        if not releaseddNode and v:isHover() and v:isTouchy() then
-            releaseddNode = v
-            return true
-        end
-    end)
-    if releaseddNode then
-        releaseddNode:trigger(NODE_EVENTS.ON_MOUSE_UP, x, y, button)
-        if self._pressedNode == releaseddNode then
-            releaseddNode:trigger(NODE_EVENTS.ON_CLICK, x, y, button)
-            self:trigger(NODE_EVENTS.ON_CLICK, releaseddNode, x, y, button)
+-- x, y, button
+function Gui:mousereleased(...)
+    self._releaseddNode = self:_getHoverTouchyNode()
+    if self._releaseddNode then
+        if self._pressedNode == self._releaseddNode then
+            self:_safeTriggerNodeEvent(NODE_EVENTS.ON_CLICK, self._releaseddNode, ...)
         elseif self._pressedNode then
-            self._pressedNode:trigger(NODE_EVENTS.ON_CANCEL, x, y, button)
-            self:trigger(NODE_EVENTS.ON_CANCEL, self._pressedNode, x, y, button)
+            self:_safeTriggerNodeEvent(NODE_EVENTS.ON_CANCEL, self._pressedNode, ...)
         end
     elseif self._pressedNode then
-        self._pressedNode:trigger(NODE_EVENTS.ON_CANCEL, x, y, button)
-        self:trigger(NODE_EVENTS.ON_CANCEL, self._pressedNode, x, y, button)
+        self:_safeTriggerNodeEvent(NODE_EVENTS.ON_CANCEL, self._pressedNode, ...)
     end
-    self._releaseddNode = releaseddNode
-    Node.mousereleased(self, x, y, button)
-    self:trigger(NODE_EVENTS.ON_MOUSE_UP, x, y, button)
-end
-
-function Gui:getFocus()
-    return self._pressedNode
-end
-
-function Gui:setTarget()
-    return self._movedNode
+    self:_safeTriggerNodeEvent(NODE_EVENTS.ON_MOUSE_UP, self._releaseddNode, ...)
+    Node.mousereleased(self, ...)
 end
 
 -- helper

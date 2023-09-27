@@ -4,24 +4,17 @@
 
 Point = class("Point", Node)
 
-function Point:__init__(conf, parent)
-	Node.__init__(self, conf, parent)
-	self:setColor(self._conf.color)
-	self:setPoints(self._conf.points)
-	self:setThickness(self._conf.thickness)
+function Point:_onInit()
+	Node._onInit(self)
 end
 
-function Point:setColor(color)
-	self._color = rgba2love(hex2rgba(color))
-end
-
-function Point:setThickness(thickness)
-	self._thickness = thickness or 2
-end
-
-function Point:setPoints(points)
-	assert(is_table(points), 'invalid points value')
+function Point:_parseConf()
+	Node._parseConf(self)
+	self._color = rgba2love(hex2rgba(self._conf.color))
+	self._thickness = self._conf.thickness
+	self._mode = self._conf.fill and 'fill' or 'line'
 	self._points = {}
+	local points = self._conf.points
 	local count = math.floor(#points / 2)
 	for i=1,count*2,2 do
 		local x = points[i]
@@ -46,11 +39,35 @@ function Point:setPoints(points)
 	end
 end
 
-function Point:draw()
+function Point:setColor(color)
+	self._conf.color = color
+	self:_setDirty()
+	return self
+end
+
+function Point:setThickness(thickness)
+	self._conf.thickness = thickness
+	self:_setDirty()
+	return self
+end
+
+function Point:setFill(isFill)
+	self._conf.fill = isFill
+	self:_setDirty()
+	return self
+end
+
+function Point:setPoints(points)
+	self._conf.points = points
+	self:_setDirty()
+	return self
+end
+
+function Point:_doDraw()
+	Node._doDraw(self)
 	if not self._isHide then
-		love.graphics.setPointSize(self._thickness)
 		love.graphics.setColor(unpack(self._color))
+		love.graphics.setPointSize(self._thickness)
 		love.graphics.points(unpack(self._points))
 	end
-	Node.draw(self)
 end

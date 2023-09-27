@@ -4,31 +4,44 @@
 
 Video = class("Video", Node)
 
-function Video:__init__(conf, parent)
-	Node.__init__(self, conf, parent)
-	self:setPath(self._conf.path)
+function Video:_onInit()
+	Node._onInit(self)
+end
+
+function Video:_parseConf()
+	Node._parseConf(self)
+	if string.valid(self._conf.path) then
+		self._video = love.graphics.newVideo(self._conf.path)
+		self._w = self._video:getWidth()
+		self._h = self._video:getHeight()
+	else
+		self._video = nil
+		self._w = nil
+		self._h = nil
+	end
+	lua_set_delegate(self, function(key)
+		if self._video then
+			return self._video[key](self._video)
+		end
+	end)
+	return self
 end
 
 function Video:setPath(path)
-	self._path = path
-	if string.valid(path) and files.is_file(path) then
-		self._video = love.graphics.newVideo(path)
-		Node.setXYWH(self, nil, nil, self._video:getWidth(), self._video:getHeight())
-	else
-		self._video = nil
-	end
-	self:_setLove(self._video)
+	self._conf.path = path
+	self:_setDirty()
+	return self
 end
 
 function Video:getPath()
-	return self._path
+	return self._conf.path
 end
 
-function Video:draw()
+function Video:_doDraw()
+	Node._doDraw(self)
 	if not self._isHide and self._video then
+		-- love.graphics.setColor(0.1, 0.1, 0.1, 0.3)
+		-- love.graphics.rectangle("fill", self:getLeft(), self:getTop(), self:getW(), self:getH())
 		love.graphics.draw(self._video, self:getLeft(), self:getTop())
-	elseif not self._isHide then
-		self:_draw()
 	end
-	Node.draw(self)
 end

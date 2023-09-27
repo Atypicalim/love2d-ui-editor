@@ -22,10 +22,10 @@ function Previewer:load()
     local video = g_pgui:getById("idVideo")
     local button = g_pgui:getById("idButton")
     button.onClick = function()
-        if video:getLove():isPlaying() then
-            video:getLove():pause()
+        if video:isPlaying() then
+            video:pause()
         else
-            video:getLove():play()
+            video:play()
         end
     end
 end

@@ -4,15 +4,12 @@
 
 Line = class("Line", Node)
 
-function Line:__init__(conf, parent)
-	Node.__init__(self, conf, parent)
-	self:setColor(self._conf.color)
-	self:setPoints(self._conf.points)
-	self:setThickness(self._conf.thickness)
+function Line:_onInit()
+	Node._onInit(self)
 end
 
-function Line:_consumeConf()
-	Node._consumeConf(self)
+function Line:_parseConf()
+	Node._parseConf(self)
 	self._color = rgba2love(hex2rgba(self._conf.color))
 	self._thickness = self._conf.thickness
 	self._mode = self._conf.fill and 'fill' or 'line'
@@ -45,24 +42,24 @@ end
 
 function Line:setColor(color)
 	self._conf.color = color
-	self:_consumeConf()
+	self:_setDirty()
 	return self
 end
 
 function Line:setThickness(thickness)
 	self._conf.thickness = thickness
-	self:_consumeConf()
+	self:_setDirty()
 	return self
 end
 
 function Line:setPoints(points)
 	self._conf.points = points
-	self:_consumeConf()
+	self:_setDirty()
 	return self
 end
 
-function Line:draw()
-	Node.draw(self)
+function Line:_doDraw()
+	Node._doDraw(self)
 	if not self._isHide then
 		love.graphics.setLineWidth(self._thickness)
 		love.graphics.setColor(unpack(self._color))

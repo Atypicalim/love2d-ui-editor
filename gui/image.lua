@@ -4,13 +4,12 @@
 
 Image = class("Image", Node)
 
-function Image:__init__(conf, parent)
-	Node.__init__(self, conf, parent)
-	self:_setLove(self._image)
+function Image:_onInit()
+	Node._onInit(self)
 end
 
-function Image:_consumeConf()
-	Node._consumeConf(self)
+function Image:_parseConf()
+	Node._parseConf(self)
 	-- 
 	if string.valid(self._conf.path) then
 		self._image = love.graphics.newImage(self._conf.path)
@@ -30,12 +29,18 @@ function Image:_consumeConf()
 		self._quad = nil
 	end
 	--
+	lua_set_delegate(self, function(key)
+		if self._image then
+			return self._image[key](self._video)
+		end
+	end)
+	--
 	return self
 end
 
 function Image:setPath(path)
 	self._conf.path = path
-	self:_consumeConf()
+	self:_setDirty()
 end
 
 function Image:getPath()
@@ -44,10 +49,11 @@ end
 
 function Image:setQuad(quad)
 	self._conf.quad = quad
-	self:_consumeConf()
+	self:_setDirty()
 end
 
-function Image:draw()
+function Image:_doDraw()
+	Node._doDraw(self)
 	if not self._isHide and self._image then
 		if self._quad then
 			love.graphics.draw(self._image, self._quad, self:getLeft(), self:getTop())
@@ -55,5 +61,4 @@ function Image:draw()
 			love.graphics.draw(self._image, self:getLeft(), self:getTop())
 		end
 	end
-	Node.draw(self)
 end

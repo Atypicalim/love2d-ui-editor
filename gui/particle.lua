@@ -4,20 +4,15 @@
 
 Particle = class("Particle", Node)
 
-function Particle:__init__(conf, parent)
-	Node.__init__(self, conf, parent)
-	self:setPath(conf.path)
-	self:setColor(self._conf.color or "#ffffff")
+function Particle:_onInit()
+	Node._onInit(self)
 end
 
-function Particle:setColor(color)
-	self._color = rgba2love(hex2rgba(color))
-end
-
-function Particle:setPath(path)
-	self._path = path
-	if string.valid(path) and files.is_file(path) then
-		local img = love.graphics.newImage(self._path)
+function Particle:_parseConf()
+	Node._parseConf(self)
+	self._color = rgba2love(hex2rgba(self._conf.color))
+	if string.valid(self._conf.path) then
+		local img = love.graphics.newImage(self._conf.path)
 		self._particle = love.graphics.newParticleSystem(img, self._conf.count or 32)
 		self._particle:setParticleLifetime(self._conf.life_min or 2, self._conf.life_max or 5) -- Particles live at least 2s and at most 5s.
 		self._particle:setEmissionRate(self._conf.emission or 5)
@@ -31,23 +26,40 @@ function Particle:setPath(path)
 	else
 		self._particle = nil
 	end
-	self:_setLove(self._particle)
+	lua_set_delegate(self, function(key)
+		if self._particle then
+			return self._particle[key](self._video)
+		end
+	end)
+end
+
+function Rectangle:setColor(color)
+	self._conf.color = color
+	self:_setDirty()
+	return self
+end
+
+function Particle:setPath(path)
+	self._conf.path = path
+	self:_setDirty()
+	return self
 end
 
 function Particle:getPath()
-	return self._path
+	return self._conf.path
 end
 
-function Particle:update(dt)
+function Particle:_doUpdate(dt)
+	Node._doUpdate(self, dt)
 	if self._particle then
 		self._particle:update(dt)
 	end
 end
 
-function Particle:draw()
+function Particle:_doDraw()
+	Node._doDraw(self)
 	if not self._isHide and self._particle then
 		love.graphics.setColor(unpack(self._color))
 		love.graphics.draw(self._particle, self:getX(), self:getY())
 	end
-	Node.draw(self)
 end

@@ -4,7 +4,7 @@
 
 Template = class("Template", Node)
 
-function Template:__init__(conf, parent)
-	Node.__init__(self, conf, parent)
+function Template:_onInit()
+	Node._onInit(self)
 	self:_createTemplate(self._conf.path)
 end
