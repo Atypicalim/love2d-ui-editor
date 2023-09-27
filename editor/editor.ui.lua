@@ -6,7 +6,7 @@
         y = '0.025+10',
         w = "1",
         h = "0.05+20",
-        bg = "#0a0a0a",
+        color = "#0a0a0a",
         open = true,
         children = {
             {
@@ -117,7 +117,7 @@
         y = '0.475+10',
         w = "0.8-200",
         h = "0.85-20",
-        bg = "#2c2c2c",
+        color = "#2c2c2c",
     },
     {
         type = "Rectangle",
@@ -126,7 +126,7 @@
         y = '0.525+10',
         w = "0.1+100",
         h = "0.95-20",
-        bg = "#1e1e1e",
+        color = "#1e1e1e",
         children = {
             {
                 type = "Rectangle",
@@ -135,7 +135,7 @@
                 y = '0.5+15',
                 w = "0.9",
                 h = "1-30",
-                bg = "#0a0a0a",
+                color = "#0a0a0a",
                 children = {
                     {
                         type = "Text",
@@ -180,7 +180,7 @@
                         y = "0.525+5",
                         w = "0.9",
                         h = "0.9",
-                        bg = "#1e1e1e",
+                        color = "#1e1e1e",
                         children = {
                             {
                                 type = "Clipper",
@@ -203,7 +203,7 @@
         y = '0.525+10',
         w = "0.1+100",
         h = "0.95-20",
-        bg = "#1e1e1e",
+        color = "#1e1e1e",
         children = {
             {
                 type = "Rectangle",
@@ -212,7 +212,7 @@
                 y = '0.5+15',
                 w = "0.9",
                 h = "1-30",
-                bg = "#0a0a0a",
+                color = "#0a0a0a",
                 children = {
                     {
                         type = "Text",
@@ -266,7 +266,7 @@
                         y = "0.525+5",
                         w = "0.9",
                         h = "0.9",
-                        bg = "#1e1e1e",
+                        color = "#1e1e1e",
                         children = {
                             {
                                 type = "Clipper",
@@ -289,6 +289,6 @@
         y = '0.95',
         w = "0.8-200",
         h = "0.1",
-        bg = "#0a0a0a",
+        color = "#0a0a0a",
     },
 }

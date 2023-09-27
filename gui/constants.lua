@@ -29,7 +29,6 @@ NODE_EVENTS = {
 CONTROL_CONF_COMMON = {
     type = nil,
 	id = "empty",
-    bg = "10101077",
 	x = "0.5",
 	y = "0.5",
 	w = "0.9",
@@ -54,19 +53,19 @@ CONTROL_CONF_MAP = {
         points = {0, 0, 50, 50},
     },
     ['Rectangle'] = {
-        fill = false,
-        color = "#ff00ffff",
+        fill = true,
+        color = "#10101077",
         thickness = 2,
         radius = 0,
     },
     ['Ellipse'] = {
         fill = false,
-        color = "#0000ffff",
+        color = "#10101077",
         thickness = 2,
     },
     ['Polygon'] = {
         fill = false,
-        color = "#00ff00ff",
+        color = "#10101077",
         thickness = 2,
         points = {0, 0, 50, 50, -50, 50},
     },

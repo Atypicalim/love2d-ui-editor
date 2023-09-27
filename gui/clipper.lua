@@ -9,12 +9,17 @@ function Clipper:_onInit()
 end
 
 function Clipper:_doDraw()
-	Node._doDraw(self)
     love.graphics.setScissor(
         self:getLeft(),
         self:getTop(),
         self:getW(),
         self:getH()
     )
+	Node._doDraw(self)
+end
+
+function Clipper:_onDraw()
+	Node._onDraw(self)
+    love.graphics.setScissor()
 end
 

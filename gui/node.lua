@@ -11,7 +11,7 @@ function Node:__init__(conf, parent)
 	self._parent = parent
 	self._children = {}
 	self._touchy = false
-	self._isDirty = false
+	self._isDirty = true
 	self._isMessy = true
 	self:_parseConf()
 	for i,config in ipairs(self._conf.children) do

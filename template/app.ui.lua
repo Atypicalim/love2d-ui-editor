@@ -5,7 +5,7 @@
         y = "0.5",
         w = "0.7",
         h = "0.7",
-        bg = "#557744"
+        color = "#557744"
     },
     [2] = {
         type = "Ellipse",
@@ -13,7 +13,7 @@
         y = "0.5",
         w = "0.5",
         h = "0.6",
-        bg = "#227733"
+        color = "#227733"
     },
     [3] = {
         type = "Polygon",
@@ -22,7 +22,7 @@
         w = "0",
         h = "0",
         points = {0, -100, 100, 0, 50, 100, -50, 100, -100, 0},
-        bg = "#5577ff"
+        color = "#5577ff"
     },
     [4] = {
         type = "Line",
@@ -49,7 +49,7 @@
         y = "0.7",
         w = 150,
         h = 50,
-        bg = "#ffaa77",
+        color = "#ffaa77",
         text = "YES",
         icon = "media/edit.png",
     },
@@ -60,7 +60,7 @@
         y = "0.3",
         w = 150,
         h = 50,
-        bg = "#111111aa",
+        color = "#111111aa",
         text = "input...",
     },
     [8] = {
@@ -105,7 +105,7 @@
         y = '0.5',
         w = "100",
         h = '100',
-        bg = "#ff0aff",
+        color = "#ff0aff",
         img_on = "media/check_off.png",
         img_off = "media/check_on.png",
     },
