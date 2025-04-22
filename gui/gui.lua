@@ -2,7 +2,7 @@
 	gui
 ]]
 
-package.path = package.path .. ";" .. "G:/Tests/LuaTest/?.lua"
+package.path = package.path .. ";../?.lua"
 require 'pure-lua-tools/test'
 
 require 'gui/constants'

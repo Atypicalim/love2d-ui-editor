@@ -4,13 +4,14 @@
 
 local Leaf = class("Leaf")
 
-function Leaf:__init__(config, x, y, w, h)
-    self._config = config
+function Leaf:__init__(node, x, y, w, h)
+    self._config = node:getConf()
     self._parent = g_tree._parent:getById('clipperTree')
+    local children = node:getChildren()
     --
     if g_tree._skippedCount < g_tree._treeIndent then
         g_tree._skippedCount = g_tree._skippedCount + 1
-        g_tree:createLeaf(self._config.open and self._config.children or {})
+        g_tree:createLeaf(self._config.open and children or {})
         return
     end
     --
@@ -40,11 +41,12 @@ function Leaf:__init__(config, x, y, w, h)
     --
     table.insert(g_tree._leafs, self)
     g_tree._leafCount = g_tree._leafCount + 1
-    g_tree:createLeaf(self._config.open and self._config.children or {})
+    g_tree:createLeaf(self._config.open and children or {})
 end
 
 function Leaf:updateStatus()
-    self._border:setColor(g_editor._conf == self._config and BORDER_ON_COLOR or BORDER_OFF_COLOR)
+    local color = g_editor._conf == self._config and BORDER_ON_COLOR or BORDER_OFF_COLOR
+    self._border:setColor(color)
 end
 
 function Leaf:destroy()

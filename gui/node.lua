@@ -10,7 +10,8 @@ function Node:__init__(conf, parent)
 	self._conf = table.copy(CONTROL_CONF_MAP[self._name]):merge(conf or {})
 	self._parent = parent
 	self._children = {}
-	self._touchy = false
+	self._debugTouch = parent ~= nil and parent._debugTouch
+	self._touchy = self._debugTouch
 	self._isDirty = true
 	self._isMessy = true
 	self:_parseConf()
@@ -24,6 +25,11 @@ function Node:_doInit()
 end
 
 function Node:_onInit()
+end
+
+function Node:debugTouchable()
+	self._debugTouch = true
+	return self
 end
 
 function Node:_setDirty()

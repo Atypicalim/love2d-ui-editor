@@ -50,6 +50,7 @@ function Editor:load()
     local height = love.graphics.getHeight()
     --
     g_egui = gui.newGUI():setXYWH(width / 2, height / 2, width, height):addTemplate("./editor/editor.ui.lua")
+    g_egui:update(0)
     g_egui.onClick = function(node)
         self:_onClick(node:getId(), node)
     end
@@ -99,6 +100,16 @@ function Editor:keypressed(key, scancode, isrepeat)
     if key == 'f5' then
         love.event.quit('restart')
         return
+    elseif key == 'f1' then
+        local txt = files.read("./test.lua")
+        local fun = loadstring(txt)
+        if fun then
+            fun()
+            print('test code executed!')
+        else
+            print('test code invalid!')
+        end
+        return
     end
     if love.keyboard.isDown('lctrl') or love.keyboard.isDown('rctrl') then
         if key == 'o' then
@@ -135,6 +146,7 @@ end
 
 function Editor:resize(width, height)
     g_egui:setXYWH(width / 2, height / 2, width, height)
+    g_egui:update(0)
     self:_refreshEditor()
 end
 
@@ -179,7 +191,7 @@ function Editor:setPath(path)
         local y = parent:getY()
         local w = parent:getW() - 100
         local h = parent:getH() - 100
-        self._template = gui.newGUI():setXYWH(x, y, w, h):addTemplate(self._path)
+        self._template = gui.newGUI():setXYWH(x, y, w, h):debugTouchable():addTemplate(self._path)
         self._tree = Tree(g_egui:getById('boxTree'))
         self._template.onClick = function(node)
             self:setConf(node:getConf(), false)
@@ -191,12 +203,12 @@ function Editor:isSelect(select)
     return self._selecting == true
 end
 
-function Editor:setConf(conf, select)
+function Editor:setConf(conf, selected)
     if self._attribute then
         self._attribute:destroy()
     end
     self._conf = conf or g_editor.guiConf
-    self._selecting = select == true
+    self._selecting = selected == true
     self:setKey(nil)
     if self._tree then
         self._tree:updateStatus()
@@ -420,7 +432,7 @@ end
 
 function Editor:_trySaveFile(toNewFile)
     local config = self._template:getConf().children or {}
-    local content = table.string(config, nil, PROPERTY_NAME_ORDER)
+    local content = table.string(config, nil, PROPERTY_NAME_ORDER, nil, nil, true)
 
     if toNewFile then
         local path = dialog.select_save('please enter a file to save ui:', '*.ui.lua|*.ui.lua', self._workspace)

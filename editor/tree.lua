@@ -75,17 +75,17 @@ function Tree:_updateTree()
     self._skippedCount = 0
     self._leafCount = 0
     self._leafDepth = 0
-    self:createLeaf(g_editor._template:getConf().children or {})
+    self:createLeaf(g_editor._template:getChildren() or {})
     self:updateStatus()
 end
 
 function Tree:createLeaf(children)
     self._leafDepth = self._leafDepth + 1
-    for i,v in ipairs(children) do
+    for i,child in ipairs(children) do
         if self._leafCount >= TREE_ITEM_COUNT then break end
         local x = '0.5+' .. ((self._leafDepth - 1) * TREE_LEAF_INDENT)
         local y = self._leafH / 2 + TREE_LEAF_MARGIN + (self._leafH + TREE_LEAF_MARGIN * 2) * (#self._leafs)
-        Leaf(v, x, y, self._leafW, self._leafH)
+        Leaf(child, x, y, self._leafW, self._leafH)
     end
     self._leafDepth = self._leafDepth - 1
 end

@@ -85,4 +85,4 @@ PROPERTY_NAME_INFO = {
 }
 
 BORDER_OFF_COLOR = "#000000ee"
-BORDER_ON_COLOR = "#ffffffee"
+BORDER_ON_COLOR = "#aaaaaa55"
