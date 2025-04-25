@@ -7,13 +7,6 @@ local Leaf = class("Leaf")
 function Leaf:__init__(node, x, y, w, h)
     self._config = node:getConf()
     self._parent = g_tree._parent:getById('clipperTree')
-    local children = node:getChildren()
-    --
-    if g_tree._skippedCount < g_tree._treeIndent then
-        g_tree._skippedCount = g_tree._skippedCount + 1
-        g_tree:createLeaf(self._config.open and children or {})
-        return
-    end
     --
     self._node = self._parent:addChild({
         type = "Node",
@@ -39,9 +32,6 @@ function Leaf:__init__(node, x, y, w, h)
         g_editor:setConf(self._config, false)
     end
     --
-    table.insert(g_tree._leafs, self)
-    g_tree._leafCount = g_tree._leafCount + 1
-    g_tree:createLeaf(self._config.open and children or {})
 end
 
 function Leaf:updateStatus()

@@ -8,23 +8,19 @@ function Tree:__init__(parent)
     g_tree = self
     self._parent = parent
     self._background = parent:getById("bgTree"):show()
+    self._clickMove = 25
+    self._scrollMove = 10
     --
     self._btnUp = parent:getById("btnUp"):show()
     self._btnUp.onClick = function()
-        if self._treeIndent > 0 then
-            self._treeIndent = self._treeIndent - 1
-            self:_updateTree()
-            -- g_editor:setConf(nil, true)
-        end
+        self._treeIndent = self._treeIndent - self._clickMove
+        self:_onSlide()
     end
     --
     self._btnDown = parent:getById("btnDown"):show()
     self._btnDown.onClick = function()
-        if self._leafCount >= TREE_ITEM_COUNT then
-            self._treeIndent = self._treeIndent + 1
-            self:_updateTree()
-            -- g_editor:setConf(nil, true)
-        end
+        self._treeIndent = self._treeIndent + self._clickMove
+        self:_onSlide()
     end
     --
     self._nodeUi  = parent:getById('templateUi')
@@ -68,24 +64,54 @@ function Tree:_updateTree()
     self._leafs = {}
     local bgW = self._background:getW()
     local bgH = self._background:getH()
+    self._bgH = bgH
     self._leafW = bgW * 0.9
-    self._leafH = (bgH - TREE_LEAF_MARGIN * TREE_ITEM_COUNT * 2) / TREE_ITEM_COUNT
+    self._leafH = TREE_ITEM_HEIGHT
+    self._unitH = self._leafH + TREE_LEAF_MARGIN * 2
+    self._leafNumber = bgH / self._unitH
     self._leafX = bgW / 2
-    self._treePadding = (bgH - self._leafH * TREE_ITEM_COUNT) / 2
-    self._skippedCount = 0
-    self._leafCount = 0
+    self._treePadding = (bgH - self._unitH * self._leafNumber) / 2
     self._leafDepth = 0
+    --
+    self._calcLeafCount = 0
+    self._skipLeafCount = 0
+    self._showLeafCount = 0
+    self._leftLeafCount = 0
+    self._topLeafY = 0 - self._unitH / 2
+    self._bottomLeafY = bgH + self._unitH / 2
+    -- 
     self:createLeaf(g_editor._template:getChildren() or {})
     self:updateStatus()
+    --
+    self._totalTreeH = self._calcLeafCount * self._unitH
+    self._maxScrollY = math.max(0, self._totalTreeH - bgH)
+    if self._maxScrollY > 0 then
+        self._maxScrollY = self._maxScrollY + 50
+    end
 end
 
 function Tree:createLeaf(children)
     self._leafDepth = self._leafDepth + 1
     for i,child in ipairs(children) do
-        if self._leafCount >= TREE_ITEM_COUNT then break end
+        local config = child:getConf()
         local x = '0.5+' .. ((self._leafDepth - 1) * TREE_LEAF_INDENT)
-        local y = self._leafH / 2 + TREE_LEAF_MARGIN + (self._leafH + TREE_LEAF_MARGIN * 2) * (#self._leafs)
-        Leaf(child, x, y, self._leafW, self._leafH)
+        local y = self._calcLeafCount * self._unitH + self._unitH / 2
+        y = y - self._treeIndent
+        --
+        self._calcLeafCount = self._calcLeafCount + 1
+        if y < self._topLeafY then
+            self._skipLeafCount = self._skipLeafCount + 1
+        elseif y > self._bottomLeafY then
+            self._leftLeafCount = self._leftLeafCount + 1
+        else
+            local leaf = Leaf(child, x, y, self._leafW, self._leafH)
+            table.insert(self._leafs, leaf)
+            self._showLeafCount = self._showLeafCount + 1
+        end
+        -- 
+        if config.open then
+            self:createLeaf(child:getChildren())
+        end
     end
     self._leafDepth = self._leafDepth - 1
 end
@@ -94,12 +120,20 @@ function Tree:wheelmoved(x, y)
     if not self._background:isHover() then
         return
     end
-    if y > 0 then
-        self._btnUp.onClick()
+    self._treeIndent = self._treeIndent - y * self._scrollMove
+    self:_onSlide()
+end
+
+function Tree:_onSlide()
+
+    if self._treeIndent < 0 then
+        self._treeIndent = 0
     end
-    if y < 0 then
-        self._btnDown.onClick()
+    if self._treeIndent > self._maxScrollY then
+        self._treeIndent = self._maxScrollY
     end
+    -- g_editor:setConf(nil, true)
+    self:_updateTree()
 end
 
 function Tree:destroy()
