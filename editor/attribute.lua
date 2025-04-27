@@ -50,6 +50,20 @@ function Attribute:__init__(parent, setPropertyFunc)
     self:_updateAttribute()
 end
 
+function Attribute:refreshAttribute(conf, key)
+    if g_editor:isSelect() then
+        -- controll
+    else
+        -- property
+        for i,v in ipairs(self._attributes) do
+            if key and v:canHandle(key) then
+                v:updateProperty()
+            end
+        end
+    end
+    self:updateStatus()
+end
+
 function Attribute:updateStatus()
     for i,v in ipairs(self._attributes or {}) do
         v:updateStatus()
@@ -78,14 +92,14 @@ function Attribute:_updateAttribute()
     self:updateStatus()
 end
 
-function Attribute:createProperty(config)
+function Attribute:createProperty(conf)
+    local config = Config(conf)
     for i,key in ipairs(PROPERTY_NAME_ORDER) do
         if self._attributesCount >= ATTRIBUTE_ITEM_COUNT then break end
-        local value = config[key]
         local info = PROPERTY_NAME_INFO[key] or {}
-        if not info.ignoreProperty and value ~= nil then
+        if not info.ignoreProperty then
             local y = self._attributeH / 2 + ATTRIBUTE_ITEM_MARGIN + (self._attributeH + ATTRIBUTE_ITEM_MARGIN * 2) * (#self._attributes)
-            Property(key, value, '0.5', y, self._attributeW, self._attributeH)
+            Property(key, config, '0.5', y, self._attributeW, self._attributeH)
         end
     end
 end

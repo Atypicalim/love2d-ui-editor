@@ -4,20 +4,18 @@
 
 Node = class("Node")
 
-function Node:__init__(conf, parent)
+function Node:__init__(config, parent)
 	self:_doInit()
 	self._name = self.__name__
-	self._conf = table.copy(CONTROL_CONF_MAP[self._name]):merge(conf or {})
+	self._config = config
 	self._parent = parent
+	self._conf = self._config:getConf()
 	self._children = {}
 	self._debugTouch = parent ~= nil and parent._debugTouch
 	self._touchy = self._debugTouch
 	self._isDirty = true
 	self._isMessy = true
 	self:_parseConf()
-	for i,config in ipairs(self._conf.children) do
-		self:createChild(config)
-	end
 	self:_onInit()
 end
 
@@ -59,12 +57,6 @@ function Node:_parseConf()
 	self._h = math.max(0, describe2xywh(false, self._conf.h, self:_parentW(), self:_parentH()))
 end
 
-function Node:generateConf()
-	local conf = {}
-	
-	return {}
-end
-
 function Node:addTemplate(path)
 	local configs = read_template(path)
 	for i,config in ipairs(configs) do
@@ -73,28 +65,13 @@ function Node:addTemplate(path)
 	return self
 end
 
-function Node:_createTemplate(path)
-	local configs = read_template(path)
-	for i,config in ipairs(configs) do
-		self:createChild(config)
+function Node:addChild(conf)
+	local _config = Config(conf)
+	local node = _config:newNode(self)
+	self:insertChild(node)
+	for i,_conf in ipairs(_config:getConfChildren()) do
+		node:addChild(_conf)
 	end
-	return self
-end
-
-function Node:addChild(config)
-	table.insert(self._conf.children, config)
-	return self:createChild(config)
-end
-
-function Node:createChild(config)
-	if not _G[config.type] then
-		error('invalid gui node! content:' .. table.string(config))
-	end
-	local node = _G[config.type](config, self)
-	if not node then
-		error('invalid gui config! content:' .. table.string(config))
-	end
-	table.insert(self._children, node)
 	return node
 end
 
@@ -150,6 +127,9 @@ function Node:_onUpdate(dt, isChange)
 end
 
 function Node:draw()
+	if self._isHide then
+		return
+	end
 	self:_doDraw()
 	local isChange = self._isMessy
 	if self._isMessy then
@@ -305,6 +285,10 @@ function Node:getConf()
 	return self._conf
 end
 
+function Node:getConfig()
+	return self._config
+end
+
 function Node:getChildren()
 	return self._children
 end
@@ -331,16 +315,44 @@ function Node:onDestroy()
 	end
 end
 
-function Node:deleteChild(child)
-	local key, value = table.find_value(self._children or {}, child)
-	table.remove(self._children or {}, key)
-	value:onDestroy()
+function Node:insertChild(child, index)
+	if child._parent then
+		child._parent:removeChild(child, true)
+	end
+	if index then
+		table.insert(self._children, index, child)
+	else
+		table.insert(self._children, child)
+	end
+	child._parent = self
+end
+
+function Node:removeChild(child, noDestory)
+	local key = table.find_value(self._children, child)
+	if key then
+		table.remove(self._children, key)
+	end
+	child._parent = nil
+	if not noDestory then
+		child:onDestroy()
+	end
 	return self
 end
 
-function Node:removeSelf()
+function Node:removeChildren(noDestory)
+	local children = self._children
+	self._children = {}
+	for i=#children,1,-1 do
+		local v = children[i]
+		v:onDestroy()
+	end
+end
+
+function Node:removeSelf(noDestory)
 	assert(self._parent ~= nil)
-	self._parent:deleteChild(self)
+	if self._parent then
+		self._parent:removeChild(self, noDestory)
+	end
 	return self
 end
 

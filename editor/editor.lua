@@ -34,6 +34,7 @@ function Editor:__init__()
     self.guiConf = {
         w = 500,
         h = 500,
+        type = "Gui",
     }
     self.auxiliary = Auxiliary()
 end
@@ -220,35 +221,40 @@ function Editor:setConf(conf, selected)
     end
 end
 
+function Editor:isEditing()
+    return self._key ~= nil
+end
+
 function Editor:setKey(key)
     if self._field then
         self._field:destroy()
+        self._field = nil
     end
     self._key = key
     if self._attribute then
         self._attribute:updateStatus()
     end
-    if not self._key then
-        self._field = nil
-    else
-        self._field = Field(g_egui:getById('bgBottom'), function(text)
-            self:setValue(text)
-            self:setKey(nil)
-        end, function(text)
-            self:setKey(nil)
-        end)
-    end
     self:_updateDescribe()
 end
 
-function Editor:setValue(textValue)
-    local oldValue = g_editor._conf[g_editor._key]
-    local newValue = to_type(textValue, type(oldValue))
-    if newValue ~= nil then
-        g_editor._conf[g_editor._key] = newValue
+function Editor:onEdited(conf, key)
+    if self._field then
+        self._field:destroy()
+        self._field = nil
     end
-    g_attribute:_updateAttribute()
-    self._template:refreshNode(g_editor._conf)
+    self._key = nil
+    --
+    if conf then
+        if self._attribute then
+            self._attribute:refreshAttribute(conf, key)
+        end
+        if self._template then
+            self._template:refreshNode(conf, key)
+        end
+        if self._tree then
+            self._tree:refreshLeaf(conf, key)
+        end
+    end
 end
 
 function Editor:_updateDescribe()

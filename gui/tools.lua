@@ -76,6 +76,15 @@ function describe2xywh(isXW, describe, pWidth, pHeight)
     return res
 end
 
+function limit_text(text, len)
+    assert(len > 3)
+    if #text > len then
+        return string.sub(text, 1, len - 3) .. "..."
+    else
+        return text
+    end
+end
+
 function read_template(path)
     path = tostring(path)
 	assert(string.valid(path), 'invalid gui path:' .. path)

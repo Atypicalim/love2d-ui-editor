@@ -26,6 +26,11 @@ NODE_EVENTS = {
     ON_CANCEL = "onCancel",
 }
 
+ICON_SWITCH_ON = "media/check_on.png"
+ICON_SWITCH_OFF = "media/check_off.png"
+ICON_COLOR = "media/color.png"
+ICON_HIDDEN = "media/hidden.png"
+
 CONTROL_CONF_COMMON = {
     type = nil,
 	id = "empty",
@@ -135,3 +140,13 @@ for name,conf in pairs(CONTROL_CONF_MAP) do
 	end
     conf.type = name
 end
+
+
+CONTROL_CONF_MAP['Gui'] = {
+    sw = 0,
+    sx = 0,
+    px = 0,
+    py = 0,
+    id = "gui",
+    type = "Gui",
+}

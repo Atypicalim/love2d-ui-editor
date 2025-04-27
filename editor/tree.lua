@@ -93,7 +93,7 @@ end
 function Tree:createLeaf(children)
     self._leafDepth = self._leafDepth + 1
     for i,child in ipairs(children) do
-        local config = child:getConf()
+        local config = child:getConfig()
         local x = '0.5+' .. ((self._leafDepth - 1) * TREE_LEAF_INDENT)
         local y = self._calcLeafCount * self._unitH + self._unitH / 2
         y = y - self._treeIndent
@@ -109,11 +109,20 @@ function Tree:createLeaf(children)
             self._showLeafCount = self._showLeafCount + 1
         end
         -- 
-        if config.open then
+        if config:isConfOpen() then
             self:createLeaf(child:getChildren())
         end
     end
     self._leafDepth = self._leafDepth - 1
+end
+
+function Tree:refreshLeaf(conf)
+    for i,leaf in ipairs(self._leafs) do
+        local _conf = leaf:getConf()
+        if conf == _conf then
+            leaf:updateLeaf()
+        end
+    end
 end
 
 function Tree:wheelmoved(x, y)

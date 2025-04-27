@@ -19,16 +19,19 @@ ATTRIBUTE_ITEM_COUNT = 10
 ATTRIBUTE_ITEM_MARGIN = 5
 
 
+PROPERTY_MULTIPLE_KEY = {
+	position_x_y = true,
+	size_w_h = true,
+	anchor_x_y = true,
+}
+
 PROPERTY_NAME_ORDER = {
 	'type',
 	'id',
-	'x',
-	'y',
-	'w',
-	'h',
+	'position_x_y',
+	"size_w_h",
+	"anchor_x_y",
 	'bg',
-	"ax",
-	"ay",
 	'open',
 	"hide",
 	'path',

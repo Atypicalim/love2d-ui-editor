@@ -7,6 +7,7 @@ require 'pure-lua-tools/test'
 
 require 'gui/constants'
 require 'gui/tools'
+require 'gui/config'
 require 'gui/node'
 require 'gui/text'
 require 'gui/image'
@@ -30,12 +31,14 @@ require 'gui/template'
 Gui = class("Gui", Node)
 
 function Gui:__init__()
-	Node.__init__(self, {
+	local _config = Config({
+        type = "Gui",
 		x = 0,
 		y = 0,
 		w = 0,
 		h = 0,
-	}, nil)
+	})
+	Node.__init__(self, _config, nil)
 end
 
 function Gui:draw()
@@ -111,7 +114,7 @@ for ctrl,_ in pairs(CONTROL_CONF_MAP) do
         Node['new' .. ctrl] = function(self, conf)
             assert(conf.type == nil, 'multiple type value for ctrl:', ctrl)
             conf.type = ctrl
-            return self:createChild(conf)
+            return self:addChild(conf)
         end
     end
 end
