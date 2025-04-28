@@ -276,7 +276,7 @@ function Editor:startEdit(key, func)
     end
     self._field = Field(g_egui:getById('bgBottom'), function(text)
         func(text)
-        self:onEditEnd(self._config, key)
+        self:onEditEnd(self._targetConf, self._targetKey)
     end, function(text)
         self:onEditEnd()
     end)

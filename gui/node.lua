@@ -4,11 +4,12 @@
 
 Node = class("Node")
 
-function Node:__init__(conf)
+function Node:__init__(conf, parent)
 	self:_doInit()
 	self._name = self.__name__
 	self._conf = conf
 	self._type = conf.type
+	self._parent = parent
 	self._children = {}
 	self._isDirty = true
 	self._isMessy = true
@@ -99,7 +100,7 @@ function Node:_addChild(conf, inner)
 	if not _G[_type] then
 		error('invalid gui conf! content:' .. table.string(conf))
 	end
-	local node = _G[_type](_conf)
+	local node = _G[_type](_conf, self)
 	if not node then
 		error('invalid gui conf! content:' .. table.string(conf))
 	end
