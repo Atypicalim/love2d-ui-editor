@@ -6,10 +6,11 @@ local gui = require('gui/gui')
 local Editor = class("Editor")
 require('editor/constants')
 Printer = require('editor/printer')
-Leaf = require('editor/leaf')
+Leaf = require('editor/item/leaf')
 Tree = require('editor/tree')
-Property = require('editor/property')
-Control = require('editor/control')
+Pair = require('editor/other/pair')
+Property = require('editor/item/property')
+Control = require('editor/item/control')
 Attribute = require('editor/attribute')
 Field = require('editor/field')
 Auxiliary = require('editor/auxiliary')
@@ -19,10 +20,6 @@ function Editor:__init__()
     --
     g_editor = self
     self._workspace = nil
-    self._path = nil
-    self._conf = nil
-    self._key = nil
-    self._selecting = false
     --
     self._template = nil
     self._tree = nil
@@ -31,12 +28,19 @@ function Editor:__init__()
     self._describe = ""
     self._messages = {}
     -- 
-    self.guiConf = {
+    self.guiConf = Config.loadConf({
+        type = "Gui",
         w = 500,
         h = 500,
-        type = "Gui",
-    }
+        x = '0.5',
+        y = '0.5',
+    })
     self.auxiliary = Auxiliary()
+    --
+    self._path = nil
+    self._targetConf = self.guiConf
+    self._targetKey = nil
+    self._selecting = false
 end
 
 function Editor:load()
@@ -50,7 +54,7 @@ function Editor:load()
     local width = love.graphics.getWidth()
     local height = love.graphics.getHeight()
     --
-    g_egui = gui.newGUI():setXYWH(width / 2, height / 2, width, height):addTemplate("./editor/editor.ui.lua")
+    g_egui = gui.newGUI():setXYWH(width / 2, height / 2, width, height):addTemplate("./editor/ui/editor.ui.lua")
     g_egui:update(0)
     g_egui.onClick = function(node)
         self:_onClick(node:getId(), node)
@@ -60,9 +64,7 @@ function Editor:load()
     self:pushMessage('welcome!')
     self:setWorkspace(files.cwd() .. "/template/")
     -- self:setPath("./template/app.ui.lua")
-    -- self:setConf(self._template:getConf()[1], true)
-    -- self:setKey('color')
-    self:setPath("./editor/editor.ui.lua")
+    self:setPath("./editor/ui/editor.ui.lua")
 end
 
 function Editor:update(dt)
@@ -89,12 +91,21 @@ function Editor:draw()
     if self._field then
         self._field:draw()
     else
-        local distance = (1 - MESSAGE_MARGIN_RATE * 2) / (#self._messages * 2)
+        local count = #self._messages
+        local parent = g_egui:getById('bgBottom')
+        local height = parent:getH()
+        local distance1 = height / (MESSAGE_MAX_COUNT + 1)
+        local distance2 = height / (count + 1)
+        local distance = math.max(distance1, distance2)
         for i,v in ipairs(self._messages) do
-            self._printer:print(g_egui:getById('bgBottom'), v, nil, tostring(distance * (i * 2 - 1) + MESSAGE_MARGIN_RATE))
+            local y = distance * i - height / 2
+            self._printer:print(parent, v, nil, y)
         end
     end
-    self._printer:print(g_egui:getById('nodeStage'), self._describe, '0.5', '0+15')
+    local parent = g_egui:getById('nodeStage')
+    local height = parent:getH()
+    local y = 15 - height / 2
+    self._printer:print(parent, self._describe, nil, y)
 end
 
 function Editor:keypressed(key, scancode, isrepeat)
@@ -114,17 +125,17 @@ function Editor:keypressed(key, scancode, isrepeat)
     end
     if love.keyboard.isDown('lctrl') or love.keyboard.isDown('rctrl') then
         if key == 'o' then
-            self:setKey(nil)
+            self:tryEndEdit(nil)
             if love.keyboard.isDown('lshift') or love.keyboard.isDown('rshift') then
                 self:_tryOpenWorkspace()
             else
                 self:_tryOpenFile()
             end
         elseif key == 'n' then
-            self:setKey(nil)
+            self:tryEndEdit(nil)
             self:_tryCreateFile()
         elseif key == 's' then
-            self:setKey(nil)
+            self:tryEndEdit(nil)
             if love.keyboard.isDown('lshift') or love.keyboard.isDown('rshift') then
                 self:_trySaveFile(true)
             else
@@ -137,10 +148,10 @@ function Editor:keypressed(key, scancode, isrepeat)
         return
     end
     if key == 'escape' then
-        if self._key then
-            self:setKey(nil)
-        elseif self._conf then
-            self:setConf(nil, true)
+        if self:isEditing() then
+            self:tryEndEdit()
+        elseif self:isTargeting() then
+            self:tryEndTarget()
         end
     end
 end
@@ -182,7 +193,7 @@ function Editor:setPath(path)
         self._tree:destroy()
     end
     self._path = path
-    self:setConf(nil, true)
+    self:setTargetConf(nil, true)
     if not self._path or not files.is_file(self._path) then
         self._template = nil
         self._tree = nil
@@ -192,61 +203,102 @@ function Editor:setPath(path)
         local y = parent:getY()
         local w = parent:getW() - 100
         local h = parent:getH() - 100
-        self._template = gui.newGUI():setXYWH(x, y, w, h):debugTouchable():addTemplate(self._path)
+        self._template = gui.newGUI():setXYWH(x, y, w, h):setEdity():addTemplate(self._path)
         self._tree = Tree(g_egui:getById('boxTree'))
         self._template.onClick = function(node)
-            self:setConf(node:getConf(), false)
+            self:setTargetConf(node:getConf(), false)
         end
     end
 end
 
-function Editor:isSelect(select)
-    return self._selecting == true
+function Editor:isTargeting()
+    return self._targetConf ~= nil and self._targetConf ~= self.guiConf
 end
 
-function Editor:setConf(conf, selected)
+function Editor:isSelectingConf()
+    return self:isTargeting() and self._selecting == true
+end
+
+function Editor:isEditingConf()
+    return self:isTargeting() and self._selecting == false
+end
+
+function Editor:tryEndTarget()
+    if self:isTargeting() then
+        self._targetConf = self.guiConf
+        self._targetKey = nil
+        self:_updateDescribe()
+        self:_updateAttr()
+        self:_updateTree()
+    end
+end
+
+function Editor:setTargetConf(conf, selected)
+    self:tryEndEdit(nil)
+    self._targetConf = conf or self.guiConf
+    self._targetKey = nil
+    self._selecting = selected == true
+    assert(self._targetConf ~= nil)
+    self:_updateDescribe()
+    self:_updateAttr()
+    self:_updateTree()
+
     if self._attribute then
         self._attribute:destroy()
     end
-    self._conf = conf or g_editor.guiConf
-    self._selecting = selected == true
-    self:setKey(nil)
-    if self._tree then
-        self._tree:updateStatus()
-    end
-    if not self._conf then
-        self._attribute = nil
-    else
-        self._attribute = Attribute(g_egui:getById('boxAttribute'))
-    end
+    self._attribute = Attribute(g_egui:getById('boxAttribute'))
+end
+
+function Editor:getTargetConf()
+    return self._targetConf
+end
+
+function Editor:setTargetKey(key)
+    self._targetKey = key
+end
+
+function Editor:getTargetKey()
+    return self._targetKey
 end
 
 function Editor:isEditing()
-    return self._key ~= nil
+    return self._targetKey ~= nil
 end
 
-function Editor:setKey(key)
-    if self._field then
-        self._field:destroy()
-        self._field = nil
-    end
-    self._key = key
-    if self._attribute then
-        self._attribute:updateStatus()
-    end
+function Editor:startEdit(key, func)
+    assert(self._targetConf ~= nil, 'invali edit state')
+    self._targetKey = key
     self:_updateDescribe()
-end
-
-function Editor:onEdited(conf, key)
+    self:_updateAttr()
     if self._field then
         self._field:destroy()
         self._field = nil
     end
-    self._key = nil
-    --
+    self._field = Field(g_egui:getById('bgBottom'), function(text)
+        func(text)
+        self:onEditEnd(self._config, key)
+    end, function(text)
+        self:onEditEnd()
+    end)
+end
+
+function Editor:tryEndEdit()
+    if self:isEditing() then
+        self:onEditEnd()
+    end
+end
+
+function Editor:onEditEnd(conf, key)
+    if self._field then
+        self._field:destroy()
+        self._field = nil
+    end
+    self._targetKey = nil
+    self:_updateDescribe()
+    self:_updateAttr()
     if conf then
         if self._attribute then
-            self._attribute:refreshAttribute(conf, key)
+            self._attribute:refreshItem(conf, key)
         end
         if self._template then
             self._template:refreshNode(conf, key)
@@ -262,17 +314,37 @@ function Editor:_updateDescribe()
     self._describe = ""
     if not self._path then return end
     self._describe = 'editing: [' .. tostring(self._path) .. ']'
-    if not self._conf then return end
-    local tp = tostring(self._conf.type)
-    local id = tostring(self._conf.id)
+    if not self._targetConf then return end
+    local tp = tostring(self._targetConf.type)
+    local id = tostring(self._targetConf.id)
     tp = #tp <= LENGTH and tp or string.sub(tp, 1, LENGTH) .. "..."
     id = #id <= LENGTH and id or string.sub(id, 1, LENGTH) .. "..."
     self._describe = self._describe .. "  [" .. tp .."]"
     self._describe = self._describe .. "  [" .. id .. "]"
-    if not self._key then return end
-    local key = tostring(self._key)
+    if not self._targetKey then return end
+    local key = tostring(self._targetKey)
     key = #key <= LENGTH and key or string.sub(key, 1, LENGTH) .. "..."
     self._describe = self._describe .. "  [" .. key .."]"
+end
+
+function Editor:_updateAttr(isRefresh)
+    if self._attribute then
+        if isRefresh then
+            self._attribute:refreshAttr()
+        else
+            self._attribute:updateAttr()
+        end
+    end
+end
+
+function Editor:_updateTree(isRefresh)
+    if self._tree then
+        if isRefresh then
+            self._tree:refreshTree()
+        else
+            self._tree:updateTree()
+        end
+    end
 end
 
 function Editor:_onClick(id, event)
@@ -437,8 +509,8 @@ function Editor:_tryCreateFile()
 end
 
 function Editor:_trySaveFile(toNewFile)
-    local config = self._template:getConf().children or {}
-    local content = table.string(config, nil, PROPERTY_NAME_ORDER, nil, nil, true)
+    local config = self._template:dumpConf(true).children
+    local content = table.string(config, nil, PROPERTY_DUMP_ORDER, nil, nil, true)
 
     if toNewFile then
         local path = dialog.select_save('please enter a file to save ui:', '*.ui.lua|*.ui.lua', self._workspace)
@@ -479,7 +551,7 @@ function Editor:addControl(name, position)
     local found = false
     self._template:foreachDescendants(false, function(descendant)
         descendant:foreachChildren(false, function(child, i)
-            if child:getConf() == self._conf then
+            if child:getConf() == self._targetConf then
                 found = true
                 parent = descendant
                 current = child
@@ -499,7 +571,7 @@ function Editor:addControl(name, position)
             targetNode = parent
             targetIndex = index + 1
         end
-    elseif self._conf == self.guiConf then
+    elseif self._targetConf == self.guiConf then
         targetNode = self._template
         targetIndex = position == -1 and 1 or (#targetNode:getChildren() + 1)
     end
@@ -519,20 +591,14 @@ function Editor:addControl(name, position)
 end
 
 function Editor:_refreshEditor()
+    self:tryEndEdit()
     if self._template then
         local parent = g_egui:getById('nodeStage')
         self._template:setXYWH(parent:getX(), parent:getY(), parent:getW() - 100, parent:getH() - 100)
         self._template:refreshNode()
     end
-    if self._tree then
-        self._tree:_updateTree()
-    end
-    if self._attribute then
-        self._attribute:_updateAttribute()
-    end
-    if self._field then
-        self:setKey(nil)
-    end
+    self:_updateTree(true)
+    self:_updateAttr(true)
 end
 
 return Editor

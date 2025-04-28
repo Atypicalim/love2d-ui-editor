@@ -40,18 +40,6 @@ function Line:_parseConf()
 	return self
 end
 
-function Line:setColor(color)
-	self._conf.color = color
-	self:_setDirty()
-	return self
-end
-
-function Line:setThickness(thickness)
-	self._conf.thickness = thickness
-	self:_setDirty()
-	return self
-end
-
 function Line:setPoints(points)
 	self._conf.points = points
 	self:_setDirty()

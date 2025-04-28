@@ -6,6 +6,11 @@ Image = class("Image", Node)
 
 function Image:_onInit()
 	Node._onInit(self)
+	lua_set_delegate(self, function(key, ...)
+		if self._image and self._image[key] then
+			return self._image[key](self._image, ...)
+		end
+	end)
 end
 
 function Image:_parseConf()
@@ -28,23 +33,9 @@ function Image:_parseConf()
 	else
 		self._quad = nil
 	end
-	--
-	lua_set_delegate(self, function(key)
-		if self._image then
-			return self._image[key](self._video)
-		end
-	end)
+	self:adjustNode(self._image)
 	--
 	return self
-end
-
-function Image:setPath(path)
-	self._conf.path = path
-	self:_setDirty()
-end
-
-function Image:getPath()
-	return self._conf.path
 end
 
 function Image:setQuad(quad)

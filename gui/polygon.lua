@@ -40,24 +40,6 @@ function Polygon:_parseConf()
 	return self
 end
 
-function Polygon:setColor(color)
-	self._conf.color = color
-	self:_setDirty()
-	return self
-end
-
-function Polygon:setThickness(thickness)
-	self._conf.thickness = thickness
-	self:_setDirty()
-	return self
-end
-
-function Polygon:setFill(isFill)
-	self._conf.fill = isFill
-	self:_setDirty()
-	return self
-end
-
 function Polygon:setPoints(points)
 	self._conf.points = points
 	self:_setDirty()

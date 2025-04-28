@@ -3,4 +3,4 @@
 ]]
 
 package.path = package.path .. ";../?.lua"
-require 'pure-lua-tools/test'
+require 'pure-lua-tools/tools'

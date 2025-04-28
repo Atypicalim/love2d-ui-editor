@@ -19,24 +19,6 @@ function Arc:_parseConf()
 	return self
 end
 
-function Arc:setColor(color)
-	self._conf.color = color
-	self:_setDirty()
-	return self
-end
-
-function Arc:setThickness(thickness)
-	self._conf.thickness = thickness
-	self:_setDirty()
-	return self
-end
-
-function Arc:setFill(isFill)
-	self._conf.fill = isFill
-	self:_setDirty()
-	return self
-end
-
 function Arc:_doDraw()
 	Node._doDraw(self)
 	if not self._isHide then

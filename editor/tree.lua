@@ -30,7 +30,7 @@ function Tree:__init__(parent)
     self._btnEditUi = self._nodeUi:getById('btnEdit')
     self._borderUi = self._nodeUi:getById('line')
     self._btnSelectUi.onClick = function()
-        g_editor:setConf(g_editor.guiConf, true)
+        g_editor:setTargetConf(nil, true)
     end
     self._btnFoldUi.onClick = function()
         self._isFoldAll = not self._isFoldAll
@@ -39,25 +39,27 @@ function Tree:__init__(parent)
         end
         self._btnFoldUi:setIcon(self._isFoldAll and "media/down.png" or "media/up.png")
         self._treeIndent = 0
-        self:_updateTree()
+        self:refreshTree()
 
     end
     self._btnEditUi.onClick = function()
-        g_editor:setConf(g_editor.guiConf, false)
+        g_editor:setTargetConf(nil, false)
     end
     --
     self._treeIndent = 0
-    self:_updateTree()
+    self:refreshTree()
 end
 
-function Tree:updateStatus()
+function Tree:updateTree()
     for i,v in ipairs(self._leafs or {}) do
         v:updateStatus()
     end
-    self._borderUi:setColor(g_editor._conf == g_editor.guiConf and BORDER_ON_COLOR or BORDER_OFF_COLOR)
+    local targetConf = g_editor:getTargetConf()
+    local selectRoot = targetConf == g_editor.guiConf
+    self._borderUi:setColor(selectRoot and BORDER_ON_COLOR or BORDER_OFF_COLOR)
 end
 
-function Tree:_updateTree()
+function Tree:refreshTree()
     for i,v in ipairs(self._leafs or {}) do
         v:destroy()
     end
@@ -80,8 +82,8 @@ function Tree:_updateTree()
     self._topLeafY = 0 - self._unitH / 2
     self._bottomLeafY = bgH + self._unitH / 2
     -- 
-    self:createLeaf(g_editor._template:getChildren() or {})
-    self:updateStatus()
+    self:_createLeaf(g_editor._template:getChildren() or {})
+    self:updateTree()
     --
     self._totalTreeH = self._calcLeafCount * self._unitH
     self._maxScrollY = math.max(0, self._totalTreeH - bgH)
@@ -90,30 +92,37 @@ function Tree:_updateTree()
     end
 end
 
-function Tree:createLeaf(children)
+function Tree:_createLeaf(children)
     self._leafDepth = self._leafDepth + 1
     for i,child in ipairs(children) do
-        local config = child:getConfig()
-        local x = '0.5+' .. ((self._leafDepth - 1) * TREE_LEAF_INDENT)
-        local y = self._calcLeafCount * self._unitH + self._unitH / 2
-        y = y - self._treeIndent
-        --
-        self._calcLeafCount = self._calcLeafCount + 1
-        if y < self._topLeafY then
-            self._skipLeafCount = self._skipLeafCount + 1
-        elseif y > self._bottomLeafY then
-            self._leftLeafCount = self._leftLeafCount + 1
-        else
-            local leaf = Leaf(child, x, y, self._leafW, self._leafH)
-            table.insert(self._leafs, leaf)
-            self._showLeafCount = self._showLeafCount + 1
-        end
-        -- 
-        if config:isConfOpen() then
-            self:createLeaf(child:getChildren())
-        end
+        self:__createLeaf(i, child)
     end
     self._leafDepth = self._leafDepth - 1
+end
+
+function Tree:__createLeaf(i, child)
+    if child:isInnerNode() then
+        return
+    end
+    local config = child:getConf()
+    local x = '0.5+' .. ((self._leafDepth - 1) * TREE_LEAF_INDENT)
+    local y = self._calcLeafCount * self._unitH + self._unitH / 2
+    y = y - self._treeIndent
+    --
+    self._calcLeafCount = self._calcLeafCount + 1
+    if y < self._topLeafY then
+        self._skipLeafCount = self._skipLeafCount + 1
+    elseif y > self._bottomLeafY then
+        self._leftLeafCount = self._leftLeafCount + 1
+    else
+        local leaf = Leaf(child, x, y, self._leafW, self._leafH)
+        table.insert(self._leafs, leaf)
+        self._showLeafCount = self._showLeafCount + 1
+    end
+    -- 
+    if config:isConfOpen() then
+        self:_createLeaf(child:getChildren())
+    end
 end
 
 function Tree:refreshLeaf(conf)
@@ -141,8 +150,7 @@ function Tree:_onSlide()
     if self._treeIndent > self._maxScrollY then
         self._treeIndent = self._maxScrollY
     end
-    -- g_editor:setConf(nil, true)
-    self:_updateTree()
+    self:refreshTree()
 end
 
 function Tree:destroy()

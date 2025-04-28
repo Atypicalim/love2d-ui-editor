@@ -6,6 +6,11 @@ Video = class("Video", Node)
 
 function Video:_onInit()
 	Node._onInit(self)
+	lua_set_delegate(self, function(key, ...)
+		if self._video and self._video[key] then
+			return self._video[key](self._video, ...)
+		end
+	end)
 end
 
 function Video:_parseConf()
@@ -16,25 +21,11 @@ function Video:_parseConf()
 		self._h = self._video:getHeight()
 	else
 		self._video = nil
-		self._w = nil
-		self._h = nil
+		self._w = 0
+		self._h = 0
 	end
-	lua_set_delegate(self, function(key)
-		if self._video then
-			return self._video[key](self._video)
-		end
-	end)
+	self:adjustNode(self._video)
 	return self
-end
-
-function Video:setPath(path)
-	self._conf.path = path
-	self:_setDirty()
-	return self
-end
-
-function Video:getPath()
-	return self._conf.path
 end
 
 function Video:_doDraw()

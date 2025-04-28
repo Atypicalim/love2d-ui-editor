@@ -57,12 +57,6 @@ function Button:setEnable(isEnable)
 	return self
 end
 
-function Button:setColor(color)
-	self._conf.color = color
-	self:_setDirty()
-	return self
-end
-
 function Button:setIcon(path)
 	self._conf.icon = path
 	self:_setDirty()

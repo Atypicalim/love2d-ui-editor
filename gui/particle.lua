@@ -6,6 +6,11 @@ Particle = class("Particle", Node)
 
 function Particle:_onInit()
 	Node._onInit(self)
+	lua_set_delegate(self, function(key, ...)
+		if self._particle and self._particle[key] then
+			return self._particle[key](self._particle, ...)
+		end
+	end)
 end
 
 function Particle:_parseConf()
@@ -26,27 +31,6 @@ function Particle:_parseConf()
 	else
 		self._particle = nil
 	end
-	lua_set_delegate(self, function(key)
-		if self._particle then
-			return self._particle[key](self._video)
-		end
-	end)
-end
-
-function Rectangle:setColor(color)
-	self._conf.color = color
-	self:_setDirty()
-	return self
-end
-
-function Particle:setPath(path)
-	self._conf.path = path
-	self:_setDirty()
-	return self
-end
-
-function Particle:getPath()
-	return self._conf.path
 end
 
 function Particle:_doUpdate(dt)

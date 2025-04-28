@@ -76,6 +76,23 @@ function describe2xywh(isXW, describe, pWidth, pHeight)
     return res
 end
 
+function is_node(val)
+    return is_table(val)
+end
+
+function parser_key(key)
+    local parts = string.explode(key, "_")
+    local count = #parts
+    if count == 1 then
+        return false, key
+    else
+        assert(count == 3, 'invalid multiple key')
+        local name = parts[1]
+        local prefix = string.sub(name, 1, 1)
+        return true, name, prefix .. parts[2], prefix .. parts[3]
+    end
+end
+
 function limit_text(text, len)
     assert(len > 3)
     if #text > len then
@@ -83,6 +100,20 @@ function limit_text(text, len)
     else
         return text
     end
+end
+
+function camel_text(text, ignoreFirst)
+    local parts = string.explode(text, "_")
+    local _text = ""
+    for i,v in ipairs(parts) do
+        local _v = string.upper(string.sub(v, 1, 1)) .. string.sub(v, 2, #v)
+        if i == 1 then
+            _text = ignoreFirst and v or _v
+        else
+            _text = _text .. _v
+        end
+    end
+    return _text
 end
 
 function read_template(path)

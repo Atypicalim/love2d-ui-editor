@@ -4,17 +4,18 @@
 
 Node = class("Node")
 
-function Node:__init__(config, parent)
+function Node:__init__(conf)
 	self:_doInit()
 	self._name = self.__name__
-	self._config = config
-	self._parent = parent
-	self._conf = self._config:getConf()
+	self._conf = conf
+	self._type = conf.type
 	self._children = {}
-	self._debugTouch = parent ~= nil and parent._debugTouch
-	self._touchy = self._debugTouch
 	self._isDirty = true
 	self._isMessy = true
+	self._edity = false
+	self._touchy = false
+	self._conf:checkConf(self)
+	self._conf:proxConf(self)
 	self:_parseConf()
 	self:_onInit()
 end
@@ -25,9 +26,22 @@ end
 function Node:_onInit()
 end
 
-function Node:debugTouchable()
-	self._debugTouch = true
-	return self
+function Node:isInnerNode()
+	return self._isInnerNode == true
+end
+
+function Node:isOuterNode()
+	return self._isOuterNode == true
+end
+
+function Node:adjustNode(node)
+	if node then
+		self._w = node:getWidth()
+		self._h = node:getHeight()
+	else
+		self._w = 0
+		self._h = 0
+	end
 end
 
 function Node:_setDirty()
@@ -40,37 +54,65 @@ function Node:_setDirty()
 end
 
 function Node:_parseConf()
-	for k,v in pairs(self._conf) do
-		if k == 'x' or k == 'y' or k == 'w' or k == 'h' then
-			self:_assert(is_number(v) or string.valid(v), "invalid value [%s] for [%s]", tostring(v), k)
-		else
-			self:_assert(type(v) ~= type(conf), "invalid value [%s] for [%s]", tostring(v), k)
-		end
-	end
-	-- 
 	self._isHide = self._conf.hide == true
 	self._ax = math.max(0, math.min(1, self._conf.ax or 0.5))
 	self._ay = math.max(0, math.min(1, self._conf.ay or 0.5))
-	self._x = describe2xywh(true, self._conf.x, self:_parentW(), self:_parentH()) + self:_parentLeft()
-	self._y = describe2xywh(false, self._conf.y, self:_parentW(), self:_parentH()) + self:_parentTop()
-	self._w = math.max(0, describe2xywh(true, self._conf.w, self:_parentW(), self:_parentH()))
-	self._h = math.max(0, describe2xywh(false, self._conf.h, self:_parentW(), self:_parentH()))
+	self._x = describe2xywh(true, self._conf.px, self:_parentW(), self:_parentH()) + self:_parentLeft()
+	self._y = describe2xywh(false, self._conf.py, self:_parentW(), self:_parentH()) + self:_parentTop()
+	self._w = math.max(0, describe2xywh(true, self._conf.sw, self:_parentW(), self:_parentH()))
+	self._h = math.max(0, describe2xywh(false, self._conf.sh, self:_parentW(), self:_parentH()))
+end
+
+function Node:dumpConf()
+	if self:isInnerNode() then
+		return nil
+	end
+    local config = self._conf:dumpConf()
+	for i,node in ipairs(self._children) do
+		local _config = node:dumpConf()
+		if _config then
+			table.insert(config.children, _config)
+		end
+	end
+	return config
 end
 
 function Node:addTemplate(path)
+	return self:_addTemplate(path, false)
+end
+
+function Node:_addTemplate(path, inner)
 	local configs = read_template(path)
 	for i,config in ipairs(configs) do
-		self:addChild(config)
+		self:_addChild(config, inner)
 	end
 	return self
 end
 
 function Node:addChild(conf)
-	local _config = Config(conf)
-	local node = _config:newNode(self)
+	return self:_addChild(conf, false)
+end
+
+function Node:_addChild(conf, inner)
+	local _conf = Config.loadConf(conf)
+	local _type = conf.type
+	if not _G[_type] then
+		error('invalid gui conf! content:' .. table.string(conf))
+	end
+	local node = _G[_type](_conf)
+	if not node then
+		error('invalid gui conf! content:' .. table.string(conf))
+	end
+	--
+	node._isOuterNode = inner == false
+	node._isInnerNode = inner == true
+	if self._edity then
+		node:setEdity()
+	end
+	--
 	self:insertChild(node)
-	for i,_conf in ipairs(_config:getConfChildren()) do
-		node:addChild(_conf)
+	for i,conf in ipairs(_conf:getConfChildren()) do
+		node:_addChild(conf, inner)
 	end
 	return node
 end
@@ -88,6 +130,15 @@ end
 
 function Node:getParent()
 	return self._parent
+end
+
+function Node:isEdity()
+	return self._edity == true
+end
+
+function Node:setEdity()
+	self._edity = true
+	return self
 end
 
 function Node:isTouchy()
@@ -114,8 +165,12 @@ function Node:update(dt)
 		self:_parseConf()
 	end
 	self:foreachChildren(false, function(v) v:update(dt) end)
-	if g_editor and g_editor._conf == self._conf then
-		g_editor.auxiliary:omUpdate(self, dt)
+	if g_editor then
+		local targetConf = g_editor:getTargetConf()
+		local selectCurrent = targetConf == self._conf
+		if selectCurrent then
+			g_editor.auxiliary:omUpdate(self, dt)
+		end
 	end
 	self:_onUpdate(dt, isChange)
 end
@@ -136,8 +191,12 @@ function Node:draw()
 		self._isMessy = false
 	end
 	self:foreachChildren(false, function(v) v:draw() end)
-	if g_editor and g_editor._conf == self._conf then
-		g_editor.auxiliary:omDraw(self)
+	if g_editor then
+		local targetConf = g_editor:getTargetConf()
+		local selectCurrent = targetConf == self._conf
+		if selectCurrent then
+			g_editor.auxiliary:omDraw(self)
+		end
 	end
 	self:_onDraw(isChange)
 end
@@ -219,8 +278,7 @@ function Node:show()
 end
 
 function Node:setVisible(isVisible)
-	assert(is_boolean(isVisible), 'invalid bool for node')
-	self._conf.hide = not isVisible
+	self:setHide(not isVisible)
 	self:_setDirty()
 	return self
 end
@@ -229,18 +287,14 @@ function Node:isVisible()
 	return not self._isHide
 end
 
-function Node:setA(ax, ay)
-	self._conf.ax = ax or self._conf.ax
-	self._conf.ay = ay or self._conf.ay
+function Node:setAnchor(ax, ay)
+	self._conf:setConfAnchor(ax, ay)
 	self:_setDirty()
 	return self
 end
 
 function Node:setXYWH(x, y, w, h)
-	self._conf.x = x or self._conf.x
-	self._conf.y = y or self._conf.y
-	self._conf.w = w or self._conf.w
-	self._conf.h = h or self._conf.h
+	self._conf:setConfXYWH(x, y, w, h)
 	self:_setDirty()
 	return self
 end
@@ -285,12 +339,28 @@ function Node:getConf()
 	return self._conf
 end
 
-function Node:getConfig()
-	return self._config
-end
-
 function Node:getChildren()
 	return self._children
+end
+
+function Node:hasOuterChildren()
+	local res = false
+	for i,v in ipairs(self._children) do
+		if v:isOuterNode() then
+			res = true
+		end
+	end
+	return res
+end
+
+function Node:hasInnerChildren()
+	local res = false
+	for i,v in ipairs(self._children) do
+		if v:isInnerNode() then
+			res = true
+		end
+	end
+	return res
 end
 
 function Node:getId()
@@ -307,6 +377,7 @@ function Node:isHover()
 end
 
 function Node:onDestroy()
+	self._parent = nil
 	local children = self._children
 	self._children = {}
 	for i=#children,1,-1 do
@@ -316,7 +387,7 @@ function Node:onDestroy()
 end
 
 function Node:insertChild(child, index)
-	if child._parent then
+	if is_node(child._parent) then
 		child._parent:removeChild(child, true)
 	end
 	if index then
@@ -332,9 +403,10 @@ function Node:removeChild(child, noDestory)
 	if key then
 		table.remove(self._children, key)
 	end
-	child._parent = nil
 	if not noDestory then
 		child:onDestroy()
+	else
+		child._parent = nil
 	end
 	return self
 end
@@ -350,7 +422,7 @@ end
 
 function Node:removeSelf(noDestory)
 	assert(self._parent ~= nil)
-	if self._parent then
+	if is_node(self._parent) then
 		self._parent:removeChild(self, noDestory)
 	end
 	return self
@@ -374,7 +446,7 @@ end
 
 function Node:getByType(nodeType)
 	local nodes = {}
-	if self._config.type == nodeType then
+	if self._conf.type == nodeType then
 		table.insert(nodes, v)
 	else
 		for i,v in ipairs(self._children) do

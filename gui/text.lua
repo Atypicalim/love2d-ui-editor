@@ -18,28 +18,6 @@ function Text:_parseConf()
 	return self
 end
 
-function Text:setColor(color)
-	self._conf.color = color
-	self:_setDirty()
-	return self
-end
-
-function Text:setSize(size)
-	self._conf.size = size
-	self:_setDirty()
-	return self
-end
-
-function Text:setText(text)
-	self._conf.text = text
-	self:_setDirty()
-	return self
-end
-
-function Text:getText()
-	return self._conf.text
-end
-
 function Text:_doDraw()
 	Node._doDraw(self)
 	if not self._isHide and self._text then

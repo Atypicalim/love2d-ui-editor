@@ -16,12 +16,6 @@ function Layer:_parseConf()
 	return self
 end
 
-function Layer:setColor(color)
-	self._conf.color = color
-	self:_setDirty()
-	return self
-end
-
 function Layer:isDisabled()
 	return self._isDisabled
 end

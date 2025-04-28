@@ -17,30 +17,6 @@ function Rectangle:_parseConf()
 	return self
 end
 
-function Rectangle:setColor(color)
-	self._conf.color = color
-	self:_setDirty()
-	return self
-end
-
-function Rectangle:setThickness(thickness)
-	self._conf.thickness = thickness
-	self:_setDirty()
-	return self
-end
-
-function Rectangle:setFill(isFill)
-	self._conf.fill = isFill
-	self:_setDirty()
-	return self
-end
-
-function Rectangle:setRadius(radius)
-	self._conf.radius = radius
-	self:_setDirty()
-	return self
-end
-
 function Rectangle:_doDraw()
 	Node._doDraw(self)
 	if not self._isHide then

@@ -14,8 +14,8 @@ function Attribute:__init__(parent, setPropertyFunc)
     self._btnUp.onClick = function()
         if self._attributeIndent > 0 then
             self._attributeIndent = self._attributeIndent - 1
-            self:_updateAttribute()
-            g_editor:setKey(nil)
+            self:refreshAttr()
+            g_editor:tryEndEdit(nil)
         end
     end
     --
@@ -23,8 +23,8 @@ function Attribute:__init__(parent, setPropertyFunc)
     self._btnDown.onClick = function()
         if self._attributesCount >= ATTRIBUTE_ITEM_COUNT then
             self._attributeIndent = self._attributeIndent + 1
-            self:_updateAttribute()
-            g_editor:setKey(nil)
+            self:refreshAttr()
+            g_editor:tryEndEdit(nil)
         end
     end
     --
@@ -35,7 +35,7 @@ function Attribute:__init__(parent, setPropertyFunc)
     self._btnEditProp = self._nodeProp:getById('btnEdit')
     self._borderProp = self._nodeProp:getById('line')
     self._btnEditProp.onClick = function()
-        g_editor:setConf(g_editor._conf, false)
+        g_editor:setTargetConf(g_editor:getTargetConf(), false)
     end
     --
     self._nodeCtrl  = parent:getById('templateCtrl')
@@ -43,37 +43,41 @@ function Attribute:__init__(parent, setPropertyFunc)
     self._btnEditCtrl = self._nodeCtrl:getById('btnEdit'):setIcon("media/plus.png")
     self._borderCtrl = self._nodeCtrl:getById('line')
     self._btnEditCtrl.onClick = function()
-        g_editor:setConf(g_editor._conf, true)
+        g_editor:setTargetConf(g_editor:getTargetConf(), true)
     end
     --
     self._attributeIndent = 0
-    self:_updateAttribute()
+    self:refreshAttr()
 end
 
-function Attribute:refreshAttribute(conf, key)
-    if g_editor:isSelect() then
+function Attribute:refreshItem(conf, key)
+    if g_editor:isSelectingConf() then
         -- controll
-    else
+    elseif g_editor:isEditingConf() then
         -- property
         for i,v in ipairs(self._attributes) do
             if key and v:canHandle(key) then
                 v:updateProperty()
             end
         end
+    else
+        error('invalid editor state')
     end
-    self:updateStatus()
+    self:updateAttr()
 end
 
-function Attribute:updateStatus()
+function Attribute:updateAttr()
     for i,v in ipairs(self._attributes or {}) do
         v:updateStatus()
     end
-    self._textAttribute:setText(g_editor:isSelect() and "Controls" or "Properties")
-    self._borderCtrl:setVisible(g_editor:isSelect())
-    self._borderProp:setVisible(not g_editor:isSelect() and g_editor._conf ~= nil)
+    local selecting = g_editor:isSelectingConf()
+    local editing = g_editor:isEditingConf()
+    self._textAttribute:setText(selecting and "Controls" or "Properties")
+    self._borderCtrl:setVisible(selecting)
+    self._borderProp:setVisible(editing)
 end
 
-function Attribute:_updateAttribute()
+function Attribute:refreshAttr()
     for i,v in ipairs(self._attributes or {}) do
         v:destroy()
     end
@@ -84,20 +88,19 @@ function Attribute:_updateAttribute()
     self._attributeH = (bgH - ATTRIBUTE_ITEM_MARGIN * ATTRIBUTE_ITEM_COUNT * 2) / ATTRIBUTE_ITEM_COUNT
     self._skippedCount = 0
     self._attributesCount = 0
-    if g_editor:isSelect() then
+    if g_editor:isSelectingConf() then
         self:createControl(CONTROL_CONF_MAP)
-    else
-        self:createProperty(g_editor._conf)
+    elseif g_editor:isEditingConf() then
+        self:createProperty(g_editor:getTargetConf())
     end
-    self:updateStatus()
+    self:updateAttr()
 end
 
-function Attribute:createProperty(conf)
-    local config = Config(conf)
-    for i,key in ipairs(PROPERTY_NAME_ORDER) do
+function Attribute:createProperty(config)
+    for i,key in ipairs(PROPERTY_EDIT_ORDER) do
         if self._attributesCount >= ATTRIBUTE_ITEM_COUNT then break end
-        local info = PROPERTY_NAME_INFO[key] or {}
-        if not info.ignoreProperty then
+        local info = PROPERTY_INFO_MAP[key] or {}
+        if not info.ignoreEdit then
             local y = self._attributeH / 2 + ATTRIBUTE_ITEM_MARGIN + (self._attributeH + ATTRIBUTE_ITEM_MARGIN * 2) * (#self._attributes)
             Property(key, config, '0.5', y, self._attributeW, self._attributeH)
         end

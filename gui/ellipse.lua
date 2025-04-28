@@ -16,24 +16,6 @@ function Ellipse:_parseConf()
 	return self
 end
 
-function Ellipse:setColor(color)
-	self._conf.color = color
-	self:_setDirty()
-	return self
-end
-
-function Ellipse:setThickness(thickness)
-	self._conf.thickness = thickness
-	self:_setDirty()
-	return self
-end
-
-function Ellipse:setFill(isFill)
-	self._conf.fill = isFill
-	self:_setDirty()
-	return self
-end
-
 function Ellipse:_doDraw()
 	Node._doDraw(self)
 	if not self._isHide then

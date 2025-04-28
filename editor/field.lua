@@ -16,7 +16,11 @@ function Field:__init__(parent, yesFunc, noFunc)
         h = '0.5',
         color = "#111111aa",
     })
-    self._input:setText(tostring(g_editor._conf[g_editor._key]))
+    
+    local targetConf = g_editor:getTargetConf()
+    local targetKey = g_editor:getTargetKey()
+    local targetVal = targetConf[targetKey]
+    self._input:setText(tostring(targetVal))
     --
     self._btnOk = self._parent:addChild({
         type = "Button",

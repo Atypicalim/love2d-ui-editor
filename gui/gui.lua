@@ -3,7 +3,7 @@
 ]]
 
 package.path = package.path .. ";../?.lua"
-require 'pure-lua-tools/test'
+require 'pure-lua-tools/tools'
 
 require 'gui/constants'
 require 'gui/tools'
@@ -31,12 +31,12 @@ require 'gui/template'
 Gui = class("Gui", Node)
 
 function Gui:__init__()
-	local _config = Config({
+	local _config = Config.loadConf({
         type = "Gui",
-		x = 0,
-		y = 0,
-		w = 0,
-		h = 0,
+		px = 0,
+		py = 0,
+		sw = '0.5',
+		sh = '0.5',
 	})
 	Node.__init__(self, _config, nil)
 end
@@ -51,18 +51,29 @@ end
 
 function Gui:_getHoverTouchyNode()
     local node = nil
-	self:foreachDescendants(true, function(v)
-        if not node and v:isHover() and v:isTouchy() then
-            node = v
-            return true
-        end
-    end)
+    if self:isEdity() then
+        self:foreachDescendants(true, function(v)
+            if not node and v:isHover() and v:isOuterNode() then
+                node = v
+                return true
+            end
+        end)
+    else
+        self:foreachDescendants(true, function(v)
+            if not node and v:isHover() and v:isTouchy() then
+                node = v
+                return true
+            end
+        end)
+    end
     return node
 end
 
 function Gui:_safeTriggerNodeEvent(event, node, ...)
     self:trigger(event, node, ...)
-    if node then node:trigger(event, ...) end
+    if node and not node:isEdity() then
+        node:trigger(event, ...)
+    end
 end
 
 -- x, y, button
@@ -111,10 +122,17 @@ for ctrl,_ in pairs(CONTROL_CONF_MAP) do
         local cls = _G[ctrl]
         assert(cls ~= nil, 'control not found for ctrl:' .. ctrl)
         assert(Node['new' .. ctrl] == nil, 'multiple new func for ctrl:', ctrl)
-        Node['new' .. ctrl] = function(self, conf)
+        Node['_new' .. ctrl] = function(self, conf)
             assert(conf.type == nil, 'multiple type value for ctrl:', ctrl)
             conf.type = ctrl
-            return self:addChild(conf)
+            local node = self:_addChild(conf, true)
+            return node
+        end
+        Node['New' .. ctrl] = function(self, conf)
+            assert(conf.type == nil, 'multiple type value for ctrl:', ctrl)
+            conf.type = ctrl
+            local node = self:_addChild(conf, false)
+            return node
         end
     end
 end

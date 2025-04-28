@@ -39,24 +39,6 @@ function Point:_parseConf()
 	end
 end
 
-function Point:setColor(color)
-	self._conf.color = color
-	self:_setDirty()
-	return self
-end
-
-function Point:setThickness(thickness)
-	self._conf.thickness = thickness
-	self:_setDirty()
-	return self
-end
-
-function Point:setFill(isFill)
-	self._conf.fill = isFill
-	self:_setDirty()
-	return self
-end
-
 function Point:setPoints(points)
 	self._conf.points = points
 	self:_setDirty()

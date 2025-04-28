@@ -6,9 +6,9 @@ Check = class("Check", Node)
 
 function Check:_onInit()
 	Node._onInit(self)
-	self._layer = self:newLayer({w = "50", h = '50',})
-	self._imgOff = self:newImage({})
-	self._imgOn = self:newImage({})
+	self._layer = self:_newLayer({w = "50", h = '50',})
+	self._imgOff = self:_newImage({})
+	self._imgOn = self:_newImage({})
 	self._layer.onClick = function()
 		self._conf.checked = not self._isChecked
 		self:_setDirty()
@@ -46,12 +46,6 @@ end
 
 function Check:setEnable(isEnable)
 	self._conf.disable = isEnable ~= true
-	self:_setDirty()
-	return self
-end
-
-function Check:setColor(color)
-	self._conf.color = color
 	self:_setDirty()
 	return self
 end
