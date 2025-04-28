@@ -53,14 +53,14 @@ function Gui:_getHoverTouchyNode()
     local node = nil
     if self:isEdity() then
         self:foreachDescendants(true, function(v)
-            if not node and v:isHover() and v:isOuterNode() then
+            if not node and v:isHover() and v:isVisible() and v:isOuterNode() then
                 node = v
                 return true
             end
         end)
     else
         self:foreachDescendants(true, function(v)
-            if not node and v:isHover() and v:isTouchy() then
+            if not node and v:isHover() and v:isVisible() and v:isTouchy() then
                 node = v
                 return true
             end
@@ -74,6 +74,12 @@ function Gui:_safeTriggerNodeEvent(event, node, ...)
     if node and not node:isEdity() then
         node:trigger(event, ...)
     end
+end
+
+function Gui:wheelmoved(...)
+    self._pressedNode = self:_getHoverTouchyNode()
+    self:_safeTriggerNodeEvent(NODE_EVENTS.ON_WHEEL_MOVE, self._pressedNode, ...)
+    Node.wheelmoved(self, ...)
 end
 
 -- x, y, button

@@ -205,8 +205,39 @@ function Editor:setPath(path)
         local h = parent:getH() - 100
         self._template = gui.newGUI():setXYWH(x, y, w, h):setEdity():addTemplate(self._path)
         self._tree = Tree(g_egui:getById('boxTree'))
+        -- 
         self._template.onClick = function(node)
             self:setTargetConf(node:getConf(), false)
+        end
+        --
+        local operatingNode = nil
+        local isOperated = nil
+        self._template.onMouseDown = function(node)
+            if node and self:isEditingConf() then
+                if node:getConf() == self._targetConf then
+                    operatingNode = node
+                    isOperated = false
+                else
+                    self:setTargetConf(nil, true)
+                end
+            end
+        end
+        self._template.onMouseUp = function(node)
+            operatingNode = nil
+            isOperated = nil
+        end
+        self._template.onMouseMove = function(node, x, y)
+            if operatingNode then
+                assert(self:isEditingConf(), 'invalid operate state')
+                -- TODO:move
+                operatingNode:setXYWH(x, y, nil, nil)
+                isOperated = true
+            end
+        end
+        self._template.onWheelMove = function(node, _, dir)
+            if node then
+                -- TODO:scale
+            end
         end
     end
 end
