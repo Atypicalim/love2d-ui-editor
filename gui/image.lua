@@ -6,11 +6,11 @@ Image = class("Image", Node)
 
 function Image:_onInit()
 	Node._onInit(self)
-	lua_set_delegate(self, function(key, ...)
-		if self._image and self._image[key] then
-			return self._image[key](self._image, ...)
-		end
-	end)
+	-- lua_set_delegate(self, function(key, ...)
+	-- 	if self._image and self._image[key] then
+	-- 		return self._image[key](self._image, ...)
+	-- 	end
+	-- end)
 end
 
 function Image:_parseConf()

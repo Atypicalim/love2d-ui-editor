@@ -64,11 +64,14 @@ function Node:_parseConf()
 	self._h = math.max(0, describe2xywh(false, self._conf.sh, self:_parentW(), self:_parentH()))
 end
 
-function Node:dumpConf()
+function Node:dumpConf(ignoreChild)
 	if self:isInnerNode() then
 		return nil
 	end
     local config = self._conf:dumpConf()
+	if ignoreChild then
+		return config
+	end
 	for i,node in ipairs(self._children) do
 		local _config = node:dumpConf()
 		if _config then
@@ -94,7 +97,27 @@ function Node:addChild(conf)
 	return self:_addChild(conf, false)
 end
 
-function Node:_addChild(conf, inner)
+function Node:addSiblingToBefore(conf)
+	local order = self:getOrder()
+	return self._parent:_addChild(conf, false, order + 0)
+end
+
+function Node:addSiblingToAfter(conf)
+	local order = self:getOrder()
+	return self._parent:_addChild(conf, false, order + 1)
+end
+
+function Node:addChildToJead(conf)
+	return self:_addChild(conf, false, 1)
+end
+
+function Node:addChildToTail(conf)
+	return self:_addChild(conf, false)
+end
+
+
+function Node:_addChild(conf, inner, index)
+	--
 	local _conf = Config.loadConf(conf)
 	local _type = conf.type
 	if not _G[_type] then
@@ -104,6 +127,13 @@ function Node:_addChild(conf, inner)
 	if not node then
 		error('invalid gui conf! content:' .. table.string(conf))
 	end
+	-- 
+	if index then
+		table.insert(self._children, index, node)
+	else
+		table.insert(self._children, node)
+	end
+	node._parent = self
 	--
 	node._isOuterNode = inner == false
 	node._isInnerNode = inner == true
@@ -111,7 +141,6 @@ function Node:_addChild(conf, inner)
 		node:setEdity()
 	end
 	--
-	self:insertChild(node)
 	for i,conf in ipairs(_conf:getConfChildren()) do
 		node:_addChild(conf, inner)
 	end
@@ -166,13 +195,6 @@ function Node:update(dt)
 		self:_parseConf()
 	end
 	self:foreachChildren(false, function(v) v:update(dt) end)
-	if g_editor then
-		local targetConf = g_editor:getTargetConf()
-		local selectCurrent = targetConf == self._conf
-		if selectCurrent then
-			g_editor.auxiliary:omUpdate(self, dt)
-		end
-	end
 	self:_onUpdate(dt, isChange)
 end
 
@@ -192,13 +214,6 @@ function Node:draw()
 		self._isMessy = false
 	end
 	self:foreachChildren(false, function(v) v:draw() end)
-	if g_editor then
-		local targetConf = g_editor:getTargetConf()
-		local selectCurrent = targetConf == self._conf
-		if selectCurrent then
-			g_editor.auxiliary:omDraw(self)
-		end
-	end
 	self:_onDraw(isChange)
 end
 
@@ -291,6 +306,29 @@ end
 function Node:setAnchor(ax, ay)
 	self._conf:setConfAnchor(ax, ay)
 	self:_setDirty()
+	return self
+end
+
+function Node:getAx()
+	return self._ax
+end
+
+function Node:getAy()
+	return self._ay
+end
+
+function Node:setXYWHForConf(x, y, w, h)
+	self._conf:setConfXYWH(x, y, w, h)
+	self:_setDirty()
+	return self
+end
+
+function Node:setXYWHForNode(x, y, w, h)
+	self._x = x or self._x
+	self._y = y or self._y
+	self._w = w or self._w
+	self._h = h or self._h
+	self:foreachChildren(false, function(v) v:_setDirty(dt) end)
 	return self
 end
 
@@ -387,16 +425,17 @@ function Node:onDestroy()
 	end
 end
 
-function Node:insertChild(child, index)
-	if is_node(child._parent) then
-		child._parent:removeChild(child, true)
+function Node:getOrder()
+	if not self._parent then
+		return -1
 	end
-	if index then
-		table.insert(self._children, index, child)
-	else
-		table.insert(self._children, child)
+	local index = 0
+	for i,v in ipairs(self._parent:getChildren()) do
+		if v == self then
+			index = i
+		end
 	end
-	child._parent = self
+	return index
 end
 
 function Node:removeChild(child, noDestory)
@@ -430,6 +469,20 @@ function Node:removeSelf(noDestory)
 end
 
 -- 
+
+function Node:getByConf(nodeConf)
+	assert(is_table(nodeConf), 'invalid node id!')
+	if self._conf == nodeConf then
+		return self
+	else
+		for i,v in ipairs(self._children) do
+			local node = v:getByConf(nodeConf)
+			if node then
+				return node
+			end
+		end
+	end
+end
 
 function Node:getById(nodeId)
 	assert(string.valid(nodeId), 'invalid node id!')

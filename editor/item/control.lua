@@ -24,13 +24,13 @@ function Control:__init__(name, conf, x, y, w, h)
     self._border = self._node:getById('line'):setColor(BORDER_OFF_COLOR)
     self._labelName = self._node:getById('text'):setText("[" .. name .. "]")
     self._node:getById('btnAddBefore').onClick = function()
-        g_editor:addControl(name, -1)
+        g_editor:addControl(name, true)
     end
     self._node:getById('btnAddIn').onClick = function()
-        g_editor:addControl(name, 0)
+        g_editor:addControl(name, nil)
     end
     self._node:getById('btnAddAfter').onClick = function()
-        g_editor:addControl(name, 1)
+        g_editor:addControl(name, false)
     end
     --
     table.insert(g_attribute._attributes, self)

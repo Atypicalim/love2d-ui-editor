@@ -27,20 +27,11 @@ function Editor:__init__()
     self._field = nil
     self._describe = ""
     self._messages = {}
-    -- 
-    self.guiConf = Config.loadConf({
-        type = "Gui",
-        w = 500,
-        h = 500,
-        x = '0.5',
-        y = '0.5',
-    })
-    self.auxiliary = Auxiliary()
     --
     self._path = nil
-    self._targetConf = self.guiConf
+    self._targetConf = nil
     self._targetKey = nil
-    self._selecting = false
+    self._onlySelect = false
 end
 
 function Editor:load()
@@ -71,6 +62,9 @@ function Editor:update(dt)
     if self._template then
         self._template:update(dt)
     end
+    if self._auxiliary then
+        self._auxiliary:update(dt)
+    end
     if self._field then
         self._field:update(dt)
     end
@@ -81,6 +75,9 @@ function Editor:draw()
         self._template:draw()
     else
         self._printer:print(g_egui:getById('nodeStage'), "please select a ui file ...")
+    end
+    if self._auxiliary then
+        self._auxiliary:draw()
     end
     if not self._tree then
         self._printer:print(g_egui:getById('bgLeft'), "no tree ...")
@@ -151,7 +148,7 @@ function Editor:keypressed(key, scancode, isrepeat)
         if self:isEditing() then
             self:tryEndEdit()
         elseif self:isTargeting() then
-            self:tryEndTarget()
+            self:tryCancelTarget()
         end
     end
 end
@@ -193,7 +190,6 @@ function Editor:setPath(path)
         self._tree:destroy()
     end
     self._path = path
-    self:setTargetConf(nil, true)
     if not self._path or not files.is_file(self._path) then
         self._template = nil
         self._tree = nil
@@ -203,42 +199,47 @@ function Editor:setPath(path)
         local y = parent:getY()
         local w = parent:getW() - 100
         local h = parent:getH() - 100
-        self._template = gui.newGUI():setXYWH(x, y, w, h):setEdity():addTemplate(self._path)
+        self.guiNode = gui.newGUI()
+        self.guiConf = self.guiNode:getConf()
+        self._template = self.guiNode:setXYWH(x, y, w, h):setEdity():addTemplate(self._path)
         self._tree = Tree(g_egui:getById('boxTree'))
-        -- 
-        self._template.onClick = function(node)
+        --
+        local isOperating = nil
+        self._template.onMouseDown = function(node, ...)
+            if self:isEditingConf() then
+                isOperating = self._auxiliary:tryAuxStart(...)
+            end
+        end
+        self._template.onMouseMove = function(node, ...)
+            if isOperating and self:isEditingConf() then
+                self._auxiliary:onAuxMove(...)
+            end
+        end
+        self._template.onCancel = function(node, ...)
+            if isOperating and self:isEditingConf() then
+                self._auxiliary:onAuxEnd(...)
+            end
+            isOperating = nil
+        end
+        self._template.onClick = function(node, ...)
+            if isOperating and self:isEditingConf() then
+                self._auxiliary:onAuxCancel(...)
+            end
+            isOperating = nil
             self:setTargetConf(node:getConf(), false)
         end
         --
-        local operatingNode = nil
-        local isOperated = nil
-        self._template.onMouseDown = function(node)
+        self._template.onWheelMove = function(node, _, dir)
             if node and self:isEditingConf() then
                 if node:getConf() == self._targetConf then
-                    operatingNode = node
-                    isOperated = false
-                else
-                    self:setTargetConf(nil, true)
+                    --
                 end
             end
         end
-        self._template.onMouseUp = function(node)
-            operatingNode = nil
-            isOperated = nil
-        end
-        self._template.onMouseMove = function(node, x, y)
-            if operatingNode then
-                assert(self:isEditingConf(), 'invalid operate state')
-                -- TODO:move
-                operatingNode:setXYWH(x, y, nil, nil)
-                isOperated = true
-            end
-        end
-        self._template.onWheelMove = function(node, _, dir)
-            if node then
-                -- TODO:scale
-            end
-        end
+    end
+    --
+    if self._template then
+        self:setTargetConf(nil, true)
     end
 end
 
@@ -247,20 +248,16 @@ function Editor:isTargeting()
 end
 
 function Editor:isSelectingConf()
-    return self:isTargeting() and self._selecting == true
+    return self:isTargeting() and self._onlySelect == true
 end
 
 function Editor:isEditingConf()
-    return self:isTargeting() and self._selecting == false
+    return self:isTargeting() and self._onlySelect == false
 end
 
-function Editor:tryEndTarget()
+function Editor:tryCancelTarget()
     if self:isTargeting() then
-        self._targetConf = self.guiConf
-        self._targetKey = nil
-        self:_updateDescribe()
-        self:_updateAttr()
-        self:_updateTree()
+        self:setTargetConf(nil, true)
     end
 end
 
@@ -268,16 +265,21 @@ function Editor:setTargetConf(conf, selected)
     self:tryEndEdit(nil)
     self._targetConf = conf or self.guiConf
     self._targetKey = nil
-    self._selecting = selected == true
+    self._onlySelect = selected == true
     assert(self._targetConf ~= nil)
     self:_updateDescribe()
     self:_updateAttr()
     self:_updateTree()
-
+    --
     if self._attribute then
         self._attribute:destroy()
     end
     self._attribute = Attribute(g_egui:getById('boxAttribute'))
+    --
+    if self._auxiliary then
+        self._auxiliary:destroy()
+    end
+    self._auxiliary = Auxiliary(g_egui:getById('nodeStage'))
 end
 
 function Editor:getTargetConf()
@@ -572,52 +574,25 @@ function Editor:pushMessage(message)
 end
 
 function Editor:addControl(name, position)
-    --
-    local targetNode = nil
-    local targetIndex = nil
-    --
-    local parent = nil
-    local current = nil
-    local index = nil
-    local found = false
-    self._template:foreachDescendants(false, function(descendant)
-        descendant:foreachChildren(false, function(child, i)
-            if child:getConf() == self._targetConf then
-                found = true
-                parent = descendant
-                current = child
-                index = i
-            end
-        end)
-        return found
-    end)
-    if found then
-        if position == 0 then
-            targetNode = current
-            targetIndex = #targetNode:getChildren() + 1
-        elseif position == -1 then
-            targetNode = parent
-            targetIndex = index
-        elseif position == 1 then
-            targetNode = parent
-            targetIndex = index + 1
+    local _newConf = {type = name,} 
+    local targetNode = self._template:getByConf(self._targetConf)
+    if targetNode then
+        if position == nil then
+            targetNode:addChild(_newConf)
+        elseif position == true then
+            targetNode:addSiblingToBefore(_newConf)
+        elseif position == false then
+            targetNode:addSiblingToAfter(_newConf)
         end
     elseif self._targetConf == self.guiConf then
-        targetNode = self._template
-        targetIndex = position == -1 and 1 or (#targetNode:getChildren() + 1)
-    end
-    if not targetNode or not targetIndex then
+        if  position == true then
+            self._template:addChildToHead(_newConf)
+        else
+            self._template:addChildToTail(_newConf)
+        end
+    else
         self:pushMessage('add control failed, target not found!')
-        return
     end
-    targetNode:addChild({
-        type = "Text",
-        x = "0.5",
-        y = "0.5",
-        w = "1",
-        h = "1",
-        text = "insert...",
-    }, targetIndex)
     self:_refreshEditor()
 end
 

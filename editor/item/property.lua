@@ -8,7 +8,7 @@ function Property:__init__(key, config, x, y, w, h)
     --
     self._config = config
     self._multiKey = false
-    if PROPERTY_MULTIPLE_KEY[key] then
+    if PROPERTY_INFO_MAP[key].multiKey then
         self._multiKey = true
         local parts = string.explode(key, "%_")
         assert(#parts == 3, 'invalid pair key')

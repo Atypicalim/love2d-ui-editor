@@ -76,6 +76,38 @@ function describe2xywh(isXW, describe, pWidth, pHeight)
     return res
 end
 
+function describe2parts(describe)
+    if string.find(describe, "-") then
+        local parts = string.explode(describe, "-")
+        local num = tostring(parts[2]) or 0
+        return parts[1], -num
+    elseif string.find(describe, "+") then
+        local parts = string.explode(describe, "+")
+        local num = tostring(parts[2]) or 0
+        return parts[1], num
+    else
+        return describe, 0
+    end
+end
+
+function describe4parts(prefix, num)
+    assert(not string.find(prefix, "-"), 'invalid describe text')
+    assert(not string.find(prefix, "+"), 'invalid describe text')
+    if num == 0 then
+        return string.format("%s", prefix)
+    elseif num < 0 then
+        return string.format("%s-%d", prefix, math.abs(num))
+    elseif num > 0 then
+        return string.format("%s+%d", prefix, math.abs(num))
+    end
+end
+
+function describe4indent(describe, indent)
+    local prefix, num = describe2parts(describe)
+    num = num + indent
+    return describe4parts(prefix, num)
+end
+
 function is_node(val)
     return is_table(val)
 end

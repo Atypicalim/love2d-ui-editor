@@ -68,12 +68,15 @@ PROPERTY_INFO_MAP = {
 	},
 	position_x_y = {
 		mustDump = true,
+		multiKey = true,
 	},
 	size_w_h = {
 		mustDump = true,
+		multiKey = true,
 	},
 	anchor_x_y = {
 		mustDump = false,
+		multiKey = true,
 	},
 	open = {
 		ignoreEdit = true,

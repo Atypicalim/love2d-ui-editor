@@ -56,7 +56,7 @@ function Attribute:refreshItem(conf, key)
     elseif g_editor:isEditingConf() then
         -- property
         for i,v in ipairs(self._attributes) do
-            if key and v:canHandle(key) then
+            if not key or v:canHandle(key) then
                 v:updateProperty()
             end
         end

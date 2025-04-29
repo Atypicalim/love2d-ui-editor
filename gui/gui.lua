@@ -84,6 +84,7 @@ end
 
 -- x, y, button
 function Gui:mousepressed(...)
+    self._pressArgs = {...}
     self._pressedNode = self:_getHoverTouchyNode()
     self:_safeTriggerNodeEvent(NODE_EVENTS.ON_MOUSE_DOWN, self._pressedNode, ...)
     Node.mousepressed(self, ...)
@@ -107,18 +108,26 @@ end
 
 -- x, y, button
 function Gui:mousereleased(...)
+    self._releaseArgs = {...}
     self._releaseddNode = self:_getHoverTouchyNode()
+    self._isClicking = false
     if self._releaseddNode then
-        if self._pressedNode == self._releaseddNode then
-            self:_safeTriggerNodeEvent(NODE_EVENTS.ON_CLICK, self._releaseddNode, ...)
-        elseif self._pressedNode then
-            self:_safeTriggerNodeEvent(NODE_EVENTS.ON_CANCEL, self._pressedNode, ...)
+        local xMove = math.abs(self._releaseArgs[1] - self._pressArgs[1])
+        local yMove = math.abs(self._releaseArgs[2] - self._pressArgs[2])
+        local isAround = xMove < 10 and yMove < 10
+        if isAround and self._pressedNode == self._releaseddNode then
+            self._isClicking = true
         end
-    elseif self._pressedNode then
-        self:_safeTriggerNodeEvent(NODE_EVENTS.ON_CANCEL, self._pressedNode, ...)
     end
+    --
     self:_safeTriggerNodeEvent(NODE_EVENTS.ON_MOUSE_UP, self._releaseddNode, ...)
     Node.mousereleased(self, ...)
+    --
+    if self._isClicking then
+        self:_safeTriggerNodeEvent(NODE_EVENTS.ON_CLICK, self._pressedNode, ...)
+    else
+        self:_safeTriggerNodeEvent(NODE_EVENTS.ON_CANCEL, self._pressedNode, ...)
+    end
 end
 
 -- helper

@@ -6,11 +6,11 @@ Video = class("Video", Node)
 
 function Video:_onInit()
 	Node._onInit(self)
-	lua_set_delegate(self, function(key, ...)
-		if self._video and self._video[key] then
-			return self._video[key](self._video, ...)
-		end
-	end)
+	-- lua_set_delegate(self, function(key, ...)
+	-- 	if self._video and self._video[key] then
+	-- 		return self._video[key](self._video, ...)
+	-- 	end
+	-- end)
 end
 
 function Video:_parseConf()
