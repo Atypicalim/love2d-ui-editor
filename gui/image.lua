@@ -6,11 +6,6 @@ Image = class("Image", Node)
 
 function Image:_onInit()
 	Node._onInit(self)
-	-- lua_set_delegate(self, function(key, ...)
-	-- 	if self._image and self._image[key] then
-	-- 		return self._image[key](self._image, ...)
-	-- 	end
-	-- end)
 end
 
 function Image:_parseConf()
@@ -25,6 +20,7 @@ function Image:_parseConf()
 		self._w = 0
 		self._h = 0
 	end
+	lua_set_delegate(self, self._image)
 	--
 	local quad = self._conf.quad
 	if self._image and not table.is_empty(quad) then
