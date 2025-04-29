@@ -64,18 +64,17 @@ function Node:_parseConf()
 	self._h = math.max(0, describe2xywh(false, self._conf.sh, self:_parentW(), self:_parentH()))
 end
 
-function Node:dumpConf(ignoreChild)
+function Node:dumpConf(withChild)
 	if self:isInnerNode() then
 		return nil
 	end
     local config = self._conf:dumpConf()
-	if ignoreChild then
-		return config
-	end
-	for i,node in ipairs(self._children) do
-		local _config = node:dumpConf()
-		if _config then
-			table.insert(config.children, _config)
+	if withChild then
+		for i,node in ipairs(self._children) do
+			local _config = node:dumpConf(withChild)
+			if _config then
+				table.insert(config.children, _config)
+			end
 		end
 	end
 	return config

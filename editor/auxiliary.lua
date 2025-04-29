@@ -58,7 +58,7 @@ function Auxiliary:tryAuxStart(x, y)
         return false
     end 
     --
-    self._startConf = self._auxNode:dumpConf(true)
+    self._startConf = self._auxNode:dumpConf(false)
     self._startAuxX = x
     self._startAuxY = y
     -- 
@@ -157,7 +157,7 @@ end
 
 function Auxiliary:onAuxEnd(x, y)
     assert(self._startConf ~= nil, 'invalid aux state')
-    local endConf = self._auxNode:dumpConf(true)
+    local endConf = self._auxNode:dumpConf(false)
     local xMove = x - self._startAuxX
     local yMove = y - self._startAuxY
     -- 
