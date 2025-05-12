@@ -60,8 +60,6 @@ function Attribute:refreshItem(conf, key)
                 v:updateProperty()
             end
         end
-    else
-        error('invalid editor state')
     end
     self:updateAttr()
 end

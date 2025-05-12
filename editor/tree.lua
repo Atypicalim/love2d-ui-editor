@@ -34,9 +34,11 @@ function Tree:__init__(parent)
     end
     self._btnFoldUi.onClick = function()
         self._isFoldAll = not self._isFoldAll
-        for i,v in ipairs(g_editor._template:getConf().children or {}) do
-            v.open = not self._isFoldAll
-        end
+        
+        g_editor._template:foreachDescendants(true, function(v)
+            v:getConf().open = not self._isFoldAll
+        end)
+
         self._btnFoldUi:setIcon(self._isFoldAll and "media/down.png" or "media/up.png")
         self._treeIndent = 0
         self:refreshTree()
