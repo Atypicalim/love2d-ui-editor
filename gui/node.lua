@@ -214,6 +214,34 @@ function Node:draw()
 	end
 	self:foreachChildren(false, function(v) v:draw() end)
 	self:_onDraw(isChange)
+
+	local sLeft = self:getLeft()
+	local sRight = self:getRight()
+	local sTop = self:getTop()
+	local sBottom = self:getBottom()
+	local x, y, width, height = love.graphics.getScissor()
+	if x and height then
+		local cLeft = x
+		local cRight = x + width
+		local cTop = y
+		local cBottom = y + height
+		if sLeft > cRight or sRight < cLeft or sTop > cBottom or sBottom < cTop then
+			self._isDisplayed = false
+		else
+			self._isDisplayed = true
+			self._displayL = math.max(sLeft, cLeft)
+			self._displayR = math.min(sRight, cRight)
+			self._displayT = math.max(sTop, cTop)
+			self._displayB = math.min(sBottom, cBottom)
+		end
+	else
+		self._isDisplayed = true
+		self._displayL = sLeft
+		self._displayR = sRight
+		self._displayT = sTop
+		self._displayB = sBottom
+	end
+
 end
 
 function Node:_doDraw()
@@ -409,9 +437,12 @@ function Node:getType()
 	return self._conf.type
 end
 
-function Node:isHover()
+function Node:isHover(isTest)
+	if not self._isDisplayed then
+		return false
+	end
 	local mouseX, mouseY = love.mouse.getPosition()
-    return mouseX > self:getLeft() and mouseX < self:getRight() and mouseY > self:getTop() and mouseY < self:getBottom()
+	return mouseX > self._displayL and mouseX < self._displayR and mouseY > self._displayT and mouseY < self._displayB
 end
 
 function Node:onDestroy()
